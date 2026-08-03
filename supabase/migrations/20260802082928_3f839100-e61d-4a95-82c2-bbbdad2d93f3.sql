@@ -1,0 +1,20 @@
+
+REVOKE EXECUTE ON FUNCTION public.apply_for_loan(text,text,numeric,numeric,integer,numeric,uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.admin_decide_loan(uuid,boolean,text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.pay_loan(uuid,uuid,numeric) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.contribute_ira(uuid,uuid,numeric) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.pay_bill(uuid,uuid,numeric,text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.submit_kyc(text,text,text,text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.admin_decide_kyc(uuid,text,text,numeric) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.admin_decide_cheque(uuid,boolean,text) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.admin_delete_user(uuid) FROM anon, public;
+REVOKE EXECUTE ON FUNCTION public.internal_post(uuid,uuid,numeric,text,text,text) FROM anon, public, authenticated;
+GRANT EXECUTE ON FUNCTION public.apply_for_loan(text,text,numeric,numeric,integer,numeric,uuid) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_decide_loan(uuid,boolean,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.pay_loan(uuid,uuid,numeric) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.contribute_ira(uuid,uuid,numeric) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.pay_bill(uuid,uuid,numeric,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.submit_kyc(text,text,text,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_decide_kyc(uuid,text,text,numeric) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_decide_cheque(uuid,boolean,text) TO authenticated;
+GRANT EXECUTE ON FUNCTION public.admin_delete_user(uuid) TO authenticated;
