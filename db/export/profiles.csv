@@ -1,0 +1,1 @@
+id,email,full_name,phone,avatar_url,address_line1,address_line2,city,state,postal_code,country,date_of_birth,ssn_last4,status,kyc_status,two_factor_enabled,notification_prefs,created_at,updated_at,transaction_limit,username
