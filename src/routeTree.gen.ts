@@ -9,249 +9,83 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as StudentLoansRouteImport } from './routes/student-loans'
-import { Route as SecurityRouteImport } from './routes/security'
-import { Route as SavingsRouteImport } from './routes/savings'
-import { Route as RewardsCardsRouteImport } from './routes/rewards-cards'
-import { Route as RetirementRouteImport } from './routes/retirement'
-import { Route as RefinanceRouteImport } from './routes/refinance'
-import { Route as PersonalLoansRouteImport } from './routes/personal-loans'
-import { Route as PersonalRouteImport } from './routes/personal'
-import { Route as MortgageRouteImport } from './routes/mortgage'
-import { Route as MoneyMarketRouteImport } from './routes/money-market'
-import { Route as MerchantServicesRouteImport } from './routes/merchant-services'
-import { Route as MakingCentsRouteImport } from './routes/making-cents'
-import { Route as LowRateCardsRouteImport } from './routes/low-rate-cards'
-import { Route as LoansMortgageRouteImport } from './routes/loans-mortgage'
-import { Route as InvestmentsRouteImport } from './routes/investments'
-import { Route as InsuranceRouteImport } from './routes/insurance'
-import { Route as HomeLoansRouteImport } from './routes/home-loans'
-import { Route as HelocRouteImport } from './routes/heloc'
-import { Route as FirstTimeHomebuyerRouteImport } from './routes/first-time-homebuyer'
-import { Route as EligibilityRouteImport } from './routes/eligibility'
-import { Route as CreditCardsRouteImport } from './routes/credit-cards'
-import { Route as ContactRouteImport } from './routes/contact'
-import { Route as CheckingRouteImport } from './routes/checking'
-import { Route as CertificatesRouteImport } from './routes/certificates'
-import { Route as CareersRouteImport } from './routes/careers'
-import { Route as CardsRouteImport } from './routes/cards'
-import { Route as BusinessLoansRouteImport } from './routes/business-loans'
-import { Route as BusinessCheckingRouteImport } from './routes/business-checking'
-import { Route as BusinessCardsRouteImport } from './routes/business-cards'
-import { Route as BusinessRouteImport } from './routes/business'
-import { Route as BrokerageRouteImport } from './routes/brokerage'
-import { Route as BenefitsRouteImport } from './routes/benefits'
-import { Route as AutoLoansRouteImport } from './routes/auto-loans'
-import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AccountsRouteImport } from './routes/accounts'
-import { Route as AboutRouteImport } from './routes/about'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LegalTermsRouteImport } from './routes/legal.terms'
-import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AccountsRouteImport } from './routes/accounts'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AutoLoansRouteImport } from './routes/auto-loans'
+import { Route as BenefitsRouteImport } from './routes/benefits'
+import { Route as BrokerageRouteImport } from './routes/brokerage'
+import { Route as BusinessRouteImport } from './routes/business'
+import { Route as BusinessCardsRouteImport } from './routes/business-cards'
+import { Route as BusinessCheckingRouteImport } from './routes/business-checking'
+import { Route as BusinessLoansRouteImport } from './routes/business-loans'
+import { Route as CardsRouteImport } from './routes/cards'
+import { Route as CareersRouteImport } from './routes/careers'
+import { Route as CertificatesRouteImport } from './routes/certificates'
+import { Route as CheckingRouteImport } from './routes/checking'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as CreditCardsRouteImport } from './routes/credit-cards'
+import { Route as EligibilityRouteImport } from './routes/eligibility'
+import { Route as FirstTimeHomebuyerRouteImport } from './routes/first-time-homebuyer'
+import { Route as HelocRouteImport } from './routes/heloc'
+import { Route as HomeLoansRouteImport } from './routes/home-loans'
+import { Route as InsuranceRouteImport } from './routes/insurance'
+import { Route as InvestmentsRouteImport } from './routes/investments'
+import { Route as LoansMortgageRouteImport } from './routes/loans-mortgage'
+import { Route as LowRateCardsRouteImport } from './routes/low-rate-cards'
+import { Route as MakingCentsRouteImport } from './routes/making-cents'
+import { Route as MerchantServicesRouteImport } from './routes/merchant-services'
+import { Route as MoneyMarketRouteImport } from './routes/money-market'
+import { Route as MortgageRouteImport } from './routes/mortgage'
+import { Route as PersonalRouteImport } from './routes/personal'
+import { Route as PersonalLoansRouteImport } from './routes/personal-loans'
+import { Route as RefinanceRouteImport } from './routes/refinance'
+import { Route as RetirementRouteImport } from './routes/retirement'
+import { Route as RewardsCardsRouteImport } from './routes/rewards-cards'
+import { Route as SavingsRouteImport } from './routes/savings'
+import { Route as SecurityRouteImport } from './routes/security'
+import { Route as StudentLoansRouteImport } from './routes/student-loans'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
-import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
+import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
+import { Route as AdminLoginRouteImport } from './routes/admin.login'
+import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
+import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
-import { Route as AuthenticatedAppWealthRouteImport } from './routes/_authenticated.app.wealth'
-import { Route as AuthenticatedAppTransfersRouteImport } from './routes/_authenticated.app.transfers'
-import { Route as AuthenticatedAppStatementsRouteImport } from './routes/_authenticated.app.statements'
-import { Route as AuthenticatedAppRetirementRouteImport } from './routes/_authenticated.app.retirement'
-import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
-import { Route as AuthenticatedAppLoansRouteImport } from './routes/_authenticated.app.loans'
-import { Route as AuthenticatedAppDepositsRouteImport } from './routes/_authenticated.app.deposits'
-import { Route as AuthenticatedAppCardsRouteImport } from './routes/_authenticated.app.cards'
-import { Route as AuthenticatedAppBillsRouteImport } from './routes/_authenticated.app.bills'
-import { Route as AuthenticatedAppAlertsRouteImport } from './routes/_authenticated.app.alerts'
-import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated.admin.settings'
-import { Route as AuthenticatedAdminRecycleRouteImport } from './routes/_authenticated.admin.recycle'
-import { Route as AuthenticatedAdminLoansRouteImport } from './routes/_authenticated.admin.loans'
-import { Route as AuthenticatedAdminKycRouteImport } from './routes/_authenticated.admin.kyc'
-import { Route as AuthenticatedAdminCmsRouteImport } from './routes/_authenticated.admin.cms'
 import { Route as AuthenticatedAdminChequesRouteImport } from './routes/_authenticated.admin.cheques'
-import { Route as AuthenticatedAppSupportIndexRouteImport } from './routes/_authenticated.app.support.index'
-import { Route as AuthenticatedAppAccountsIndexRouteImport } from './routes/_authenticated.app.accounts.index'
-import { Route as AuthenticatedAdminTicketsIndexRouteImport } from './routes/_authenticated.admin.tickets.index'
+import { Route as AuthenticatedAdminCmsRouteImport } from './routes/_authenticated.admin.cms'
+import { Route as AuthenticatedAdminKycRouteImport } from './routes/_authenticated.admin.kyc'
+import { Route as AuthenticatedAdminLoansRouteImport } from './routes/_authenticated.admin.loans'
+import { Route as AuthenticatedAdminRecycleRouteImport } from './routes/_authenticated.admin.recycle'
+import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated.admin.settings'
+import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
+import { Route as AuthenticatedAppAlertsRouteImport } from './routes/_authenticated.app.alerts'
+import { Route as AuthenticatedAppBillsRouteImport } from './routes/_authenticated.app.bills'
+import { Route as AuthenticatedAppCardsRouteImport } from './routes/_authenticated.app.cards'
+import { Route as AuthenticatedAppDepositsRouteImport } from './routes/_authenticated.app.deposits'
+import { Route as AuthenticatedAppLoansRouteImport } from './routes/_authenticated.app.loans'
+import { Route as AuthenticatedAppProfileRouteImport } from './routes/_authenticated.app.profile'
+import { Route as AuthenticatedAppRetirementRouteImport } from './routes/_authenticated.app.retirement'
+import { Route as AuthenticatedAppStatementsRouteImport } from './routes/_authenticated.app.statements'
+import { Route as AuthenticatedAppTransfersRouteImport } from './routes/_authenticated.app.transfers'
+import { Route as AuthenticatedAppWealthRouteImport } from './routes/_authenticated.app.wealth'
 import { Route as AuthenticatedAdminCustomersIndexRouteImport } from './routes/_authenticated.admin.customers.index'
-import { Route as AuthenticatedAppSupportIdRouteImport } from './routes/_authenticated.app.support.$id'
-import { Route as AuthenticatedAppAccountsIdRouteImport } from './routes/_authenticated.app.accounts.$id'
-import { Route as AuthenticatedAdminTicketsIdRouteImport } from './routes/_authenticated.admin.tickets.$id'
 import { Route as AuthenticatedAdminCustomersIdRouteImport } from './routes/_authenticated.admin.customers.$id'
+import { Route as AuthenticatedAdminTicketsIndexRouteImport } from './routes/_authenticated.admin.tickets.index'
+import { Route as AuthenticatedAdminTicketsIdRouteImport } from './routes/_authenticated.admin.tickets.$id'
+import { Route as AuthenticatedAppAccountsIndexRouteImport } from './routes/_authenticated.app.accounts.index'
+import { Route as AuthenticatedAppAccountsIdRouteImport } from './routes/_authenticated.app.accounts.$id'
+import { Route as AuthenticatedAppSupportIndexRouteImport } from './routes/_authenticated.app.support.index'
+import { Route as AuthenticatedAppSupportIdRouteImport } from './routes/_authenticated.app.support.$id'
 
-const StudentLoansRoute = StudentLoansRouteImport.update({
-  id: '/student-loans',
-  path: '/student-loans',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SecurityRoute = SecurityRouteImport.update({
-  id: '/security',
-  path: '/security',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SavingsRoute = SavingsRouteImport.update({
-  id: '/savings',
-  path: '/savings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RewardsCardsRoute = RewardsCardsRouteImport.update({
-  id: '/rewards-cards',
-  path: '/rewards-cards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RetirementRoute = RetirementRouteImport.update({
-  id: '/retirement',
-  path: '/retirement',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const RefinanceRoute = RefinanceRouteImport.update({
-  id: '/refinance',
-  path: '/refinance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PersonalLoansRoute = PersonalLoansRouteImport.update({
-  id: '/personal-loans',
-  path: '/personal-loans',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PersonalRoute = PersonalRouteImport.update({
-  id: '/personal',
-  path: '/personal',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MortgageRoute = MortgageRouteImport.update({
-  id: '/mortgage',
-  path: '/mortgage',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MoneyMarketRoute = MoneyMarketRouteImport.update({
-  id: '/money-market',
-  path: '/money-market',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MerchantServicesRoute = MerchantServicesRouteImport.update({
-  id: '/merchant-services',
-  path: '/merchant-services',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MakingCentsRoute = MakingCentsRouteImport.update({
-  id: '/making-cents',
-  path: '/making-cents',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LowRateCardsRoute = LowRateCardsRouteImport.update({
-  id: '/low-rate-cards',
-  path: '/low-rate-cards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoansMortgageRoute = LoansMortgageRouteImport.update({
-  id: '/loans-mortgage',
-  path: '/loans-mortgage',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InvestmentsRoute = InvestmentsRouteImport.update({
-  id: '/investments',
-  path: '/investments',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const InsuranceRoute = InsuranceRouteImport.update({
-  id: '/insurance',
-  path: '/insurance',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HomeLoansRoute = HomeLoansRouteImport.update({
-  id: '/home-loans',
-  path: '/home-loans',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const HelocRoute = HelocRouteImport.update({
-  id: '/heloc',
-  path: '/heloc',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FirstTimeHomebuyerRoute = FirstTimeHomebuyerRouteImport.update({
-  id: '/first-time-homebuyer',
-  path: '/first-time-homebuyer',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EligibilityRoute = EligibilityRouteImport.update({
-  id: '/eligibility',
-  path: '/eligibility',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CreditCardsRoute = CreditCardsRouteImport.update({
-  id: '/credit-cards',
-  path: '/credit-cards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ContactRoute = ContactRouteImport.update({
-  id: '/contact',
-  path: '/contact',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckingRoute = CheckingRouteImport.update({
-  id: '/checking',
-  path: '/checking',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CertificatesRoute = CertificatesRouteImport.update({
-  id: '/certificates',
-  path: '/certificates',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CareersRoute = CareersRouteImport.update({
-  id: '/careers',
-  path: '/careers',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CardsRoute = CardsRouteImport.update({
-  id: '/cards',
-  path: '/cards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BusinessLoansRoute = BusinessLoansRouteImport.update({
-  id: '/business-loans',
-  path: '/business-loans',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BusinessCheckingRoute = BusinessCheckingRouteImport.update({
-  id: '/business-checking',
-  path: '/business-checking',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BusinessCardsRoute = BusinessCardsRouteImport.update({
-  id: '/business-cards',
-  path: '/business-cards',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BusinessRoute = BusinessRouteImport.update({
-  id: '/business',
-  path: '/business',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BrokerageRoute = BrokerageRouteImport.update({
-  id: '/brokerage',
-  path: '/brokerage',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BenefitsRoute = BenefitsRouteImport.update({
-  id: '/benefits',
-  path: '/benefits',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AutoLoansRoute = AutoLoansRouteImport.update({
-  id: '/auto-loans',
-  path: '/auto-loans',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AuthRoute = AuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AccountsRoute = AccountsRouteImport.update({
-  id: '/accounts',
-  path: '/accounts',
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -259,18 +93,194 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
+const AccountsRoute = AccountsRouteImport.update({
+  id: '/accounts',
+  path: '/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LegalTermsRoute = LegalTermsRouteImport.update({
-  id: '/legal/terms',
-  path: '/legal/terms',
+const AutoLoansRoute = AutoLoansRouteImport.update({
+  id: '/auto-loans',
+  path: '/auto-loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BenefitsRoute = BenefitsRouteImport.update({
+  id: '/benefits',
+  path: '/benefits',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrokerageRoute = BrokerageRouteImport.update({
+  id: '/brokerage',
+  path: '/brokerage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessRoute = BusinessRouteImport.update({
+  id: '/business',
+  path: '/business',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessCardsRoute = BusinessCardsRouteImport.update({
+  id: '/business-cards',
+  path: '/business-cards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessCheckingRoute = BusinessCheckingRouteImport.update({
+  id: '/business-checking',
+  path: '/business-checking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BusinessLoansRoute = BusinessLoansRouteImport.update({
+  id: '/business-loans',
+  path: '/business-loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CardsRoute = CardsRouteImport.update({
+  id: '/cards',
+  path: '/cards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CertificatesRoute = CertificatesRouteImport.update({
+  id: '/certificates',
+  path: '/certificates',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckingRoute = CheckingRouteImport.update({
+  id: '/checking',
+  path: '/checking',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditCardsRoute = CreditCardsRouteImport.update({
+  id: '/credit-cards',
+  path: '/credit-cards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EligibilityRoute = EligibilityRouteImport.update({
+  id: '/eligibility',
+  path: '/eligibility',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FirstTimeHomebuyerRoute = FirstTimeHomebuyerRouteImport.update({
+  id: '/first-time-homebuyer',
+  path: '/first-time-homebuyer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HelocRoute = HelocRouteImport.update({
+  id: '/heloc',
+  path: '/heloc',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeLoansRoute = HomeLoansRouteImport.update({
+  id: '/home-loans',
+  path: '/home-loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsuranceRoute = InsuranceRouteImport.update({
+  id: '/insurance',
+  path: '/insurance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestmentsRoute = InvestmentsRouteImport.update({
+  id: '/investments',
+  path: '/investments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoansMortgageRoute = LoansMortgageRouteImport.update({
+  id: '/loans-mortgage',
+  path: '/loans-mortgage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LowRateCardsRoute = LowRateCardsRouteImport.update({
+  id: '/low-rate-cards',
+  path: '/low-rate-cards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MakingCentsRoute = MakingCentsRouteImport.update({
+  id: '/making-cents',
+  path: '/making-cents',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MerchantServicesRoute = MerchantServicesRouteImport.update({
+  id: '/merchant-services',
+  path: '/merchant-services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MoneyMarketRoute = MoneyMarketRouteImport.update({
+  id: '/money-market',
+  path: '/money-market',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MortgageRoute = MortgageRouteImport.update({
+  id: '/mortgage',
+  path: '/mortgage',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonalRoute = PersonalRouteImport.update({
+  id: '/personal',
+  path: '/personal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonalLoansRoute = PersonalLoansRouteImport.update({
+  id: '/personal-loans',
+  path: '/personal-loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RefinanceRoute = RefinanceRouteImport.update({
+  id: '/refinance',
+  path: '/refinance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RetirementRoute = RetirementRouteImport.update({
+  id: '/retirement',
+  path: '/retirement',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RewardsCardsRoute = RewardsCardsRouteImport.update({
+  id: '/rewards-cards',
+  path: '/rewards-cards',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SavingsRoute = SavingsRouteImport.update({
+  id: '/savings',
+  path: '/savings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SecurityRoute = SecurityRouteImport.update({
+  id: '/security',
+  path: '/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StudentLoansRoute = StudentLoansRouteImport.update({
+  id: '/student-loans',
+  path: '/student-loans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/admin/login',
+  path: '/admin/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
@@ -278,110 +288,14 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   path: '/legal/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/admin/login',
-  path: '/admin/login',
+const LegalTermsRoute = LegalTermsRouteImport.update({
+  id: '/legal/terms',
+  path: '/legal/terms',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AuthenticatedAppRoute = AuthenticatedAppRouteImport.update({
-  id: '/app',
-  path: '/app',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
-  id: '/admin',
-  path: '/admin',
-  getParentRoute: () => AuthenticatedRoute,
-} as any)
-const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AuthenticatedAppRoute,
 } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAppWealthRoute = AuthenticatedAppWealthRouteImport.update({
-  id: '/wealth',
-  path: '/wealth',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppTransfersRoute =
-  AuthenticatedAppTransfersRouteImport.update({
-    id: '/transfers',
-    path: '/transfers',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppStatementsRoute =
-  AuthenticatedAppStatementsRouteImport.update({
-    id: '/statements',
-    path: '/statements',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppRetirementRoute =
-  AuthenticatedAppRetirementRouteImport.update({
-    id: '/retirement',
-    path: '/retirement',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppLoansRoute = AuthenticatedAppLoansRouteImport.update({
-  id: '/loans',
-  path: '/loans',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppDepositsRoute =
-  AuthenticatedAppDepositsRouteImport.update({
-    id: '/deposits',
-    path: '/deposits',
-    getParentRoute: () => AuthenticatedAppRoute,
-  } as any)
-const AuthenticatedAppCardsRoute = AuthenticatedAppCardsRouteImport.update({
-  id: '/cards',
-  path: '/cards',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppBillsRoute = AuthenticatedAppBillsRouteImport.update({
-  id: '/bills',
-  path: '/bills',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAppAlertsRoute = AuthenticatedAppAlertsRouteImport.update({
-  id: '/alerts',
-  path: '/alerts',
-  getParentRoute: () => AuthenticatedAppRoute,
-} as any)
-const AuthenticatedAdminSettingsRoute =
-  AuthenticatedAdminSettingsRouteImport.update({
-    id: '/settings',
-    path: '/settings',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminRecycleRoute =
-  AuthenticatedAdminRecycleRouteImport.update({
-    id: '/recycle',
-    path: '/recycle',
-    getParentRoute: () => AuthenticatedAdminRoute,
-  } as any)
-const AuthenticatedAdminLoansRoute = AuthenticatedAdminLoansRouteImport.update({
-  id: '/loans',
-  path: '/loans',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminKycRoute = AuthenticatedAdminKycRouteImport.update({
-  id: '/kyc',
-  path: '/kyc',
-  getParentRoute: () => AuthenticatedAdminRoute,
-} as any)
-const AuthenticatedAdminCmsRoute = AuthenticatedAdminCmsRouteImport.update({
-  id: '/cms',
-  path: '/cms',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
 const AuthenticatedAdminChequesRoute =
@@ -390,17 +304,103 @@ const AuthenticatedAdminChequesRoute =
     path: '/cheques',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAppSupportIndexRoute =
-  AuthenticatedAppSupportIndexRouteImport.update({
-    id: '/support/',
-    path: '/support/',
+const AuthenticatedAdminCmsRoute = AuthenticatedAdminCmsRouteImport.update({
+  id: '/cms',
+  path: '/cms',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminKycRoute = AuthenticatedAdminKycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminLoansRoute = AuthenticatedAdminLoansRouteImport.update({
+  id: '/loans',
+  path: '/loans',
+  getParentRoute: () => AuthenticatedAdminRoute,
+} as any)
+const AuthenticatedAdminRecycleRoute =
+  AuthenticatedAdminRecycleRouteImport.update({
+    id: '/recycle',
+    path: '/recycle',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminSettingsRoute =
+  AuthenticatedAdminSettingsRouteImport.update({
+    id: '/settings',
+    path: '/settings',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAppIndexRoute = AuthenticatedAppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppAlertsRoute = AuthenticatedAppAlertsRouteImport.update({
+  id: '/alerts',
+  path: '/alerts',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppBillsRoute = AuthenticatedAppBillsRouteImport.update({
+  id: '/bills',
+  path: '/bills',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppCardsRoute = AuthenticatedAppCardsRouteImport.update({
+  id: '/cards',
+  path: '/cards',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppDepositsRoute =
+  AuthenticatedAppDepositsRouteImport.update({
+    id: '/deposits',
+    path: '/deposits',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAppAccountsIndexRoute =
-  AuthenticatedAppAccountsIndexRouteImport.update({
-    id: '/accounts/',
-    path: '/accounts/',
+const AuthenticatedAppLoansRoute = AuthenticatedAppLoansRouteImport.update({
+  id: '/loans',
+  path: '/loans',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppProfileRoute = AuthenticatedAppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAppRetirementRoute =
+  AuthenticatedAppRetirementRouteImport.update({
+    id: '/retirement',
+    path: '/retirement',
     getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppStatementsRoute =
+  AuthenticatedAppStatementsRouteImport.update({
+    id: '/statements',
+    path: '/statements',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppTransfersRoute =
+  AuthenticatedAppTransfersRouteImport.update({
+    id: '/transfers',
+    path: '/transfers',
+    getParentRoute: () => AuthenticatedAppRoute,
+  } as any)
+const AuthenticatedAppWealthRoute = AuthenticatedAppWealthRouteImport.update({
+  id: '/wealth',
+  path: '/wealth',
+  getParentRoute: () => AuthenticatedAppRoute,
+} as any)
+const AuthenticatedAdminCustomersIndexRoute =
+  AuthenticatedAdminCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
+const AuthenticatedAdminCustomersIdRoute =
+  AuthenticatedAdminCustomersIdRouteImport.update({
+    id: '/customers/$id',
+    path: '/customers/$id',
+    getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
 const AuthenticatedAdminTicketsIndexRoute =
   AuthenticatedAdminTicketsIndexRouteImport.update({
@@ -408,16 +408,16 @@ const AuthenticatedAdminTicketsIndexRoute =
     path: '/tickets/',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAdminCustomersIndexRoute =
-  AuthenticatedAdminCustomersIndexRouteImport.update({
-    id: '/customers/',
-    path: '/customers/',
+const AuthenticatedAdminTicketsIdRoute =
+  AuthenticatedAdminTicketsIdRouteImport.update({
+    id: '/tickets/$id',
+    path: '/tickets/$id',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
-const AuthenticatedAppSupportIdRoute =
-  AuthenticatedAppSupportIdRouteImport.update({
-    id: '/support/$id',
-    path: '/support/$id',
+const AuthenticatedAppAccountsIndexRoute =
+  AuthenticatedAppAccountsIndexRouteImport.update({
+    id: '/accounts/',
+    path: '/accounts/',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 const AuthenticatedAppAccountsIdRoute =
@@ -426,17 +426,17 @@ const AuthenticatedAppAccountsIdRoute =
     path: '/accounts/$id',
     getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAdminTicketsIdRoute =
-  AuthenticatedAdminTicketsIdRouteImport.update({
-    id: '/tickets/$id',
-    path: '/tickets/$id',
-    getParentRoute: () => AuthenticatedAdminRoute,
+const AuthenticatedAppSupportIndexRoute =
+  AuthenticatedAppSupportIndexRouteImport.update({
+    id: '/support/',
+    path: '/support/',
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
-const AuthenticatedAdminCustomersIdRoute =
-  AuthenticatedAdminCustomersIdRouteImport.update({
-    id: '/customers/$id',
-    path: '/customers/$id',
-    getParentRoute: () => AuthenticatedAdminRoute,
+const AuthenticatedAppSupportIdRoute =
+  AuthenticatedAppSupportIdRouteImport.update({
+    id: '/support/$id',
+    path: '/support/$id',
+    getParentRoute: () => AuthenticatedAppRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -907,256 +907,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/student-loans': {
-      id: '/student-loans'
-      path: '/student-loans'
-      fullPath: '/student-loans'
-      preLoaderRoute: typeof StudentLoansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/security': {
-      id: '/security'
-      path: '/security'
-      fullPath: '/security'
-      preLoaderRoute: typeof SecurityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/savings': {
-      id: '/savings'
-      path: '/savings'
-      fullPath: '/savings'
-      preLoaderRoute: typeof SavingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/rewards-cards': {
-      id: '/rewards-cards'
-      path: '/rewards-cards'
-      fullPath: '/rewards-cards'
-      preLoaderRoute: typeof RewardsCardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/retirement': {
-      id: '/retirement'
-      path: '/retirement'
-      fullPath: '/retirement'
-      preLoaderRoute: typeof RetirementRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/refinance': {
-      id: '/refinance'
-      path: '/refinance'
-      fullPath: '/refinance'
-      preLoaderRoute: typeof RefinanceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/personal-loans': {
-      id: '/personal-loans'
-      path: '/personal-loans'
-      fullPath: '/personal-loans'
-      preLoaderRoute: typeof PersonalLoansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/personal': {
-      id: '/personal'
-      path: '/personal'
-      fullPath: '/personal'
-      preLoaderRoute: typeof PersonalRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/mortgage': {
-      id: '/mortgage'
-      path: '/mortgage'
-      fullPath: '/mortgage'
-      preLoaderRoute: typeof MortgageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/money-market': {
-      id: '/money-market'
-      path: '/money-market'
-      fullPath: '/money-market'
-      preLoaderRoute: typeof MoneyMarketRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/merchant-services': {
-      id: '/merchant-services'
-      path: '/merchant-services'
-      fullPath: '/merchant-services'
-      preLoaderRoute: typeof MerchantServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/making-cents': {
-      id: '/making-cents'
-      path: '/making-cents'
-      fullPath: '/making-cents'
-      preLoaderRoute: typeof MakingCentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/low-rate-cards': {
-      id: '/low-rate-cards'
-      path: '/low-rate-cards'
-      fullPath: '/low-rate-cards'
-      preLoaderRoute: typeof LowRateCardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/loans-mortgage': {
-      id: '/loans-mortgage'
-      path: '/loans-mortgage'
-      fullPath: '/loans-mortgage'
-      preLoaderRoute: typeof LoansMortgageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/investments': {
-      id: '/investments'
-      path: '/investments'
-      fullPath: '/investments'
-      preLoaderRoute: typeof InvestmentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/insurance': {
-      id: '/insurance'
-      path: '/insurance'
-      fullPath: '/insurance'
-      preLoaderRoute: typeof InsuranceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/home-loans': {
-      id: '/home-loans'
-      path: '/home-loans'
-      fullPath: '/home-loans'
-      preLoaderRoute: typeof HomeLoansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/heloc': {
-      id: '/heloc'
-      path: '/heloc'
-      fullPath: '/heloc'
-      preLoaderRoute: typeof HelocRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/first-time-homebuyer': {
-      id: '/first-time-homebuyer'
-      path: '/first-time-homebuyer'
-      fullPath: '/first-time-homebuyer'
-      preLoaderRoute: typeof FirstTimeHomebuyerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/eligibility': {
-      id: '/eligibility'
-      path: '/eligibility'
-      fullPath: '/eligibility'
-      preLoaderRoute: typeof EligibilityRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/credit-cards': {
-      id: '/credit-cards'
-      path: '/credit-cards'
-      fullPath: '/credit-cards'
-      preLoaderRoute: typeof CreditCardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/contact': {
-      id: '/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof ContactRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checking': {
-      id: '/checking'
-      path: '/checking'
-      fullPath: '/checking'
-      preLoaderRoute: typeof CheckingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/certificates': {
-      id: '/certificates'
-      path: '/certificates'
-      fullPath: '/certificates'
-      preLoaderRoute: typeof CertificatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/careers': {
-      id: '/careers'
-      path: '/careers'
-      fullPath: '/careers'
-      preLoaderRoute: typeof CareersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cards': {
-      id: '/cards'
-      path: '/cards'
-      fullPath: '/cards'
-      preLoaderRoute: typeof CardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/business-loans': {
-      id: '/business-loans'
-      path: '/business-loans'
-      fullPath: '/business-loans'
-      preLoaderRoute: typeof BusinessLoansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/business-checking': {
-      id: '/business-checking'
-      path: '/business-checking'
-      fullPath: '/business-checking'
-      preLoaderRoute: typeof BusinessCheckingRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/business-cards': {
-      id: '/business-cards'
-      path: '/business-cards'
-      fullPath: '/business-cards'
-      preLoaderRoute: typeof BusinessCardsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/business': {
-      id: '/business'
-      path: '/business'
-      fullPath: '/business'
-      preLoaderRoute: typeof BusinessRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/brokerage': {
-      id: '/brokerage'
-      path: '/brokerage'
-      fullPath: '/brokerage'
-      preLoaderRoute: typeof BrokerageRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/benefits': {
-      id: '/benefits'
-      path: '/benefits'
-      fullPath: '/benefits'
-      preLoaderRoute: typeof BenefitsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auto-loans': {
-      id: '/auto-loans'
-      path: '/auto-loans'
-      fullPath: '/auto-loans'
-      preLoaderRoute: typeof AutoLoansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/auth': {
-      id: '/auth'
-      path: '/auth'
-      fullPath: '/auth'
-      preLoaderRoute: typeof AuthRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/accounts': {
-      id: '/accounts'
-      path: '/accounts'
-      fullPath: '/accounts'
-      preLoaderRoute: typeof AccountsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -1166,18 +921,277 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/legal/terms': {
-      id: '/legal/terms'
-      path: '/legal/terms'
-      fullPath: '/legal/terms'
-      preLoaderRoute: typeof LegalTermsRouteImport
+    '/accounts': {
+      id: '/accounts'
+      path: '/accounts'
+      fullPath: '/accounts'
+      preLoaderRoute: typeof AccountsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auto-loans': {
+      id: '/auto-loans'
+      path: '/auto-loans'
+      fullPath: '/auto-loans'
+      preLoaderRoute: typeof AutoLoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/benefits': {
+      id: '/benefits'
+      path: '/benefits'
+      fullPath: '/benefits'
+      preLoaderRoute: typeof BenefitsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brokerage': {
+      id: '/brokerage'
+      path: '/brokerage'
+      fullPath: '/brokerage'
+      preLoaderRoute: typeof BrokerageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business': {
+      id: '/business'
+      path: '/business'
+      fullPath: '/business'
+      preLoaderRoute: typeof BusinessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business-cards': {
+      id: '/business-cards'
+      path: '/business-cards'
+      fullPath: '/business-cards'
+      preLoaderRoute: typeof BusinessCardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business-checking': {
+      id: '/business-checking'
+      path: '/business-checking'
+      fullPath: '/business-checking'
+      preLoaderRoute: typeof BusinessCheckingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/business-loans': {
+      id: '/business-loans'
+      path: '/business-loans'
+      fullPath: '/business-loans'
+      preLoaderRoute: typeof BusinessLoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/cards': {
+      id: '/cards'
+      path: '/cards'
+      fullPath: '/cards'
+      preLoaderRoute: typeof CardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/certificates': {
+      id: '/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof CertificatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checking': {
+      id: '/checking'
+      path: '/checking'
+      fullPath: '/checking'
+      preLoaderRoute: typeof CheckingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credit-cards': {
+      id: '/credit-cards'
+      path: '/credit-cards'
+      fullPath: '/credit-cards'
+      preLoaderRoute: typeof CreditCardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/eligibility': {
+      id: '/eligibility'
+      path: '/eligibility'
+      fullPath: '/eligibility'
+      preLoaderRoute: typeof EligibilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/first-time-homebuyer': {
+      id: '/first-time-homebuyer'
+      path: '/first-time-homebuyer'
+      fullPath: '/first-time-homebuyer'
+      preLoaderRoute: typeof FirstTimeHomebuyerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/heloc': {
+      id: '/heloc'
+      path: '/heloc'
+      fullPath: '/heloc'
+      preLoaderRoute: typeof HelocRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home-loans': {
+      id: '/home-loans'
+      path: '/home-loans'
+      fullPath: '/home-loans'
+      preLoaderRoute: typeof HomeLoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insurance': {
+      id: '/insurance'
+      path: '/insurance'
+      fullPath: '/insurance'
+      preLoaderRoute: typeof InsuranceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/investments': {
+      id: '/investments'
+      path: '/investments'
+      fullPath: '/investments'
+      preLoaderRoute: typeof InvestmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loans-mortgage': {
+      id: '/loans-mortgage'
+      path: '/loans-mortgage'
+      fullPath: '/loans-mortgage'
+      preLoaderRoute: typeof LoansMortgageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/low-rate-cards': {
+      id: '/low-rate-cards'
+      path: '/low-rate-cards'
+      fullPath: '/low-rate-cards'
+      preLoaderRoute: typeof LowRateCardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/making-cents': {
+      id: '/making-cents'
+      path: '/making-cents'
+      fullPath: '/making-cents'
+      preLoaderRoute: typeof MakingCentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/merchant-services': {
+      id: '/merchant-services'
+      path: '/merchant-services'
+      fullPath: '/merchant-services'
+      preLoaderRoute: typeof MerchantServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/money-market': {
+      id: '/money-market'
+      path: '/money-market'
+      fullPath: '/money-market'
+      preLoaderRoute: typeof MoneyMarketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mortgage': {
+      id: '/mortgage'
+      path: '/mortgage'
+      fullPath: '/mortgage'
+      preLoaderRoute: typeof MortgageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personal': {
+      id: '/personal'
+      path: '/personal'
+      fullPath: '/personal'
+      preLoaderRoute: typeof PersonalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personal-loans': {
+      id: '/personal-loans'
+      path: '/personal-loans'
+      fullPath: '/personal-loans'
+      preLoaderRoute: typeof PersonalLoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refinance': {
+      id: '/refinance'
+      path: '/refinance'
+      fullPath: '/refinance'
+      preLoaderRoute: typeof RefinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/retirement': {
+      id: '/retirement'
+      path: '/retirement'
+      fullPath: '/retirement'
+      preLoaderRoute: typeof RetirementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rewards-cards': {
+      id: '/rewards-cards'
+      path: '/rewards-cards'
+      fullPath: '/rewards-cards'
+      preLoaderRoute: typeof RewardsCardsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/savings': {
+      id: '/savings'
+      path: '/savings'
+      fullPath: '/savings'
+      preLoaderRoute: typeof SavingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/security': {
+      id: '/security'
+      path: '/security'
+      fullPath: '/security'
+      preLoaderRoute: typeof SecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/student-loans': {
+      id: '/student-loans'
+      path: '/student-loans'
+      fullPath: '/student-loans'
+      preLoaderRoute: typeof StudentLoansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/app': {
+      id: '/_authenticated/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AuthenticatedAppRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/admin/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/legal/privacy': {
@@ -1187,144 +1201,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/admin/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
+    '/legal/terms': {
+      id: '/legal/terms'
+      path: '/legal/terms'
+      fullPath: '/legal/terms'
+      preLoaderRoute: typeof LegalTermsRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/app': {
-      id: '/_authenticated/app'
-      path: '/app'
-      fullPath: '/app'
-      preLoaderRoute: typeof AuthenticatedAppRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/admin': {
-      id: '/_authenticated/admin'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AuthenticatedAdminRouteImport
-      parentRoute: typeof AuthenticatedRoute
-    }
-    '/_authenticated/app/': {
-      id: '/_authenticated/app/'
-      path: '/'
-      fullPath: '/app/'
-      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/admin/': {
       id: '/_authenticated/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AuthenticatedAdminIndexRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/app/wealth': {
-      id: '/_authenticated/app/wealth'
-      path: '/wealth'
-      fullPath: '/app/wealth'
-      preLoaderRoute: typeof AuthenticatedAppWealthRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/transfers': {
-      id: '/_authenticated/app/transfers'
-      path: '/transfers'
-      fullPath: '/app/transfers'
-      preLoaderRoute: typeof AuthenticatedAppTransfersRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/statements': {
-      id: '/_authenticated/app/statements'
-      path: '/statements'
-      fullPath: '/app/statements'
-      preLoaderRoute: typeof AuthenticatedAppStatementsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/retirement': {
-      id: '/_authenticated/app/retirement'
-      path: '/retirement'
-      fullPath: '/app/retirement'
-      preLoaderRoute: typeof AuthenticatedAppRetirementRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/profile': {
-      id: '/_authenticated/app/profile'
-      path: '/profile'
-      fullPath: '/app/profile'
-      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/loans': {
-      id: '/_authenticated/app/loans'
-      path: '/loans'
-      fullPath: '/app/loans'
-      preLoaderRoute: typeof AuthenticatedAppLoansRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/deposits': {
-      id: '/_authenticated/app/deposits'
-      path: '/deposits'
-      fullPath: '/app/deposits'
-      preLoaderRoute: typeof AuthenticatedAppDepositsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/cards': {
-      id: '/_authenticated/app/cards'
-      path: '/cards'
-      fullPath: '/app/cards'
-      preLoaderRoute: typeof AuthenticatedAppCardsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/bills': {
-      id: '/_authenticated/app/bills'
-      path: '/bills'
-      fullPath: '/app/bills'
-      preLoaderRoute: typeof AuthenticatedAppBillsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/alerts': {
-      id: '/_authenticated/app/alerts'
-      path: '/alerts'
-      fullPath: '/app/alerts'
-      preLoaderRoute: typeof AuthenticatedAppAlertsRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/admin/settings': {
-      id: '/_authenticated/admin/settings'
-      path: '/settings'
-      fullPath: '/admin/settings'
-      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/recycle': {
-      id: '/_authenticated/admin/recycle'
-      path: '/recycle'
-      fullPath: '/admin/recycle'
-      preLoaderRoute: typeof AuthenticatedAdminRecycleRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/loans': {
-      id: '/_authenticated/admin/loans'
-      path: '/loans'
-      fullPath: '/admin/loans'
-      preLoaderRoute: typeof AuthenticatedAdminLoansRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/kyc': {
-      id: '/_authenticated/admin/kyc'
-      path: '/kyc'
-      fullPath: '/admin/kyc'
-      preLoaderRoute: typeof AuthenticatedAdminKycRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
-    }
-    '/_authenticated/admin/cms': {
-      id: '/_authenticated/admin/cms'
-      path: '/cms'
-      fullPath: '/admin/cms'
-      preLoaderRoute: typeof AuthenticatedAdminCmsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
     '/_authenticated/admin/cheques': {
@@ -1334,26 +1222,117 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminChequesRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/app/support/': {
-      id: '/_authenticated/app/support/'
-      path: '/support'
-      fullPath: '/app/support/'
-      preLoaderRoute: typeof AuthenticatedAppSupportIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/app/accounts/': {
-      id: '/_authenticated/app/accounts/'
-      path: '/accounts'
-      fullPath: '/app/accounts/'
-      preLoaderRoute: typeof AuthenticatedAppAccountsIndexRouteImport
-      parentRoute: typeof AuthenticatedAppRoute
-    }
-    '/_authenticated/admin/tickets/': {
-      id: '/_authenticated/admin/tickets/'
-      path: '/tickets'
-      fullPath: '/admin/tickets/'
-      preLoaderRoute: typeof AuthenticatedAdminTicketsIndexRouteImport
+    '/_authenticated/admin/cms': {
+      id: '/_authenticated/admin/cms'
+      path: '/cms'
+      fullPath: '/admin/cms'
+      preLoaderRoute: typeof AuthenticatedAdminCmsRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/kyc': {
+      id: '/_authenticated/admin/kyc'
+      path: '/kyc'
+      fullPath: '/admin/kyc'
+      preLoaderRoute: typeof AuthenticatedAdminKycRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/loans': {
+      id: '/_authenticated/admin/loans'
+      path: '/loans'
+      fullPath: '/admin/loans'
+      preLoaderRoute: typeof AuthenticatedAdminLoansRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/recycle': {
+      id: '/_authenticated/admin/recycle'
+      path: '/recycle'
+      fullPath: '/admin/recycle'
+      preLoaderRoute: typeof AuthenticatedAdminRecycleRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/settings': {
+      id: '/_authenticated/admin/settings'
+      path: '/settings'
+      fullPath: '/admin/settings'
+      preLoaderRoute: typeof AuthenticatedAdminSettingsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/app/': {
+      id: '/_authenticated/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AuthenticatedAppIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/alerts': {
+      id: '/_authenticated/app/alerts'
+      path: '/alerts'
+      fullPath: '/app/alerts'
+      preLoaderRoute: typeof AuthenticatedAppAlertsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/bills': {
+      id: '/_authenticated/app/bills'
+      path: '/bills'
+      fullPath: '/app/bills'
+      preLoaderRoute: typeof AuthenticatedAppBillsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/cards': {
+      id: '/_authenticated/app/cards'
+      path: '/cards'
+      fullPath: '/app/cards'
+      preLoaderRoute: typeof AuthenticatedAppCardsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/deposits': {
+      id: '/_authenticated/app/deposits'
+      path: '/deposits'
+      fullPath: '/app/deposits'
+      preLoaderRoute: typeof AuthenticatedAppDepositsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/loans': {
+      id: '/_authenticated/app/loans'
+      path: '/loans'
+      fullPath: '/app/loans'
+      preLoaderRoute: typeof AuthenticatedAppLoansRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/profile': {
+      id: '/_authenticated/app/profile'
+      path: '/profile'
+      fullPath: '/app/profile'
+      preLoaderRoute: typeof AuthenticatedAppProfileRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/retirement': {
+      id: '/_authenticated/app/retirement'
+      path: '/retirement'
+      fullPath: '/app/retirement'
+      preLoaderRoute: typeof AuthenticatedAppRetirementRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/statements': {
+      id: '/_authenticated/app/statements'
+      path: '/statements'
+      fullPath: '/app/statements'
+      preLoaderRoute: typeof AuthenticatedAppStatementsRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/transfers': {
+      id: '/_authenticated/app/transfers'
+      path: '/transfers'
+      fullPath: '/app/transfers'
+      preLoaderRoute: typeof AuthenticatedAppTransfersRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
+    }
+    '/_authenticated/app/wealth': {
+      id: '/_authenticated/app/wealth'
+      path: '/wealth'
+      fullPath: '/app/wealth'
+      preLoaderRoute: typeof AuthenticatedAppWealthRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/admin/customers/': {
       id: '/_authenticated/admin/customers/'
@@ -1362,11 +1341,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminCustomersIndexRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
-    '/_authenticated/app/support/$id': {
-      id: '/_authenticated/app/support/$id'
-      path: '/support/$id'
-      fullPath: '/app/support/$id'
-      preLoaderRoute: typeof AuthenticatedAppSupportIdRouteImport
+    '/_authenticated/admin/customers/$id': {
+      id: '/_authenticated/admin/customers/$id'
+      path: '/customers/$id'
+      fullPath: '/admin/customers/$id'
+      preLoaderRoute: typeof AuthenticatedAdminCustomersIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/tickets/': {
+      id: '/_authenticated/admin/tickets/'
+      path: '/tickets'
+      fullPath: '/admin/tickets/'
+      preLoaderRoute: typeof AuthenticatedAdminTicketsIndexRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/admin/tickets/$id': {
+      id: '/_authenticated/admin/tickets/$id'
+      path: '/tickets/$id'
+      fullPath: '/admin/tickets/$id'
+      preLoaderRoute: typeof AuthenticatedAdminTicketsIdRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
+    '/_authenticated/app/accounts/': {
+      id: '/_authenticated/app/accounts/'
+      path: '/accounts'
+      fullPath: '/app/accounts/'
+      preLoaderRoute: typeof AuthenticatedAppAccountsIndexRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
     '/_authenticated/app/accounts/$id': {
@@ -1376,19 +1376,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAppAccountsIdRouteImport
       parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/admin/tickets/$id': {
-      id: '/_authenticated/admin/tickets/$id'
-      path: '/tickets/$id'
-      fullPath: '/admin/tickets/$id'
-      preLoaderRoute: typeof AuthenticatedAdminTicketsIdRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+    '/_authenticated/app/support/': {
+      id: '/_authenticated/app/support/'
+      path: '/support'
+      fullPath: '/app/support/'
+      preLoaderRoute: typeof AuthenticatedAppSupportIndexRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
-    '/_authenticated/admin/customers/$id': {
-      id: '/_authenticated/admin/customers/$id'
-      path: '/customers/$id'
-      fullPath: '/admin/customers/$id'
-      preLoaderRoute: typeof AuthenticatedAdminCustomersIdRouteImport
-      parentRoute: typeof AuthenticatedAdminRoute
+    '/_authenticated/app/support/$id': {
+      id: '/_authenticated/app/support/$id'
+      path: '/support/$id'
+      fullPath: '/app/support/$id'
+      preLoaderRoute: typeof AuthenticatedAppSupportIdRouteImport
+      parentRoute: typeof AuthenticatedAppRoute
     }
   }
 }

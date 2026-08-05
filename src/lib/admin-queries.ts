@@ -27,7 +27,12 @@ export const adminCustomerQuery = (id: string) =>
       const [profile, accounts, tx, roles] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase.from("accounts").select("*").eq("user_id", id).order("created_at"),
-        supabase.from("transactions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(25),
+        supabase
+          .from("transactions")
+          .select("*")
+          .eq("user_id", id)
+          .order("created_at", { ascending: false })
+          .limit(25),
         supabase.from("user_roles").select("role").eq("user_id", id),
       ]);
       if (profile.error) throw profile.error;
@@ -77,7 +82,11 @@ export const adminKycQuery = queryOptions({
 export const adminLoansQuery = queryOptions({
   queryKey: ["admin", "loans"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("loans").select("*").order("created_at", { ascending: false }).limit(150);
+    const { data, error } = await supabase
+      .from("loans")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(150);
     if (error) throw error;
     return data ?? [];
   },
@@ -100,8 +109,13 @@ export const adminProfileLookupQuery = queryOptions({
   queryKey: ["admin", "profile-lookup"],
   queryFn: async () => {
     const { data } = await supabase.from("profiles").select("id,email,full_name,username");
-    const map = new Map<string, { email: string; full_name: string | null; username: string | null }>();
-    (data ?? []).forEach((p) => map.set(p.id, { email: p.email, full_name: p.full_name, username: p.username }));
+    const map = new Map<
+      string,
+      { email: string; full_name: string | null; username: string | null }
+    >();
+    (data ?? []).forEach((p) =>
+      map.set(p.id, { email: p.email, full_name: p.full_name, username: p.username }),
+    );
     return map;
   },
 });
@@ -121,14 +135,19 @@ export const adminTicketQuery = (id: string) =>
 export const adminEmailLogQuery = queryOptions({
   queryKey: ["admin", "email_log"],
   queryFn: async () => {
-    const { data } = await supabase.from("email_log").select("*").order("created_at", { ascending: false }).limit(50);
+    const { data } = await supabase
+      .from("email_log")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
     return data ?? [];
   },
 });
 
 export const smtpSettingsQuery = queryOptions({
   queryKey: ["admin", "smtp"],
-  queryFn: async () => (await supabase.from("smtp_settings").select("*").eq("id", 1).maybeSingle()).data,
+  queryFn: async () =>
+    (await supabase.from("smtp_settings").select("*").eq("id", 1).maybeSingle()).data,
 });
 
 export const adminDeletedUsersQuery = queryOptions({
@@ -140,8 +159,13 @@ export const adminDeletedUsersQuery = queryOptions({
       .limit(200);
     if (error) throw error;
     return (data ?? []) as {
-      id: string; user_id: string; email: string | null; full_name: string | null;
-      username: string | null; snapshot: unknown; deleted_at: string;
+      id: string;
+      user_id: string;
+      email: string | null;
+      full_name: string | null;
+      username: string | null;
+      snapshot: unknown;
+      deleted_at: string;
     }[];
   },
 });

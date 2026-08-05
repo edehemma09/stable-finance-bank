@@ -22,9 +22,18 @@ export type SmtpConfig = {
 };
 
 const esc = (v: unknown) =>
-  String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
+  String(v ?? "").replace(
+    /[&<>"']/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!,
+  );
 
-export function renderEmail(brand: Branding, title: string, intro: string, rows: [string, string][], footnote?: string) {
+export function renderEmail(
+  brand: Branding,
+  title: string,
+  intro: string,
+  rows: [string, string][],
+  footnote?: string,
+) {
   const navy = brand.primary_color || "#0b2a4a";
   const accent = brand.accent_color || "#d98324";
   const logo = brand.logo_url
@@ -59,7 +68,13 @@ export function renderEmail(brand: Branding, title: string, intro: string, rows:
 </td></tr></table></body></html>`;
 }
 
-export async function sendMail(smtp: SmtpConfig, brand: Branding, to: string, subject: string, html: string) {
+export async function sendMail(
+  smtp: SmtpConfig,
+  brand: Branding,
+  to: string,
+  subject: string,
+  html: string,
+) {
   if (!smtp.enabled) throw new Error("Email sending is disabled in admin settings");
   if (!smtp.host || !smtp.from_email) throw new Error("SMTP is not configured");
 

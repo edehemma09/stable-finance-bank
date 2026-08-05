@@ -1,6 +1,16 @@
 import { createFileRoute, Outlet, redirect, Link, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Users, FileEdit, Settings, LifeBuoy, ShieldCheck, Landmark, FileCheck2, Trash2 } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  FileEdit,
+  Settings,
+  LifeBuoy,
+  ShieldCheck,
+  Landmark,
+  FileCheck2,
+  Trash2,
+} from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -26,7 +36,6 @@ const NAV = [
   { to: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
-
 function AdminShell() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   return (
@@ -37,15 +46,27 @@ function AdminShell() {
           {NAV.map(({ to, label, icon: Icon, exact }) => {
             const active = exact ? path === to : path.startsWith(to);
             return (
-              <Link key={to} to={to as never} className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${active ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}>
-                <Icon className="h-4 w-4" />{label}
+              <Link
+                key={to}
+                to={to as never}
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm ${active ? "bg-primary text-primary-foreground" : "hover:bg-muted"}`}
+              >
+                <Icon className="h-4 w-4" />
+                {label}
               </Link>
             );
           })}
         </nav>
-        <Link to="/app" className="mt-6 block px-3 text-xs text-muted-foreground hover:text-foreground">← Back to banking</Link>
+        <Link
+          to="/app"
+          className="mt-6 block px-3 text-xs text-muted-foreground hover:text-foreground"
+        >
+          ← Back to banking
+        </Link>
       </aside>
-      <main className="flex-1"><Outlet /></main>
+      <main className="flex-1">
+        <Outlet />
+      </main>
     </div>
   );
 }

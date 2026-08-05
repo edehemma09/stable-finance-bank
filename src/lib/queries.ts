@@ -4,25 +4,39 @@ import { supabase } from "@/integrations/supabase/client";
 export const siteSettingsQuery = queryOptions({
   queryKey: ["site_settings"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle();
+    const { data, error } = await supabase
+      .from("site_settings")
+      .select("*")
+      .eq("id", 1)
+      .maybeSingle();
     if (error) throw error;
     return data;
   },
 });
 
-export const pageBySlugQuery = (slug: string) => queryOptions({
-  queryKey: ["page", slug],
-  queryFn: async () => {
-    const { data, error } = await supabase.from("pages").select("*").eq("slug", slug).maybeSingle();
-    if (error) throw error;
-    return data;
-  },
-});
+export const pageBySlugQuery = (slug: string) =>
+  queryOptions({
+    queryKey: ["page", slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("pages")
+        .select("*")
+        .eq("slug", slug)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+  });
 
 export const navPagesQuery = queryOptions({
   queryKey: ["pages", "nav"],
   queryFn: async () => {
-    const { data, error } = await supabase.from("pages").select("slug,nav_label,nav_order").eq("in_nav", true).eq("published", true).order("nav_order");
+    const { data, error } = await supabase
+      .from("pages")
+      .select("slug,nav_label,nav_order")
+      .eq("in_nav", true)
+      .eq("published", true)
+      .order("nav_order");
     if (error) throw error;
     return data ?? [];
   },
@@ -63,14 +77,19 @@ export const myAccountsQuery = queryOptions({
   },
 });
 
-export const myTransactionsQuery = (limit = 50) => queryOptions({
-  queryKey: ["me", "tx", limit],
-  queryFn: async () => {
-    const { data, error } = await supabase.from("transactions").select("*").order("created_at", { ascending: false }).limit(limit);
-    if (error) throw error;
-    return data ?? [];
-  },
-});
+export const myTransactionsQuery = (limit = 50) =>
+  queryOptions({
+    queryKey: ["me", "tx", limit],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("transactions")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(limit);
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
 
 export const myCardsQuery = queryOptions({
   queryKey: ["me", "cards"],
@@ -92,7 +111,11 @@ export const myPayeesQuery = queryOptions({
 export const myAlertsQuery = queryOptions({
   queryKey: ["me", "alerts"],
   queryFn: async () => {
-    const { data } = await supabase.from("alerts").select("*").order("created_at", { ascending: false }).limit(50);
+    const { data } = await supabase
+      .from("alerts")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(50);
     return data ?? [];
   },
 });
@@ -100,7 +123,10 @@ export const myAlertsQuery = queryOptions({
 export const myTicketsQuery = queryOptions({
   queryKey: ["me", "tickets"],
   queryFn: async () => {
-    const { data } = await supabase.from("support_tickets").select("*").order("updated_at", { ascending: false });
+    const { data } = await supabase
+      .from("support_tickets")
+      .select("*")
+      .order("updated_at", { ascending: false });
     return data ?? [];
   },
 });
@@ -141,7 +167,11 @@ export const myKycQuery = queryOptions({
 export const myChequesQuery = queryOptions({
   queryKey: ["me", "cheques"],
   queryFn: async () => {
-    const { data } = await supabase.from("cheque_deposits").select("*").order("created_at", { ascending: false }).limit(20);
+    const { data } = await supabase
+      .from("cheque_deposits")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(20);
     return data ?? [];
   },
 });
