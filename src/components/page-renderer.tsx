@@ -126,7 +126,18 @@ function BlockView({ block }: { block: Block }) {
           <div className="grid gap-6 md:grid-cols-3">
             {block.items.map((it, i) => (
               <div key={i} className="flex flex-col overflow-hidden rounded-xl border border-border/70 bg-card">
-                <div className="aspect-[4/3] bg-gradient-to-br from-brand-blue/15 via-primary/10 to-accent/20" />
+                {it.image ? (
+                  <img
+                    src={it.image}
+                    alt={it.title}
+                    loading="lazy"
+                    width={1024}
+                    height={768}
+                    className="aspect-[4/3] w-full object-cover"
+                  />
+                ) : (
+                  <div className="aspect-[4/3] bg-gradient-to-br from-brand-blue/15 via-primary/10 to-accent/20" />
+                )}
                 <div className="flex flex-1 flex-col p-6">
                   <h3 className="font-display text-lg">{it.title}</h3>
                   {it.body && <p className="mt-2 text-sm text-muted-foreground">{it.body}</p>}
