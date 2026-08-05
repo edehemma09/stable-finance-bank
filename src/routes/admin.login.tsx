@@ -11,11 +11,11 @@ export const Route = createFileRoute("/admin/login")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Administrator Sign In — Meridian Bank" },
-      { name: "description", content: "Secure sign-in for Meridian Bank operations staff and administrators." },
+      { title: "Administrator Sign In — Stable Finance Bank" },
+      { name: "description", content: "Secure sign-in for Stable Finance Bank operations staff and administrators." },
       { name: "robots", content: "noindex" },
-      { property: "og:title", content: "Administrator Sign In — Meridian Bank" },
-      { property: "og:description", content: "Secure sign-in for Meridian Bank operations staff." },
+      { property: "og:title", content: "Administrator Sign In — Stable Finance Bank" },
+      { property: "og:description", content: "Secure sign-in for Stable Finance Bank operations staff." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

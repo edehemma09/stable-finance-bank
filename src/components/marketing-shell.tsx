@@ -247,7 +247,7 @@ export function MarketingShell({ children }: { children: ReactNode }) {
         </div>
         <div className="border-t border-primary-foreground/15">
           <div className="container-page py-4 text-xs text-primary-foreground/60">
-            © {new Date().getFullYear()} {settings?.brand_name ?? "Meridian Bank"}. All rights reserved.
+            © {new Date().getFullYear()} {settings?.brand_name ?? "Stable Finance Bank"}. All rights reserved.
           </div>
         </div>
       </footer>

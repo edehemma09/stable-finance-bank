@@ -18,7 +18,7 @@ async function loadContext() {
   ]);
   if (!smtp) throw new Error("Email settings missing");
   const brand = {
-    brand_name: site?.brand_name ?? "Meridian Bank",
+    brand_name: site?.brand_name ?? "Stable Finance Bank",
     logo_url: site?.logo_url ?? null,
     contact_email: site?.contact_email ?? "",
     contact_phone: site?.contact_phone ?? "",

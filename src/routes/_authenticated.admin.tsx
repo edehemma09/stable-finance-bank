@@ -32,7 +32,7 @@ function AdminShell() {
   return (
     <div className="flex min-h-screen w-full bg-background">
       <aside className="hidden w-60 shrink-0 border-r bg-card p-4 md:block">
-        <p className="px-2 pb-4 font-display text-xl">Meridian Admin</p>
+        <p className="px-2 pb-4 font-display text-xl">Stable Finance Admin</p>
         <nav className="space-y-1">
           {NAV.map(({ to, label, icon: Icon, exact }) => {
             const active = exact ? path === to : path.startsWith(to);

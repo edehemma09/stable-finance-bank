@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_authenticated/app/loans")({
   },
   head: () => ({
     meta: [
-      { title: "Loans — Meridian Bank" },
+      { title: "Loans — Stable Finance Bank" },
       { name: "description", content: "Apply for auto, personal, mortgage and student loans, track balances and make payments." },
     ],
   }),

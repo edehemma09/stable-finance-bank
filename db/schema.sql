@@ -65,7 +65,7 @@ create table if not exists public.cards (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
   "account_id" uuid not null,
-  "brand" text default 'Meridian'::text not null,
+  "brand" text default 'Stable Finance'::text not null,
   "network" text default 'visa'::text not null,
   "card_type" text not null,
   "cardholder_name" text not null,
@@ -214,7 +214,7 @@ create table if not exists public.risk_scores (
 );
 create table if not exists public.site_settings (
   "id" integer default 1 not null,
-  "brand_name" text default 'Meridian Bank'::text not null,
+  "brand_name" text default 'Stable Finance Bank'::text not null,
   "tagline" text default 'Banking with clarity, care, and craft.'::text not null,
   "logo_url" text,
   "primary_color" text default '#0b2545'::text not null,
@@ -615,7 +615,7 @@ BEGIN
   -- Debit source
   UPDATE public.accounts SET balance=balance-_amount, available_balance=available_balance-_amount WHERE id=_from;
   INSERT INTO public.transactions(account_id,user_id,amount,description,type,status,reference,counterparty)
-  VALUES (_from,_uid,-_amount, COALESCE(_memo, CASE _kind WHEN 'same' THEN 'Transfer between accounts' WHEN 'intra' THEN 'Transfer to Meridian member' WHEN 'ach' THEN 'ACH transfer' WHEN 'wire' THEN 'Wire transfer' ELSE 'Transfer' END),'transfer','completed',_receipt,
+  VALUES (_from,_uid,-_amount, COALESCE(_memo, CASE _kind WHEN 'same' THEN 'Transfer between accounts' WHEN 'intra' THEN 'Transfer to Stable Finance member' WHEN 'ach' THEN 'ACH transfer' WHEN 'wire' THEN 'Wire transfer' ELSE 'Transfer' END),'transfer','completed',_receipt,
     CASE WHEN _external IS NOT NULL THEN (_external->>'name') ELSE NULL END);
 
   IF _kind IN ('same','intra') AND _to IS NOT NULL THEN
@@ -743,7 +743,7 @@ BEGIN
   IF _q = '' THEN RETURN; END IF;
   RETURN QUERY
   SELECT a.id,
-         COALESCE(NULLIF(p.full_name,''), p.username, 'Meridian member') AS display_name,
+         COALESCE(NULLIF(p.full_name,''), p.username, 'Stable Finance member') AS display_name,
          '••' || right(a.account_number, 4) AS masked_account
   FROM public.accounts a
   JOIN public.profiles p ON p.id = a.user_id

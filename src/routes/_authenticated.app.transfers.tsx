@@ -25,7 +25,7 @@ function Transfers() {
   return (
     <div className="container-page py-6 md:py-10">
       <h1 className="font-display text-3xl md:text-4xl">Transfer money</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Move money between your accounts, to another Meridian member, or externally.</p>
+      <p className="mt-1 text-sm text-muted-foreground">Move money between your accounts, to another Stable Finance member, or externally.</p>
       {receipt ? <Receipt r={receipt} onDone={() => setReceipt(null)} /> : (
         <Tabs defaultValue="same" className="mt-6">
           <TabsList className="grid w-full grid-cols-4">
@@ -124,7 +124,7 @@ function IntraForm({ accounts, onSuccess }: { accounts: Acc[]; onSuccess: (r: { 
     const { data, error } = await (supabase.rpc as any)("resolve_transfer_recipient", { _query: q });
     setLooking(false);
     const hit = Array.isArray(data) ? data[0] : data;
-    if (error || !hit) { setFound(null); toast.error("No active Meridian member found for that account number or username"); return; }
+    if (error || !hit) { setFound(null); toast.error("No active Stable Finance member found for that account number or username"); return; }
     setFound(hit as { account_id: string; display_name: string; masked_account: string });
   }
 
@@ -197,7 +197,7 @@ function ExternalForm({ accounts, kind, onSuccess }: { accounts: Acc[]; kind: "a
 
 function Receipt({ r, onDone }: { r: { id: string; amount: number; kind: string; to: string }; onDone: () => void }) {
   const { data: site } = useQuery(siteSettingsQuery);
-  const brand = site?.brand_name ?? "Meridian Bank";
+  const brand = site?.brand_name ?? "Stable Finance Bank";
   return (
     <div className="mt-6 rounded-2xl border bg-card p-8 text-center">
       <div className="mx-auto flex max-w-sm items-center justify-center gap-2 border-b pb-4">
