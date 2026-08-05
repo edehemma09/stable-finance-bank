@@ -27,7 +27,9 @@ function KycQueue() {
 
   return (
     <div className="p-4 md:p-8">
-      <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Compliance</p>
+      <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+        Compliance
+      </p>
       <h1 className="font-display text-3xl">KYC review queue</h1>
       <div className="mt-4 flex flex-wrap gap-2">
         {FILTERS.map((f) => (
@@ -43,10 +45,17 @@ function KycQueue() {
 
       <div className="mt-6 space-y-4">
         {list.map((s) => (
-          <KycCard key={s.id} s={s} who={people?.get(s.user_id)} onDone={() => qc.invalidateQueries({ queryKey: ["admin"] })} />
+          <KycCard
+            key={s.id}
+            s={s}
+            who={people?.get(s.user_id)}
+            onDone={() => qc.invalidateQueries({ queryKey: ["admin"] })}
+          />
         ))}
         {list.length === 0 && (
-          <p className="rounded-xl border bg-card px-5 py-10 text-center text-sm text-muted-foreground">Nothing in this queue.</p>
+          <p className="rounded-xl border bg-card px-5 py-10 text-center text-sm text-muted-foreground">
+            Nothing in this queue.
+          </p>
         )}
       </div>
     </div>
@@ -54,11 +63,26 @@ function KycQueue() {
 }
 
 type Submission = {
-  id: string; user_id: string; doc_type: string; status: string; notes: string | null;
-  doc_front_url: string | null; doc_back_url: string | null; selfie_url: string | null; submitted_at: string;
+  id: string;
+  user_id: string;
+  doc_type: string;
+  status: string;
+  notes: string | null;
+  doc_front_url: string | null;
+  doc_back_url: string | null;
+  selfie_url: string | null;
+  submitted_at: string;
 };
 
-function KycCard({ s, who, onDone }: { s: Submission; who?: { email: string; full_name: string | null; username: string | null }; onDone: () => void }) {
+function KycCard({
+  s,
+  who,
+  onDone,
+}: {
+  s: Submission;
+  who?: { email: string; full_name: string | null; username: string | null };
+  onDone: () => void;
+}) {
   const [notes, setNotes] = useState(s.notes ?? "");
   const [limit, setLimit] = useState("");
 
@@ -77,10 +101,14 @@ function KycCard({ s, who, onDone }: { s: Submission; who?: { email: string; ful
           userId: s.user_id,
           template: "kyc_decision",
           subject: `Identity verification ${status}`,
-          title: status === "verified" ? "Your identity is verified" : "We could not verify your identity",
-          intro: status === "verified"
-            ? "Your documents passed review. Your account limits have been updated."
-            : "Our compliance team could not verify the documents you submitted.",
+          title:
+            status === "verified"
+              ? "Your identity is verified"
+              : "We could not verify your identity",
+          intro:
+            status === "verified"
+              ? "Your documents passed review. Your account limits have been updated."
+              : "Our compliance team could not verify the documents you submitted.",
           rows: [
             ["Status", status],
             ["Reviewed", new Date().toLocaleString()],
@@ -90,7 +118,10 @@ function KycCard({ s, who, onDone }: { s: Submission; who?: { email: string; ful
       }).catch(() => {});
       return status;
     },
-    onSuccess: (status) => { toast.success(`Submission ${status}`); onDone(); },
+    onSuccess: (status) => {
+      toast.success(`Submission ${status}`);
+      onDone();
+    },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Decision failed"),
   });
 
@@ -116,13 +147,35 @@ function KycCard({ s, who, onDone }: { s: Submission; who?: { email: string; ful
 
       {pending ? (
         <div className="mt-4 grid gap-3 md:grid-cols-[1fr_200px]">
-          <div><Label>Reviewer notes</Label><Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} /></div>
+          <div>
+            <Label>Reviewer notes</Label>
+            <Textarea rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </div>
           <div>
             <Label>New daily limit (optional)</Label>
-            <Input type="number" min="0" value={limit} onChange={(e) => setLimit(e.target.value)} placeholder="e.g. 25000" />
+            <Input
+              type="number"
+              min="0"
+              value={limit}
+              onChange={(e) => setLimit(e.target.value)}
+              placeholder="e.g. 25000"
+            />
             <div className="mt-2 flex gap-2">
-              <Button size="sm" onClick={() => decide.mutate("verified")} disabled={decide.isPending}>Approve</Button>
-              <Button size="sm" variant="destructive" onClick={() => decide.mutate("rejected")} disabled={decide.isPending}>Reject</Button>
+              <Button
+                size="sm"
+                onClick={() => decide.mutate("verified")}
+                disabled={decide.isPending}
+              >
+                Approve
+              </Button>
+              <Button
+                size="sm"
+                variant="destructive"
+                onClick={() => decide.mutate("rejected")}
+                disabled={decide.isPending}
+              >
+                Reject
+              </Button>
             </div>
           </div>
         </div>

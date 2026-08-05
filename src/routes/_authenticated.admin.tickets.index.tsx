@@ -10,13 +10,17 @@ export const Route = createFileRoute("/_authenticated/admin/tickets/")({
 function Tickets() {
   const { data } = useQuery({
     queryKey: ["admin", "tickets"],
-    queryFn: async () => (await supabase.from("support_tickets").select("*").order("updated_at", { ascending: false })).data ?? [],
+    queryFn: async () =>
+      (await supabase.from("support_tickets").select("*").order("updated_at", { ascending: false }))
+        .data ?? [],
   });
   const { data: people } = useQuery(adminProfileLookupQuery);
   const rows = data ?? [];
   return (
     <div className="p-4 md:p-8">
-      <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Service desk</p>
+      <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">
+        Service desk
+      </p>
       <h1 className="font-display text-3xl">Support tickets</h1>
       <div className="mt-6 overflow-x-auto rounded-xl border bg-card">
         <table className="w-full text-sm">
@@ -36,19 +40,33 @@ function Tickets() {
               return (
                 <tr key={t.id} className="border-b last:border-0 hover:bg-muted/30">
                   <td className="px-4 py-3">
-                    <Link to="/admin/tickets/$id" params={{ id: t.id }} className="font-medium underline-offset-2 hover:underline">
+                    <Link
+                      to="/admin/tickets/$id"
+                      params={{ id: t.id }}
+                      className="font-medium underline-offset-2 hover:underline"
+                    >
                       {t.subject}
                     </Link>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground">{who?.full_name ?? who?.email ?? "—"}</td>
+                  <td className="px-4 py-3 text-muted-foreground">
+                    {who?.full_name ?? who?.email ?? "—"}
+                  </td>
                   <td className="px-4 py-3 capitalize text-muted-foreground">{t.category}</td>
                   <td className="px-4 py-3 capitalize">{t.priority}</td>
                   <td className="px-4 py-3 capitalize">{t.status}</td>
-                  <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(t.updated_at).toLocaleString()}</td>
+                  <td className="px-4 py-3 text-xs text-muted-foreground">
+                    {new Date(t.updated_at).toLocaleString()}
+                  </td>
                 </tr>
               );
             })}
-            {rows.length === 0 && <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">No tickets yet.</td></tr>}
+            {rows.length === 0 && (
+              <tr>
+                <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                  No tickets yet.
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

@@ -35,13 +35,19 @@ async function deliver(to: string, p: Payload) {
   const html = renderEmail(brand, p.title, p.intro, p.rows, p.footnote);
   try {
     await sendMail(smtp, brand, to, p.subject, html);
-    await supabaseAdmin.from("email_log").insert({ to_email: to, subject: p.subject, template: p.template, status: "sent" });
+    await supabaseAdmin
+      .from("email_log")
+      .insert({ to_email: to, subject: p.subject, template: p.template, status: "sent" });
     return { sent: true as const };
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    await supabaseAdmin
-      .from("email_log")
-      .insert({ to_email: to, subject: p.subject, template: p.template, status: "failed", error: message });
+    await supabaseAdmin.from("email_log").insert({
+      to_email: to,
+      subject: p.subject,
+      template: p.template,
+      status: "failed",
+      error: message,
+    });
     return { sent: false as const, error: message };
   }
 }
@@ -64,13 +70,17 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     return data;
   })
   .handler(async ({ data, context }) => {
-    const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
+    const { data: isAdmin } = await context.supabase.rpc("has_role", {
+      _user_id: context.userId,
+      _role: "admin",
+    });
     if (!isAdmin) throw new Error("Forbidden");
     return deliver(data.to, {
       template: "smtp_test",
       subject: "SMTP test message",
       title: "Your mail server works",
-      intro: "This is a test message sent from your admin console to confirm outgoing email is configured correctly.",
+      intro:
+        "This is a test message sent from your admin console to confirm outgoing email is configured correctly.",
       rows: [["Sent at", new Date().toLocaleString()]],
     });
   });
@@ -85,7 +95,11 @@ export const sendCustomerNotification = createServerFn({ method: "POST" })
       context.supabase.rpc("has_role", { _user_id: context.userId, _role: "support" }),
     ]);
     if (!isAdmin && !isSupport) throw new Error("Forbidden");
-    const { data: profile } = await context.supabase.from("profiles").select("email").eq("id", data.userId).maybeSingle();
+    const { data: profile } = await context.supabase
+      .from("profiles")
+      .select("email")
+      .eq("id", data.userId)
+      .maybeSingle();
     if (!profile?.email) return { sent: false as const, error: "Customer has no email" };
     const { userId: _ignored, ...payload } = data;
     return deliver(profile.email, payload);

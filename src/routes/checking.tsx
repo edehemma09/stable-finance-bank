@@ -3,6 +3,14 @@ import { MarketingPage } from "@/components/marketing-page";
 import { pageBySlugQuery } from "@/lib/queries";
 export const Route = createFileRoute("/checking")({
   loader: ({ context }) => context.queryClient.ensureQueryData(pageBySlugQuery("checking")),
-  head: () => ({ meta: [{ title: "Checking — Stable Finance Bank" }, { name: "description", content: "No-fee checking with early direct deposit and nationwide ATM access." }] }),
+  head: () => ({
+    meta: [
+      { title: "Checking — Stable Finance Bank" },
+      {
+        name: "description",
+        content: "No-fee checking with early direct deposit and nationwide ATM access.",
+      },
+    ],
+  }),
   component: () => <MarketingPage slug="checking" />,
 });

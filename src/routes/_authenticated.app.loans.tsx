@@ -7,7 +7,13 @@ import { notifyByEmail } from "@/lib/notify";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Landmark } from "lucide-react";
 import { toast } from "sonner";
 
@@ -19,7 +25,11 @@ export const Route = createFileRoute("/_authenticated/app/loans")({
   head: () => ({
     meta: [
       { title: "Loans — Stable Finance Bank" },
-      { name: "description", content: "Apply for auto, personal, mortgage and student loans, track balances and make payments." },
+      {
+        name: "description",
+        content:
+          "Apply for auto, personal, mortgage and student loans, track balances and make payments.",
+      },
     ],
   }),
   component: Loans,
@@ -64,7 +74,9 @@ function Loans() {
       const principal = Number(amount);
       if (!principal || principal <= 0) throw new Error("Enter a valid amount");
       if (!funding) throw new Error("Choose an account to receive the funds");
-      const { error } = await (supabase.rpc as never as (n: string, a: unknown) => Promise<{ error: Error | null }>)("apply_for_loan", {
+      const { error } = await (
+        supabase.rpc as never as (n: string, a: unknown) => Promise<{ error: Error | null }>
+      )("apply_for_loan", {
         _kind: kind,
         _nickname: p.label,
         _principal: principal,
@@ -101,7 +113,9 @@ function Loans() {
       const from = accounts.find((a) => a.type === "checking") ?? accounts[0];
       if (!from) throw new Error("No funding account");
       const amt = Math.min(Number(loan.monthly_payment), Number(loan.balance));
-      const { error } = await (supabase.rpc as never as (n: string, a: unknown) => Promise<{ error: Error | null }>)("pay_loan", {
+      const { error } = await (
+        supabase.rpc as never as (n: string, a: unknown) => Promise<{ error: Error | null }>
+      )("pay_loan", {
         _loan_id: loan.id,
         _from: from.id,
         _amount: amt,
@@ -130,14 +144,18 @@ function Loans() {
   return (
     <div className="mx-auto max-w-5xl px-5 py-6 lg:px-10 lg:py-10">
       <h1 className="font-display text-3xl font-bold text-primary">Loans</h1>
-      <p className="mt-1 text-sm text-muted-foreground">Apply, track balances, and make payments.</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        Apply, track balances, and make payments.
+      </p>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-3">
           {loans.length === 0 && (
             <div className="grid place-items-center rounded-2xl border border-dashed p-10 text-center">
               <Landmark className="mb-3 h-8 w-8 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">No loans yet. Use the calculator to apply.</p>
+              <p className="text-sm text-muted-foreground">
+                No loans yet. Use the calculator to apply.
+              </p>
             </div>
           )}
           {loans.map((l) => {
@@ -154,8 +172,12 @@ function Loans() {
                     </p>
                   </div>
                   <div className="shrink-0 text-right">
-                    <p className="font-display text-2xl font-bold text-primary">{formatUSD(isActive ? l.balance : l.principal)}</p>
-                    <span className={`mt-1 inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_TONE[l.status] ?? STATUS_TONE.closed}`}>
+                    <p className="font-display text-2xl font-bold text-primary">
+                      {formatUSD(isActive ? l.balance : l.principal)}
+                    </p>
+                    <span
+                      className={`mt-1 inline-block rounded-full border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${STATUS_TONE[l.status] ?? STATUS_TONE.closed}`}
+                    >
                       {l.status}
                     </span>
                   </div>
@@ -163,11 +185,20 @@ function Loans() {
                 {isActive && (
                   <>
                     <div className="mt-4 h-2 rounded-full bg-muted">
-                      <div className="h-2 rounded-full bg-accent" style={{ width: `${Math.min(100, Math.max(0, paid * 100))}%` }} />
+                      <div
+                        className="h-2 rounded-full bg-accent"
+                        style={{ width: `${Math.min(100, Math.max(0, paid * 100))}%` }}
+                      />
                     </div>
                     <div className="mt-4 flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Monthly {formatUSD(l.monthly_payment)}</span>
-                      <Button size="sm" onClick={() => pay.mutate(l)} disabled={pay.isPending || Number(l.balance) <= 0}>
+                      <span className="text-xs text-muted-foreground">
+                        Monthly {formatUSD(l.monthly_payment)}
+                      </span>
+                      <Button
+                        size="sm"
+                        onClick={() => pay.mutate(l)}
+                        disabled={pay.isPending || Number(l.balance) <= 0}
+                      >
                         Make payment
                       </Button>
                     </div>
@@ -194,17 +225,32 @@ function Loans() {
             <div>
               <Label>Loan type</Label>
               <Select value={kind} onValueChange={setKind}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
                 <SelectContent>
-                  {Object.entries(PRODUCTS).map(([k, v]) => <SelectItem key={k} value={k}>{v.label}</SelectItem>)}
+                  {Object.entries(PRODUCTS).map(([k, v]) => (
+                    <SelectItem key={k} value={k}>
+                      {v.label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
-            <div><Label>Amount</Label><Input inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} /></div>
+            <div>
+              <Label>Amount</Label>
+              <Input
+                inputMode="decimal"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+              />
+            </div>
             <div>
               <Label>Deposit funds to</Label>
               <Select value={funding} onValueChange={setFunding}>
-                <SelectTrigger><SelectValue placeholder="Choose account" /></SelectTrigger>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose account" />
+                </SelectTrigger>
                 <SelectContent>
                   {deposit.map((a) => (
                     <SelectItem key={a.id} value={a.id}>
@@ -217,13 +263,21 @@ function Loans() {
             <div className="rounded-xl bg-muted p-4 text-sm">
               <p className="text-muted-foreground">Estimated monthly payment</p>
               <p className="font-display text-2xl font-bold text-primary">{formatUSD(est)}</p>
-              <p className="text-xs text-muted-foreground">{(p.rate * 100).toFixed(2)}% APR · {p.term} months</p>
+              <p className="text-xs text-muted-foreground">
+                {(p.rate * 100).toFixed(2)}% APR · {p.term} months
+              </p>
             </div>
-            <Button className="w-full" onClick={() => apply.mutate()} disabled={apply.isPending || !funding}>
+            <Button
+              className="w-full"
+              onClick={() => apply.mutate()}
+              disabled={apply.isPending || !funding}
+            >
               {apply.isPending ? "Submitting…" : "Submit application"}
             </Button>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground">Total outstanding debt: {formatUSD(totalDebt)}</p>
+          <p className="mt-4 text-xs text-muted-foreground">
+            Total outstanding debt: {formatUSD(totalDebt)}
+          </p>
         </div>
       </div>
     </div>
