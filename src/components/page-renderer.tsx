@@ -9,7 +9,7 @@ type Block =
   | { type: "cta"; title: string; body?: string; button?: string; to?: string }
   | { type: "rich"; body: string }
   | { type: "tiles"; title?: string; items: Tile[] }
-  | { type: "promos"; title?: string; items: { title: string; body?: string; cta?: string; to?: string }[] }
+  | { type: "promos"; title?: string; items: { title: string; body?: string; cta?: string; to?: string; image?: string }[] }
   | { type: "billboard"; kicker?: string; title: string; body?: string; cta?: string; to?: string };
 
 const ICONS: Record<string, typeof Wallet> = {
