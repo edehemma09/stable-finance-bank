@@ -3,7 +3,7 @@ import { siteSettingsQuery } from "@/lib/queries";
 
 export function BrandMark({ className = "" }: { className?: string }) {
   const { data } = useQuery(siteSettingsQuery);
-  const name = data?.brand_name ?? "Meridian Bank";
+  const name = data?.brand_name ?? "Stable Finance Bank";
   return (
     <a href="/" className={`inline-flex items-center gap-2 ${className}`}>
       {data?.logo_url ? (

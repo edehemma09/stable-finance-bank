@@ -3,6 +3,6 @@ import { MarketingPage } from "@/components/marketing-page";
 import { pageBySlugQuery } from "@/lib/queries";
 export const Route = createFileRoute("/cards")({
   loader: ({ context }) => context.queryClient.ensureQueryData(pageBySlugQuery("cards")),
-  head: () => ({ meta: [{ title: "Cards — Meridian Bank" }] }),
+  head: () => ({ meta: [{ title: "Cards — Stable Finance Bank" }] }),
   component: () => <MarketingPage slug="cards" />,
 });

@@ -73,7 +73,7 @@ function AuthPage() {
           <p className="max-w-md font-display text-4xl leading-tight md:text-5xl">Banking with clarity, care, and craft.</p>
           <p className="mt-4 max-w-md text-sm text-primary-foreground/80">A modern bank built around your day — checking, savings, cards, loans, and human support.</p>
           <div className="mt-8 h-40 w-64 rounded-2xl bg-primary-dark p-5 ring-1 ring-primary-foreground/15">
-            <p className="text-xs opacity-70">Meridian</p>
+            <p className="text-xs opacity-70">Stable Finance</p>
             <p className="mt-8 font-mono tracking-widest">•••• 4218</p>
             <p className="mt-1 text-xs opacity-70">Available</p>
           </div>
@@ -83,7 +83,7 @@ function AuthPage() {
       <div className="flex items-center justify-center bg-surface p-6">
         <div className="w-full max-w-sm">
           <div className="mb-6 md:hidden"><BrandMark /></div>
-          <h1 className="font-display text-3xl">{mode === "signin" ? "Sign in to Meridian" : "Enroll in Meridian"}</h1>
+          <h1 className="font-display text-3xl">{mode === "signin" ? "Sign in to Stable Finance" : "Enroll in Stable Finance"}</h1>
           <p className="mt-1 text-sm text-muted-foreground">{mode === "signin" ? "Welcome back. Access your accounts securely." : "Open your account in less than a minute."}</p>
 
 
@@ -106,7 +106,7 @@ function AuthPage() {
           </form>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            {mode === "signin" ? "New to Meridian?" : "Already a member?"}{" "}
+            {mode === "signin" ? "New to Stable Finance?" : "Already a member?"}{" "}
             <button className="font-semibold text-brand-blue underline" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>
               {mode === "signin" ? "Enroll now" : "Sign in"}
             </button>

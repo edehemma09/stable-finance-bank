@@ -79,7 +79,7 @@ function AdminHome() {
               <div className="h-5 w-5 border-2 border-primary" />
             </div>
             <h1 className="font-display text-lg font-semibold uppercase tracking-tight text-primary-foreground">
-              Meridian <span className="font-normal opacity-80">Admin</span>
+              Stable Finance <span className="font-normal opacity-80">Admin</span>
             </h1>
           </div>
           <div className="flex items-center gap-6">

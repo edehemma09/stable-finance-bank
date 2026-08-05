@@ -55,7 +55,7 @@ function Cards() {
   return (
     <div className="container-page py-6 md:py-10">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div><h1 className="font-display text-3xl md:text-4xl">Cards</h1><p className="mt-1 text-sm text-muted-foreground">Manage your Meridian cards.</p></div>
+        <div><h1 className="font-display text-3xl md:text-4xl">Cards</h1><p className="mt-1 text-sm text-muted-foreground">Manage your Stable Finance cards.</p></div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild><Button><Plus className="mr-2 h-4 w-4" />Request card</Button></DialogTrigger>
           <DialogContent>

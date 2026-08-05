@@ -47,9 +47,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Meridian Bank — Banking with clarity, care, and craft" },
+      { title: "Stable Finance Bank — Banking with clarity, care, and craft" },
       { name: "description", content: "A modern bank built around your day. Checking, savings, cards, transfers, and human support." },
-      { property: "og:title", content: "Meridian Bank" },
+      { property: "og:title", content: "Stable Finance Bank" },
       { property: "og:description", content: "Banking with clarity, care, and craft." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
