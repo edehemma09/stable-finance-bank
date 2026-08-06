@@ -75,17 +75,20 @@ function SmtpPanel() {
 
   const save = useMutation({
     mutationFn: async () => {
-      const patch: Record<string, unknown> = {
+      const row: Record<string, unknown> = {
+        id: 1,
         host: s.host, port: Number(s.port), secure: s.secure, username: s.username,
         from_name: s.from_name, from_email: s.from_email, enabled: s.enabled,
+        password: s.password.trim() ? s.password.trim() : (data?.password ?? ""),
       };
-      if (s.password.trim()) patch.password = s.password.trim();
-      const { error } = await supabase.from("smtp_settings").update(patch as never).eq("id", 1);
+      const { error } = await supabase.from("smtp_settings").upsert(row as never, { onConflict: "id" });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("SMTP credentials saved"); setS((v) => ({ ...v, password: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
+  const configured = Boolean(s.host.trim() && s.from_email.trim());
 
   const test = useMutation({
     mutationFn: async () => {
