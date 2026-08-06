@@ -104,6 +104,19 @@ function SmtpPanel() {
     <div className="mt-8 max-w-xl">
       <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Delivery</p>
       <h2 className="font-display text-2xl">Email / SMTP</h2>
+      <div
+        className={`mt-3 rounded-lg border px-4 py-3 text-sm ${
+          configured && s.enabled
+            ? "border-success/30 bg-success/10 text-success"
+            : "border-warning/40 bg-warning/10 text-warning-foreground"
+        }`}
+      >
+        {configured && s.enabled
+          ? "Email delivery is configured and enabled. Send a test below to confirm."
+          : !configured
+            ? "Not configured — enter a host and from-address, save, then send a test email."
+            : "Credentials saved, but delivery is switched off. Tick “Email delivery enabled” to start sending."}
+      </div>
       <div className="mt-4 grid gap-3 rounded-xl border bg-card p-5">
         <div className="grid gap-3 sm:grid-cols-2">
           <div><Label>Host</Label><Input value={s.host} onChange={(e) => setS({ ...s, host: e.target.value })} /></div>
