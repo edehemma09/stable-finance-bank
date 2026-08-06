@@ -1,6 +1,6 @@
 import { createFileRoute, Outlet, redirect, Link, useRouterState } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
-import { LayoutDashboard, Users, FileEdit, Settings, LifeBuoy, ShieldCheck, Landmark, FileCheck2, Trash2 } from "lucide-react";
+import { LayoutDashboard, Users, FileEdit, Settings, LifeBuoy, ShieldCheck, Landmark, FileCheck2, Trash2, Mail } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   ssr: false,
@@ -21,6 +21,7 @@ const NAV = [
   { to: "/admin/loans", label: "Loan decisions", icon: Landmark },
   { to: "/admin/cheques", label: "Cheque queue", icon: FileCheck2 },
   { to: "/admin/tickets", label: "Tickets", icon: LifeBuoy },
+  { to: "/admin/messages", label: "Email customer", icon: Mail },
   { to: "/admin/recycle", label: "Recycle bin", icon: Trash2 },
   { to: "/admin/cms", label: "CMS", icon: FileEdit },
   { to: "/admin/settings", label: "Settings", icon: Settings },

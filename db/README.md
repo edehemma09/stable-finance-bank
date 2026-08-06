@@ -68,3 +68,13 @@ API settings):
 
 The service-role key stays inside your own project's settings and is never pasted
 into chat.
+
+## Offline backup (added later)
+
+| File | What it does |
+| --- | --- |
+| `data.sql` | Current live rows: site settings, SMTP placeholder, CMS pages |
+| `full-backup.sql` | Everything in one file — schema + storage + data. Run this alone on an empty project |
+
+`full-backup.sql` is the file to keep for safe storage. Regenerate it any time
+the CMS content or branding changes.

@@ -66,6 +66,7 @@ import { Route as AuthenticatedAppBillsRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedAppAlertsRouteImport } from './routes/_authenticated.app.alerts'
 import { Route as AuthenticatedAdminSettingsRouteImport } from './routes/_authenticated.admin.settings'
 import { Route as AuthenticatedAdminRecycleRouteImport } from './routes/_authenticated.admin.recycle'
+import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated.admin.messages'
 import { Route as AuthenticatedAdminLoansRouteImport } from './routes/_authenticated.admin.loans'
 import { Route as AuthenticatedAdminKycRouteImport } from './routes/_authenticated.admin.kyc'
 import { Route as AuthenticatedAdminCmsRouteImport } from './routes/_authenticated.admin.cms'
@@ -369,6 +370,12 @@ const AuthenticatedAdminRecycleRoute =
     path: '/recycle',
     getParentRoute: () => AuthenticatedAdminRoute,
   } as any)
+const AuthenticatedAdminMessagesRoute =
+  AuthenticatedAdminMessagesRouteImport.update({
+    id: '/messages',
+    path: '/messages',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminLoansRoute = AuthenticatedAdminLoansRouteImport.update({
   id: '/loans',
   path: '/loans',
@@ -486,6 +493,7 @@ export interface FileRoutesByFullPath {
   '/admin/cms': typeof AuthenticatedAdminCmsRoute
   '/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/admin/loans': typeof AuthenticatedAdminLoansRoute
+  '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/recycle': typeof AuthenticatedAdminRecycleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/app/alerts': typeof AuthenticatedAppAlertsRoute
@@ -554,6 +562,7 @@ export interface FileRoutesByTo {
   '/admin/cms': typeof AuthenticatedAdminCmsRoute
   '/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/admin/loans': typeof AuthenticatedAdminLoansRoute
+  '/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/admin/recycle': typeof AuthenticatedAdminRecycleRoute
   '/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/app/alerts': typeof AuthenticatedAppAlertsRoute
@@ -626,6 +635,7 @@ export interface FileRoutesById {
   '/_authenticated/admin/cms': typeof AuthenticatedAdminCmsRoute
   '/_authenticated/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/_authenticated/admin/loans': typeof AuthenticatedAdminLoansRoute
+  '/_authenticated/admin/messages': typeof AuthenticatedAdminMessagesRoute
   '/_authenticated/admin/recycle': typeof AuthenticatedAdminRecycleRoute
   '/_authenticated/admin/settings': typeof AuthenticatedAdminSettingsRoute
   '/_authenticated/app/alerts': typeof AuthenticatedAppAlertsRoute
@@ -698,6 +708,7 @@ export interface FileRouteTypes {
     | '/admin/cms'
     | '/admin/kyc'
     | '/admin/loans'
+    | '/admin/messages'
     | '/admin/recycle'
     | '/admin/settings'
     | '/app/alerts'
@@ -766,6 +777,7 @@ export interface FileRouteTypes {
     | '/admin/cms'
     | '/admin/kyc'
     | '/admin/loans'
+    | '/admin/messages'
     | '/admin/recycle'
     | '/admin/settings'
     | '/app/alerts'
@@ -837,6 +849,7 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/cms'
     | '/_authenticated/admin/kyc'
     | '/_authenticated/admin/loans'
+    | '/_authenticated/admin/messages'
     | '/_authenticated/admin/recycle'
     | '/_authenticated/admin/settings'
     | '/_authenticated/app/alerts'
@@ -1306,6 +1319,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminRecycleRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/messages': {
+      id: '/_authenticated/admin/messages'
+      path: '/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AuthenticatedAdminMessagesRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/loans': {
       id: '/_authenticated/admin/loans'
       path: '/loans'
@@ -1398,6 +1418,7 @@ interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminCmsRoute: typeof AuthenticatedAdminCmsRoute
   AuthenticatedAdminKycRoute: typeof AuthenticatedAdminKycRoute
   AuthenticatedAdminLoansRoute: typeof AuthenticatedAdminLoansRoute
+  AuthenticatedAdminMessagesRoute: typeof AuthenticatedAdminMessagesRoute
   AuthenticatedAdminRecycleRoute: typeof AuthenticatedAdminRecycleRoute
   AuthenticatedAdminSettingsRoute: typeof AuthenticatedAdminSettingsRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -1412,6 +1433,7 @@ const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminCmsRoute: AuthenticatedAdminCmsRoute,
   AuthenticatedAdminKycRoute: AuthenticatedAdminKycRoute,
   AuthenticatedAdminLoansRoute: AuthenticatedAdminLoansRoute,
+  AuthenticatedAdminMessagesRoute: AuthenticatedAdminMessagesRoute,
   AuthenticatedAdminRecycleRoute: AuthenticatedAdminRecycleRoute,
   AuthenticatedAdminSettingsRoute: AuthenticatedAdminSettingsRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
@@ -1523,13 +1545,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

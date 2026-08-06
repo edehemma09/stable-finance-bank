@@ -12,7 +12,7 @@ import {
   AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import { ArrowLeft, Trash2 } from "lucide-react";
+import { ArrowLeft, Trash2, Mail } from "lucide-react";
 
 
 export const Route = createFileRoute("/_authenticated/admin/customers/$id")({
@@ -116,6 +116,9 @@ function CustomerDetail() {
         <span className="font-mono text-xs text-muted-foreground">@{p.username ?? "—"}</span>
       </div>
       <p className="text-sm text-muted-foreground">{p.email} · joined {new Date(p.created_at).toLocaleDateString()}</p>
+      <Link to="/admin/messages" search={{ u: id }} className="mt-3 inline-flex items-center gap-2 rounded-lg border px-3 py-2 text-sm hover:bg-muted">
+        <Mail className="h-4 w-4" /> Email this customer
+      </Link>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Accounts */}

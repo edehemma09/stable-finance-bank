@@ -75,17 +75,20 @@ function SmtpPanel() {
 
   const save = useMutation({
     mutationFn: async () => {
-      const patch: Record<string, unknown> = {
+      const row: Record<string, unknown> = {
+        id: 1,
         host: s.host, port: Number(s.port), secure: s.secure, username: s.username,
         from_name: s.from_name, from_email: s.from_email, enabled: s.enabled,
+        password: s.password.trim() ? s.password.trim() : (data?.password ?? ""),
       };
-      if (s.password.trim()) patch.password = s.password.trim();
-      const { error } = await supabase.from("smtp_settings").update(patch as never).eq("id", 1);
+      const { error } = await supabase.from("smtp_settings").upsert(row as never, { onConflict: "id" });
       if (error) throw error;
     },
     onSuccess: () => { toast.success("SMTP credentials saved"); setS((v) => ({ ...v, password: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
+
+  const configured = Boolean(s.host.trim() && s.from_email.trim());
 
   const test = useMutation({
     mutationFn: async () => {
@@ -101,6 +104,19 @@ function SmtpPanel() {
     <div className="mt-8 max-w-xl">
       <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Delivery</p>
       <h2 className="font-display text-2xl">Email / SMTP</h2>
+      <div
+        className={`mt-3 rounded-lg border px-4 py-3 text-sm ${
+          configured && s.enabled
+            ? "border-success/30 bg-success/10 text-success"
+            : "border-warning/40 bg-warning/10 text-warning-foreground"
+        }`}
+      >
+        {configured && s.enabled
+          ? "Email delivery is configured and enabled. Send a test below to confirm."
+          : !configured
+            ? "Not configured — enter a host and from-address, save, then send a test email."
+            : "Credentials saved, but delivery is switched off. Tick “Email delivery enabled” to start sending."}
+      </div>
       <div className="mt-4 grid gap-3 rounded-xl border bg-card p-5">
         <div className="grid gap-3 sm:grid-cols-2">
           <div><Label>Host</Label><Input value={s.host} onChange={(e) => setS({ ...s, host: e.target.value })} /></div>
