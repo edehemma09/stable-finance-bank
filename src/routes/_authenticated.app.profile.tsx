@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useSuspenseQuery, useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
+import { Camera, LoaderCircle, UserRound } from "lucide-react";
 import { myProfileQuery, myKycQuery, formatUSD } from "@/lib/queries";
 import { supabase } from "@/integrations/supabase/client";
 import { notifyByEmail } from "@/lib/notify";
@@ -20,16 +21,59 @@ export const Route = createFileRoute("/_authenticated/app/profile")({
 function Profile() {
   const { data: profile } = useSuspenseQuery(myProfileQuery);
   const qc = useQueryClient();
+  const avatarInput = useRef<HTMLInputElement>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [f, setF] = useState({ full_name: "", phone: "", address_line1: "", city: "", state: "", postal_code: "", two_factor_enabled: false });
   useEffect(() => { if (profile) setF({ full_name: profile.full_name ?? "", phone: profile.phone ?? "", address_line1: profile.address_line1 ?? "", city: profile.city ?? "", state: profile.state ?? "", postal_code: profile.postal_code ?? "", two_factor_enabled: profile.two_factor_enabled }); }, [profile]);
+  useEffect(() => {
+    if (!profile?.avatar_url) {
+      setAvatarUrl(null);
+      return;
+    }
+    let active = true;
+    void supabase.storage.from("avatars").createSignedUrl(profile.avatar_url, 3600).then(({ data }) => {
+      if (active) setAvatarUrl(data?.signedUrl ?? null);
+    });
+    return () => { active = false; };
+  }, [profile?.avatar_url]);
 
   const save = useMutation({
     mutationFn: async () => {
-      const u = (await supabase.auth.getUser()).data.user!;
+      const u = (await supabase.auth.getUser()).data.user;
+      if (!u) throw new Error("Your session expired — sign in again");
       const { error } = await supabase.from("profiles").update(f).eq("id", u.id); if (error) throw error;
     },
     onSuccess: () => { toast.success("Profile saved"); qc.invalidateQueries({ queryKey: ["me","profile"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+  });
+
+  const uploadAvatar = useMutation({
+    mutationFn: async (file: File) => {
+      const allowedTypes = ["image/png", "image/jpeg"];
+      const extension = file.name.split(".").pop()?.toLowerCase();
+      if (!allowedTypes.includes(file.type) || !extension || !["png", "jpg", "jpeg"].includes(extension)) {
+        throw new Error("Choose a PNG or JPG image");
+      }
+      if (file.size > 5 * 1024 * 1024) throw new Error("Profile pictures must be 5 MB or smaller");
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) throw new Error("Your session expired — sign in again");
+      const path = `${user.id}/profile.${extension === "png" ? "png" : "jpg"}`;
+      if (profile?.avatar_url && profile.avatar_url !== path) {
+        await supabase.storage.from("avatars").remove([profile.avatar_url]);
+      }
+      const { error: uploadError } = await supabase.storage.from("avatars").upload(path, file, {
+        contentType: file.type,
+        upsert: true,
+      });
+      if (uploadError) throw uploadError;
+      const { error: profileError } = await supabase.from("profiles").update({ avatar_url: path }).eq("id", user.id);
+      if (profileError) throw profileError;
+    },
+    onSuccess: () => {
+      toast.success("Profile picture updated");
+      qc.invalidateQueries({ queryKey: ["me", "profile"] });
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : "Upload failed"),
   });
 
   const changePw = async () => {
@@ -45,6 +89,30 @@ function Profile() {
         <div className="rounded-xl border bg-card p-6">
           <h2 className="font-display text-lg">Personal info</h2>
           <div className="mt-4 grid gap-3">
+            <div className="flex items-center gap-4 border-b pb-5">
+              <div className="relative flex size-20 shrink-0 items-center justify-center overflow-hidden rounded-full border bg-muted text-muted-foreground">
+                {avatarUrl ? <img src={avatarUrl} alt="Profile" className="size-full object-cover" /> : <UserRound className="size-8" aria-hidden />}
+                {uploadAvatar.isPending && <div className="absolute inset-0 grid place-items-center bg-background/75"><LoaderCircle className="size-5 animate-spin" aria-hidden /></div>}
+              </div>
+              <div>
+                <Button type="button" variant="outline" onClick={() => avatarInput.current?.click()} disabled={uploadAvatar.isPending}>
+                  <Camera className="size-4" aria-hidden />
+                  Change picture
+                </Button>
+                <input
+                  ref={avatarInput}
+                  className="sr-only"
+                  type="file"
+                  accept="image/png,image/jpeg,.png,.jpg,.jpeg"
+                  onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file) uploadAvatar.mutate(file);
+                    event.target.value = "";
+                  }}
+                />
+                <p className="mt-1 text-xs text-muted-foreground">PNG or JPG, up to 5 MB</p>
+              </div>
+            </div>
             <div><Label>Email</Label><Input value={profile?.email ?? ""} readOnly disabled /></div>
             <div><Label>Full name</Label><Input value={f.full_name} onChange={(e) => setF({ ...f, full_name: e.target.value })} /></div>
             <div><Label>Phone</Label><Input value={f.phone} onChange={(e) => setF({ ...f, phone: e.target.value })} /></div>

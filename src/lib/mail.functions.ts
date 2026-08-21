@@ -10,11 +10,6 @@ type Payload = {
   subject: string;
 };
 
-async function deliver(to: string, p: Payload) {
-  const { sendBrandedEmail } = await import("./email/send.server");
-  return sendBrandedEmail(to, p);
-}
-
 /** Sends a notification to the signed-in customer's own address only. */
 export const sendMyNotification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -22,7 +17,8 @@ export const sendMyNotification = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const email = (context.claims as { email?: string } | null)?.email;
     if (!email) return { sent: false as const, error: "No email on account" };
-    return deliver(email, data);
+    const { sendBrandedEmail } = await import("./email/send.server");
+    return sendBrandedEmail(email, data);
   });
 
 /** Admin-only: send a test message to any address to validate the email provider. */
@@ -35,7 +31,8 @@ export const sendTestEmail = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden");
-    return deliver(data.to, {
+    const { sendBrandedEmail } = await import("./email/send.server");
+    return sendBrandedEmail(data.to, {
       template: "provider_test",
       subject: "Email delivery test",
       title: "Your email delivery works",
@@ -58,5 +55,6 @@ export const sendCustomerNotification = createServerFn({ method: "POST" })
     const { data: profile } = await context.supabase.from("profiles").select("email").eq("id", data.userId).maybeSingle();
     if (!profile?.email) return { sent: false as const, error: "Customer has no email" };
     const { userId: _ignored, ...payload } = data;
-    return deliver(profile.email, payload);
+    const { sendBrandedEmail } = await import("./email/send.server");
+    return sendBrandedEmail(profile.email, payload);
   });
