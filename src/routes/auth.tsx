@@ -1,11 +1,15 @@
 import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
+import { signUpWithBrandedEmail, resendConfirmationEmail, sendPasswordResetEmail } from "@/lib/auth-mail.functions";
+
+
 
 
 type Search = { mode?: "signin" | "signup"; redirect?: string };
