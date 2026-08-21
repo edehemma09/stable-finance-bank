@@ -1,11 +1,15 @@
 import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
+import { signUpWithBrandedEmail, resendConfirmationEmail, sendPasswordResetEmail } from "@/lib/auth-mail.functions";
+
+
 
 
 type Search = { mode?: "signin" | "signup"; redirect?: string };
@@ -26,12 +30,16 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const search = useSearch({ from: "/auth" });
   const navigate = useNavigate();
+  const signUpFn = useServerFn(signUpWithBrandedEmail);
+  const resendFn = useServerFn(resendConfirmationEmail);
+  const resetFn = useServerFn(sendPasswordResetEmail);
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,15 +52,28 @@ function AuthPage() {
         }
         const { data: taken } = await supabase.from("profiles").select("id").eq("username", uname).maybeSingle();
         if (taken) throw new Error("That username is already taken.");
-        const { error } = await supabase.auth.signUp({
-          email, password,
-          options: { data: { full_name: fullName, username: uname }, emailRedirectTo: `${window.location.origin}/app` },
+        const res = await signUpFn({
+          data: { email, password, fullName, username: uname, origin: window.location.origin },
         });
-        if (error) throw error;
-        toast.success("Account created. Signing you in…");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (res.fallback) {
+          const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: fullName, username: uname }, emailRedirectTo: `${window.location.origin}/app` },
+          });
+          if (error) throw error;
+        } else if (!res.sent) {
+          throw new Error(res.error ?? "We couldn't send your confirmation email.");
+        }
+        setPendingEmail(email);
+        toast.success("Account created. Check your inbox to confirm your email.");
+        return;
+
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        if (/confirm/i.test(error.message)) setPendingEmail(email);
+        throw error;
       }
       navigate({ to: search.redirect ?? "/app" });
     } catch (err) {
@@ -61,6 +82,28 @@ function AuthPage() {
       setLoading(false);
     }
   }
+
+  async function resend() {
+    if (!pendingEmail) return;
+    setLoading(true);
+    const res = await resendFn({ data: { email: pendingEmail, origin: window.location.origin } });
+    setLoading(false);
+    toast[res.error === "already_confirmed" ? "info" : "success"](
+      res.error === "already_confirmed" ? "That address is already confirmed — just sign in." : "Confirmation link sent.",
+    );
+  }
+
+  async function forgotPassword() {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Enter your email address first, then tap “Forgot password”.");
+      return;
+    }
+    setLoading(true);
+    await resetFn({ data: { email, origin: window.location.origin } });
+    setLoading(false);
+    toast.success("If that address has an account, a reset link is on its way.");
+  }
+
 
 
 
@@ -88,8 +131,20 @@ function AuthPage() {
 
 
 
+          {pendingEmail && (
+            <div className="mt-5 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm">
+              <p className="font-semibold">Confirm your email</p>
+              <p className="mt-1 text-muted-foreground">
+                We sent a confirmation link to <span className="font-medium text-foreground">{pendingEmail}</span>. Open it to
+                activate your accounts and sign in.
+              </p>
+              <button type="button" onClick={resend} disabled={loading} className="mt-2 font-semibold text-brand-blue underline">
+                Resend the link
+              </button>
+            </div>
+          )}
 
-          <form onSubmit={submit} className="space-y-3">
+          <form onSubmit={submit} className="mt-5 space-y-3">
             {mode === "signup" && (
               <>
                 <div><Label htmlFor="fn">Full name</Label><Input id="fn" className="bg-card" value={fullName} onChange={(e) => setFullName(e.target.value)} required /></div>
@@ -104,6 +159,15 @@ function AuthPage() {
             <div><Label htmlFor="p">Password</Label><Input id="p" className="bg-card" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>
             <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>{loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Enroll now"}</Button>
           </form>
+
+          {mode === "signin" && (
+            <p className="mt-3 text-center text-sm">
+              <button type="button" onClick={forgotPassword} disabled={loading} className="text-muted-foreground underline hover:text-foreground">
+                Forgot password?
+              </button>
+            </p>
+          )}
+
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "New to Stable Finance?" : "Already a member?"}{" "}
