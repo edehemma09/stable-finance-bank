@@ -30,9 +30,10 @@ export type SmtpMessage = {
 
 async function openSocket(cfg: SmtpConfig): Promise<Duplex> {
   try {
-    const { connect } = (await import(/* @vite-ignore */ "cloudflare:sockets")) as {
+    const mod = (await import(/* @vite-ignore */ ("cloudflare" + ":sockets"))) as unknown as {
       connect: (addr: { hostname: string; port: number }, opts?: Record<string, unknown>) => Duplex;
     };
+    const { connect } = mod;
     return connect(
       { hostname: cfg.host, port: cfg.port },
       { secureTransport: cfg.secure ? "on" : "starttls", allowHalfOpen: false },
@@ -50,7 +51,9 @@ async function openSocket(cfg: SmtpConfig): Promise<Duplex> {
         const upgraded = tls.connect({ socket: sock, servername: cfg.host, rejectUnauthorized: false });
         return wrap(upgraded as unknown as import("node:net").Socket);
       },
-      close: () => sock.destroy(),
+      close: () => {
+        sock.destroy();
+      },
     });
 
     const sock = cfg.secure
@@ -159,7 +162,7 @@ export async function sendViaSmtp(cfg: SmtpConfig, m: SmtpMessage): Promise<void
     const greeting = await conn.readReply();
     if (greeting.code !== 220) throw new Error(`SMTP greeting failed: ${greeting.text}`);
 
-    const ehloName = cfg.from?.host ?? "localhost";
+    const ehloName = m.from.email.split("@")[1] ?? "localhost";
     let caps = (await conn.cmd(`EHLO ${ehloName}`, [250], "EHLO")).text;
 
     if (!cfg.secure) {
