@@ -8,6 +8,16 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { smtpSettingsQuery, adminEmailLogQuery } from "@/lib/admin-queries";
 import { sendTestEmail } from "@/lib/mail.functions";
+/** Turns raw server errors into something an admin can act on. */
+function errorText(e: unknown) {
+  const raw = e instanceof Error ? e.message : typeof e === "string" ? e : "";
+  if (/Missing Supabase environment variable|Failed to fetch|NetworkError|dynamically imported module/i.test(raw)) {
+    return "The backend was restarting — reload the page and try again.";
+  }
+  if (/Unauthorized/i.test(raw)) return "Your session expired — sign in again and retry.";
+  return raw || "Failed";
+}
+
 
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
