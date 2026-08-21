@@ -122,6 +122,24 @@ export type Database = {
         }
         Relationships: []
       }
+      app_config: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value?: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: string
@@ -768,6 +786,7 @@ export type Database = {
       }
       smtp_settings: {
         Row: {
+          api_key: string
           enabled: boolean
           from_email: string
           from_name: string | null
@@ -775,11 +794,14 @@ export type Database = {
           id: number
           password: string
           port: number
+          provider: string
+          reply_to: string | null
           secure: boolean
           updated_at: string
           username: string
         }
         Insert: {
+          api_key?: string
           enabled?: boolean
           from_email?: string
           from_name?: string | null
@@ -787,11 +809,14 @@ export type Database = {
           id?: number
           password?: string
           port?: number
+          provider?: string
+          reply_to?: string | null
           secure?: boolean
           updated_at?: string
           username?: string
         }
         Update: {
+          api_key?: string
           enabled?: boolean
           from_email?: string
           from_name?: string | null
@@ -799,6 +824,8 @@ export type Database = {
           id?: number
           password?: string
           port?: number
+          provider?: string
+          reply_to?: string | null
           secure?: boolean
           updated_at?: string
           username?: string

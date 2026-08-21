@@ -10,40 +10,9 @@ type Payload = {
   subject: string;
 };
 
-async function loadContext() {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const [{ data: smtp }, { data: site }] = await Promise.all([
-    supabaseAdmin.from("smtp_settings").select("*").eq("id", 1).maybeSingle(),
-    supabaseAdmin.from("site_settings").select("*").eq("id", 1).maybeSingle(),
-  ]);
-  if (!smtp) throw new Error("Email settings missing");
-  const brand = {
-    brand_name: site?.brand_name ?? "Stable Finance Bank",
-    logo_url: site?.logo_url ?? null,
-    contact_email: site?.contact_email ?? "",
-    contact_phone: site?.contact_phone ?? "",
-    address: site?.address ?? "",
-    primary_color: site?.primary_color ?? "#0b2a4a",
-    accent_color: site?.accent_color ?? "#d98324",
-  };
-  return { supabaseAdmin, smtp, brand };
-}
-
 async function deliver(to: string, p: Payload) {
-  const { supabaseAdmin, smtp, brand } = await loadContext();
-  const { renderEmail, sendMail } = await import("./mailer.server");
-  const html = renderEmail(brand, p.title, p.intro, p.rows, p.footnote);
-  try {
-    await sendMail(smtp, brand, to, p.subject, html);
-    await supabaseAdmin.from("email_log").insert({ to_email: to, subject: p.subject, template: p.template, status: "sent" });
-    return { sent: true as const };
-  } catch (e) {
-    const message = e instanceof Error ? e.message : String(e);
-    await supabaseAdmin
-      .from("email_log")
-      .insert({ to_email: to, subject: p.subject, template: p.template, status: "failed", error: message });
-    return { sent: false as const, error: message };
-  }
+  const { sendBrandedEmail } = await import("./email/send.server");
+  return sendBrandedEmail(to, p);
 }
 
 /** Sends a notification to the signed-in customer's own address only. */
@@ -56,7 +25,7 @@ export const sendMyNotification = createServerFn({ method: "POST" })
     return deliver(email, data);
   });
 
-/** Admin-only: send a test message to any address to validate SMTP credentials. */
+/** Admin-only: send a test message to any address to validate the email provider. */
 export const sendTestEmail = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { to: string }) => {
@@ -67,10 +36,11 @@ export const sendTestEmail = createServerFn({ method: "POST" })
     const { data: isAdmin } = await context.supabase.rpc("has_role", { _user_id: context.userId, _role: "admin" });
     if (!isAdmin) throw new Error("Forbidden");
     return deliver(data.to, {
-      template: "smtp_test",
-      subject: "SMTP test message",
-      title: "Your mail server works",
-      intro: "This is a test message sent from your admin console to confirm outgoing email is configured correctly.",
+      template: "provider_test",
+      subject: "Email delivery test",
+      title: "Your email delivery works",
+      intro:
+        "This is a test message sent from your admin console to confirm outgoing email is configured correctly.",
       rows: [["Sent at", new Date().toLocaleString()]],
     });
   });

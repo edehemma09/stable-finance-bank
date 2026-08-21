@@ -41,6 +41,12 @@
   --color-surface: var(--surface);
   --color-surface-foreground: var(--surface-foreground);
   --color-brand-blue: var(--brand-blue);
+  --color-ink: var(--ink);
+  --color-ink-foreground: var(--ink-foreground);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-ivory: var(--ivory);
+  --color-ivory-foreground: var(--ivory-foreground);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -74,8 +80,15 @@
   --secondary-foreground: oklch(0.32 0.21 266);
   --muted: oklch(0.96 0.01 250);
   --muted-foreground: oklch(0.45 0.03 255);
-  --accent: oklch(0.535 0.26 274);
-  --accent-foreground: oklch(0.99 0 0);
+  /* Gold — the premium action colour. Blue stays the identity colour. */
+  --accent: oklch(0.735 0.126 88);
+  --accent-foreground: oklch(0.19 0.07 275);
+  --gold: oklch(0.735 0.126 88);
+  --gold-foreground: oklch(0.19 0.07 275);
+  --ink: oklch(0.19 0.07 275);
+  --ink-foreground: oklch(0.97 0.01 95);
+  --ivory: oklch(0.965 0.014 95);
+  --ivory-foreground: oklch(0.22 0.05 255);
   --destructive: oklch(0.55 0.22 25);
   --destructive-foreground: oklch(0.99 0 0);
   --success: oklch(0.55 0.13 155);
@@ -115,11 +128,17 @@
   --secondary-foreground: oklch(0.95 0.008 250);
   --muted: oklch(0.28 0.05 255);
   --muted-foreground: oklch(0.7 0.03 250);
-  --accent: oklch(0.62 0.24 272);
-  --accent-foreground: oklch(0.99 0 0);
+  --accent: oklch(0.78 0.13 88);
+  --accent-foreground: oklch(0.19 0.07 275);
+  --gold: oklch(0.78 0.13 88);
+  --gold-foreground: oklch(0.19 0.07 275);
+  --ink: oklch(0.16 0.05 275);
+  --ink-foreground: oklch(0.96 0.01 95);
+  --ivory: oklch(0.26 0.03 90);
+  --ivory-foreground: oklch(0.95 0.008 250);
   --border: oklch(1 0 0 / 12%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.62 0.24 272);
+  --ring: oklch(0.78 0.13 88);
 }
 
 @layer base {
