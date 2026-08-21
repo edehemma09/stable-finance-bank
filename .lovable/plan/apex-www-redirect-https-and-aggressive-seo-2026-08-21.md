@@ -1,6 +1,6 @@
 # Apex → www redirect, HTTPS, and aggressive SEO
 
-## 1. Redirecting stf-b.com → www.stf-b.com
+## 1. Redirecting stf-b.com → [www.stf-b.com](http://www.stf-b.com)
 
 Important: this app is not served by Apache, so an `.htaccess` file placed in the project does nothing here. There are two cases:
 
@@ -12,14 +12,17 @@ The `.htaccess` file is harmless in the Lovable deploy (ignored), so I'll includ
 ## 2. Aggressive SEO pass
 
 Site-wide files:
+
 - `public/robots.txt` — allow all crawlers and the AI crawlers (GPTBot, ClaudeBot, PerplexityBot, Google-Extended), disallow `/app/*`, `/admin/*`, `/auth*`.
 - `public/sitemap.xml` — every public marketing route (~55 pages) with priority and changefreq, using `https://www.stf-b.com` as the base once the domain is confirmed.
 
 Per-route metadata (all public routes):
+
 - Unique `title`, `description`, `og:title`, `og:description`, `og:type`, `og:url`, `twitter:card`, plus a self-referencing `<link rel="canonical">` on each leaf route. Many routes today have only a title and no description/og tags; several (including the homepage) have no `head()` at all.
 - Bank-specific, keyword-led descriptions per page (checking, savings, mortgage, auto loans, credit cards, business banking, etc.) rather than one boilerplate line.
 
 Structured data (JSON-LD):
+
 - Root: `BankOrCreditUnion` + `WebSite` with `SearchAction`, logo, contact point, sameAs.
 - Product/service routes: `FinancialProduct` where it fits.
 - Deep routes: `BreadcrumbList`.
@@ -35,3 +38,5 @@ Structured data (JSON-LD):
 - Head tags go in each route's `head()` via `createFileRoute`; canonical only on leaf routes (root-level canonical would duplicate).
 - Absolute URLs are used for `og:image`/`og:url` only after you confirm `www.stf-b.com` is the canonical host; otherwise relative paths.
 - No database or backend changes.
+- Write a simple cronjob to keep the supabase active 24/7 and note this webapp is hosted on vercel. so attcahce a verceljoson script to enable smoth operation
+- &nbsp;
