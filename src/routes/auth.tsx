@@ -121,21 +121,6 @@ function AuthPage() {
 
 
 
-
-          <form onSubmit={submit} className="space-y-3">
-            {mode === "signup" && (
-              <>
-                <div><Label htmlFor="fn">Full name</Label><Input id="fn" className="bg-card" value={fullName} onChange={(e) => setFullName(e.target.value)} required /></div>
-                <div>
-                  <Label htmlFor="un">Username</Label>
-                  <Input id="un" className="bg-card" value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} maxLength={20} autoComplete="username" placeholder="e.g. jordan_m" />
-                  <p className="mt-1 text-xs text-muted-foreground">3–20 characters. Letters, numbers, dot or underscore.</p>
-                </div>
-              </>
-            )}
-            <div><Label htmlFor="e">Email</Label><Input id="e" className="bg-card" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></div>
-            <div><Label htmlFor="p">Password</Label><Input id="p" className="bg-card" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>
-
           {pendingEmail && (
             <div className="mt-5 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm">
               <p className="font-semibold">Confirm your email</p>
