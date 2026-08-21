@@ -45,7 +45,7 @@ function SiteSettings() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Site settings saved"); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(errorText(e)),
   });
 
   return (
@@ -123,7 +123,7 @@ function SmtpPanel() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Email settings saved"); setS((v) => ({ ...v, api_key: "", password: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(errorText(e)),
   });
 
   const isSmtp = s.provider === "smtp";
@@ -139,7 +139,7 @@ function SmtpPanel() {
       if (!res?.sent) throw new Error(res?.error ?? "Send failed");
     },
     onSuccess: () => { toast.success("Test email sent"); qc.invalidateQueries({ queryKey: ["admin", "email_log"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(errorText(e)),
   });
 
   return (
