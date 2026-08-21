@@ -12,7 +12,9 @@ export const Route = createFileRoute("/auth/reset")({
     meta: [
       { title: "Choose a new password · Stable Finance Bank" },
       { name: "description", content: "Set a new password for your Stable Finance Bank online banking profile." },
+      { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Choose a new password · Stable Finance Bank" },
+
       { property: "og:description", content: "Set a new password for your online banking profile." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
