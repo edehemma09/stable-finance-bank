@@ -12,13 +12,17 @@ export type SignUpInput = {
 export const signUpWithBrandedEmail = createServerFn({ method: "POST" })
   .inputValidator((data: SignUpInput) => data)
   .handler(async ({ data }) => {
-    const { signUpAndSendConfirmation } = await import("./email/auth-links.server");
+    const { signUpAndSendConfirmation, providerReady } = await import("./email/auth-links.server");
+    // If the admin email provider isn't configured yet, let the built-in auth mailer handle it.
+    if (!(await providerReady())) return { sent: false as const, fallback: true as const, error: undefined };
     try {
-      return await signUpAndSendConfirmation(data);
+      const r = await signUpAndSendConfirmation(data);
+      return { ...r, fallback: false as const };
     } catch (e) {
-      return { sent: false as const, error: e instanceof Error ? e.message : String(e) };
+      return { sent: false as const, fallback: false as const, error: e instanceof Error ? e.message : String(e) };
     }
   });
+
 
 /** Public: re-sends the confirmation link. Generic result to avoid revealing whether an address exists. */
 export const resendConfirmationEmail = createServerFn({ method: "POST" })
