@@ -1,4 +1,11 @@
-import { sendBrandedEmail } from "./send.server";
+import { sendBrandedEmail, loadEmailContext } from "./send.server";
+
+/** True when the admin email provider is switched on and has everything it needs to send. */
+export async function providerReady() {
+  const { settings } = await loadEmailContext();
+  return Boolean(settings?.enabled && settings.from_email?.trim() && (settings.api_key?.trim() || settings.provider === "mailgun"));
+}
+
 
 type LinkKind = "signup" | "recovery" | "magiclink";
 
