@@ -1,0 +1,30 @@
+# Stable Finance Bank — Apache/cPanel rules
+# Force HTTPS + canonical www host in a single 301 hop.
+# (Ignored by Lovable/Vercel hosting; upload to an Apache document root to use.)
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1) Non-www (and any other host alias) -> https://www.stf-b.com
+  RewriteCond %{HTTP_HOST} !^www\.stf-b\.com$ [NC]
+  RewriteRule ^ https://www.stf-b.com%{REQUEST_URI} [R=301,L]
+
+  # 2) Plain HTTP on the canonical host -> HTTPS
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !=https
+  RewriteRule ^ https://www.stf-b.com%{REQUEST_URI} [R=301,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  # Only sent over HTTPS; tells browsers never to try http:// again.
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
+# SPA/SSR fallback if this app is ever served from Apache as static files
+<IfModule mod_rewrite.c>
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
