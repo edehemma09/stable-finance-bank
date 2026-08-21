@@ -15,10 +15,22 @@ import { signUpWithBrandedEmail, resendConfirmationEmail, sendPasswordResetEmail
 type Search = { mode?: "signin" | "signup"; redirect?: string };
 
 export const Route = createFileRoute("/auth")({
+  head: () => ({
+    meta: [
+      { title: "Sign in or open an account — Stable Finance Bank" },
+      { name: "description", content: "Sign in to Stable Finance Bank online banking, or open a new checking or savings account in minutes." },
+      { name: "robots", content: "noindex, follow" },
+      { property: "og:title", content: "Sign in — Stable Finance Bank" },
+      { property: "og:description", content: "Secure online banking sign-in." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
+    ],
+  }),
   validateSearch: (s: Record<string, unknown>): Search => ({
     mode: s.mode === "signup" ? "signup" : "signin",
     redirect: typeof s.redirect === "string" ? s.redirect : undefined,
   }),
+
   beforeLoad: async ({ search }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
