@@ -71,6 +71,20 @@ async function transport(s: DeliverySettings, from: { name: string; email: strin
   const key = s.api_key?.trim() || process.env["EMAIL_API_KEY"] || "";
   const provider = (s.provider || "resend").toLowerCase();
 
+  if (provider === "smtp") {
+    const { sendViaSmtp } = await import("./smtp.server");
+    return sendViaSmtp(
+      {
+        host: s.host?.trim() ?? "",
+        port: Number(s.port) || 465,
+        secure: s.secure !== false,
+        username: s.username?.trim() ?? "",
+        password: s.password ?? "",
+      },
+      { from, to, subject, html, replyTo: s.reply_to },
+    );
+  }
+
   if (provider === "resend") {
     if (!key) throw new Error("No Resend API key saved in admin settings");
     return post("https://api.resend.com/emails", { authorization: `Bearer ${key}` }, {
