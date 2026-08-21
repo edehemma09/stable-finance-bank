@@ -8,6 +8,16 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { smtpSettingsQuery, adminEmailLogQuery } from "@/lib/admin-queries";
 import { sendTestEmail } from "@/lib/mail.functions";
+/** Turns raw server errors into something an admin can act on. */
+function errorText(e: unknown) {
+  const raw = e instanceof Error ? e.message : typeof e === "string" ? e : "";
+  if (/Missing Supabase environment variable|Failed to fetch|NetworkError|dynamically imported module/i.test(raw)) {
+    return "The backend was restarting — reload the page and try again.";
+  }
+  if (/Unauthorized/i.test(raw)) return "Your session expired — sign in again and retry.";
+  return raw || "Failed";
+}
+
 
 
 export const Route = createFileRoute("/_authenticated/admin/settings")({
@@ -35,7 +45,7 @@ function SiteSettings() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Site settings saved"); qc.invalidateQueries(); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(errorText(e)),
   });
 
   return (
@@ -113,7 +123,7 @@ function SmtpPanel() {
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Email settings saved"); setS((v) => ({ ...v, api_key: "", password: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(errorText(e)),
   });
 
   const isSmtp = s.provider === "smtp";
@@ -129,7 +139,7 @@ function SmtpPanel() {
       if (!res?.sent) throw new Error(res?.error ?? "Send failed");
     },
     onSuccess: () => { toast.success("Test email sent"); qc.invalidateQueries({ queryKey: ["admin", "email_log"] }); },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e) => toast.error(errorText(e)),
   });
 
   return (
