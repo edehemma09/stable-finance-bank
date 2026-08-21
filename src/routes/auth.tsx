@@ -30,12 +30,16 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const search = useSearch({ from: "/auth" });
   const navigate = useNavigate();
+  const signUpFn = useServerFn(signUpWithBrandedEmail);
+  const resendFn = useServerFn(resendConfirmationEmail);
+  const resetFn = useServerFn(sendPasswordResetEmail);
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -48,15 +52,18 @@ function AuthPage() {
         }
         const { data: taken } = await supabase.from("profiles").select("id").eq("username", uname).maybeSingle();
         if (taken) throw new Error("That username is already taken.");
-        const { error } = await supabase.auth.signUp({
-          email, password,
-          options: { data: { full_name: fullName, username: uname }, emailRedirectTo: `${window.location.origin}/app` },
+        const res = await signUpFn({
+          data: { email, password, fullName, username: uname, origin: window.location.origin },
         });
-        if (error) throw error;
-        toast.success("Account created. Signing you in…");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
+        if (!res.sent) throw new Error(res.error ?? "We couldn't send your confirmation email.");
+        setPendingEmail(email);
+        toast.success("Account created. Check your inbox to confirm your email.");
+        return;
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        if (/confirm/i.test(error.message)) setPendingEmail(email);
+        throw error;
       }
       navigate({ to: search.redirect ?? "/app" });
     } catch (err) {
@@ -65,6 +72,28 @@ function AuthPage() {
       setLoading(false);
     }
   }
+
+  async function resend() {
+    if (!pendingEmail) return;
+    setLoading(true);
+    const res = await resendFn({ data: { email: pendingEmail, origin: window.location.origin } });
+    setLoading(false);
+    toast[res.error === "already_confirmed" ? "info" : "success"](
+      res.error === "already_confirmed" ? "That address is already confirmed — just sign in." : "Confirmation link sent.",
+    );
+  }
+
+  async function forgotPassword() {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Enter your email address first, then tap “Forgot password”.");
+      return;
+    }
+    setLoading(true);
+    await resetFn({ data: { email, origin: window.location.origin } });
+    setLoading(false);
+    toast.success("If that address has an account, a reset link is on its way.");
+  }
+
 
 
 
