@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Wallet, ArrowLeftRight, Upload, CreditCard, Receipt, FileText, Bell, User,
@@ -40,6 +40,19 @@ export function CustomerShell() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [moreOpen, setMoreOpen] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!profile?.avatar_url) {
+      setAvatarUrl(null);
+      return;
+    }
+    let active = true;
+    void supabase.storage.from("avatars").createSignedUrl(profile.avatar_url, 3600).then(({ data }) => {
+      if (active) setAvatarUrl(data?.signedUrl ?? null);
+    });
+    return () => { active = false; };
+  }, [profile?.avatar_url]);
 
   async function signOut() {
     await qc.cancelQueries();
@@ -86,7 +99,9 @@ export function CustomerShell() {
         {/* Mobile app bar */}
         <header className="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-primary px-4 text-primary-foreground md:hidden">
           <div className="flex min-w-0 items-center gap-3">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-accent text-sm font-bold text-primary">{initials}</div>
+            <div className="grid h-9 w-9 shrink-0 place-items-center overflow-hidden rounded-full bg-accent text-sm font-bold text-primary">
+              {avatarUrl ? <img src={avatarUrl} alt="" className="size-full object-cover" /> : initials}
+            </div>
             <div className="min-w-0">
               <p className="truncate text-xs text-primary-foreground/70">Welcome back</p>
               <p className="truncate text-sm font-semibold">{profile?.full_name ?? profile?.email}</p>
@@ -94,7 +109,9 @@ export function CustomerShell() {
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <Link to="/app/alerts" className="grid h-9 w-9 place-items-center rounded-full bg-primary-foreground/10"><Bell className="h-4 w-4" /></Link>
-            <Link to="/app/profile" className="grid h-9 w-9 place-items-center rounded-full bg-primary-foreground/10"><User className="h-4 w-4" /></Link>
+            <Link to="/app/profile" aria-label="Profile" className="grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-primary-foreground/10">
+              {avatarUrl ? <img src={avatarUrl} alt="" className="size-full object-cover" /> : <User className="h-4 w-4" />}
+            </Link>
           </div>
         </header>
         <main className="min-h-[calc(100vh-4rem)] pb-28 md:min-h-screen md:pb-0"><Outlet /></main>
