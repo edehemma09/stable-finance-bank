@@ -59,17 +59,31 @@ function SiteSettings() {
   );
 }
 
+const PROVIDERS = [
+  { id: "resend", label: "Resend", hint: "Paste the API key that starts with re_. Verify your sending domain in Resend first." },
+  { id: "brevo", label: "Brevo (Sendinblue)", hint: "Use an API v3 key from Brevo → SMTP & API → API keys." },
+  { id: "smtp2go", label: "SMTP2GO", hint: "Use an API key from SMTP2GO → Sending → API Keys." },
+  { id: "mailgun", label: "Mailgun", hint: "Paste your private API key, and put your Mailgun sending domain in the field below." },
+];
+
 function SmtpPanel() {
   const qc = useQueryClient();
   const { data } = useQuery(smtpSettingsQuery);
-  const [s, setS] = useState({ host: "", port: 465, secure: true, username: "", password: "", from_name: "", from_email: "", enabled: true });
+  const [s, setS] = useState({
+    provider: "resend", api_key: "", username: "", from_name: "", from_email: "", reply_to: "", enabled: true,
+  });
   const [testTo, setTestTo] = useState("");
 
   useEffect(() => {
     if (!data) return;
     setS({
-      host: data.host, port: data.port, secure: data.secure, username: data.username,
-      password: "", from_name: data.from_name ?? "", from_email: data.from_email, enabled: data.enabled,
+      provider: data.provider || "resend",
+      api_key: "",
+      username: data.username ?? "",
+      from_name: data.from_name ?? "",
+      from_email: data.from_email ?? "",
+      reply_to: data.reply_to ?? "",
+      enabled: data.enabled,
     });
   }, [data]);
 
@@ -77,24 +91,33 @@ function SmtpPanel() {
     mutationFn: async () => {
       const row: Record<string, unknown> = {
         id: 1,
-        host: s.host, port: Number(s.port), secure: s.secure, username: s.username,
-        from_name: s.from_name, from_email: s.from_email, enabled: s.enabled,
-        password: s.password.trim() ? s.password.trim() : (data?.password ?? ""),
+        provider: s.provider,
+        username: s.username,
+        from_name: s.from_name,
+        from_email: s.from_email.trim(),
+        reply_to: s.reply_to.trim() || null,
+        enabled: s.enabled,
+        api_key: s.api_key.trim() ? s.api_key.trim() : (data?.api_key ?? ""),
+        host: data?.host ?? "",
+        port: data?.port ?? 465,
+        secure: data?.secure ?? true,
+        password: data?.password ?? "",
       };
       const { error } = await supabase.from("smtp_settings").upsert(row as never, { onConflict: "id" });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("SMTP credentials saved"); setS((v) => ({ ...v, password: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
+    onSuccess: () => { toast.success("Email settings saved"); setS((v) => ({ ...v, api_key: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-  const configured = Boolean(s.host.trim() && s.from_email.trim());
+  const hasKey = Boolean(s.api_key.trim() || data?.api_key);
+  const configured = Boolean(hasKey && s.from_email.trim());
+  const hint = PROVIDERS.find((p) => p.id === s.provider)?.hint ?? "";
 
   const test = useMutation({
     mutationFn: async () => {
       const res = await sendTestEmail({ data: { to: testTo.trim() } });
       if (!res?.sent) throw new Error(res?.error ?? "Send failed");
-
     },
     onSuccess: () => { toast.success("Test email sent"); qc.invalidateQueries({ queryKey: ["admin", "email_log"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
@@ -103,7 +126,7 @@ function SmtpPanel() {
   return (
     <div className="mt-8 max-w-xl">
       <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-muted-foreground">Delivery</p>
-      <h2 className="font-display text-2xl">Email / SMTP</h2>
+      <h2 className="font-display text-2xl">Email delivery</h2>
       <div
         className={`mt-3 rounded-lg border px-4 py-3 text-sm ${
           configured && s.enabled
@@ -114,30 +137,46 @@ function SmtpPanel() {
         {configured && s.enabled
           ? "Email delivery is configured and enabled. Send a test below to confirm."
           : !configured
-            ? "Not configured — enter a host and from-address, save, then send a test email."
+            ? "Not configured — choose a provider, paste its API key and a from-address, save, then send a test."
             : "Credentials saved, but delivery is switched off. Tick “Email delivery enabled” to start sending."}
       </div>
       <div className="mt-4 grid gap-3 rounded-xl border bg-card p-5">
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div><Label>Host</Label><Input value={s.host} onChange={(e) => setS({ ...s, host: e.target.value })} /></div>
-          <div><Label>Port</Label><Input type="number" value={s.port} onChange={(e) => setS({ ...s, port: Number(e.target.value) })} /></div>
-        </div>
-        <div><Label>Username</Label><Input value={s.username} onChange={(e) => setS({ ...s, username: e.target.value })} /></div>
         <div>
-          <Label>Password</Label>
-          <Input type="password" placeholder="Leave blank to keep current password" value={s.password} onChange={(e) => setS({ ...s, password: e.target.value })} />
+          <Label>Provider</Label>
+          <select
+            className="mt-1 h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+            value={s.provider}
+            onChange={(e) => setS({ ...s, provider: e.target.value })}
+          >
+            {PROVIDERS.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}
+          </select>
+          <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
         </div>
+        <div>
+          <Label>API key</Label>
+          <Input
+            type="password"
+            placeholder={data?.api_key ? "Saved — leave blank to keep current key" : "Paste your provider API key"}
+            value={s.api_key}
+            onChange={(e) => setS({ ...s, api_key: e.target.value })}
+          />
+        </div>
+        {s.provider === "mailgun" && (
+          <div><Label>Mailgun sending domain</Label><Input value={s.username} onChange={(e) => setS({ ...s, username: e.target.value })} placeholder="mg.yourbank.com" /></div>
+        )}
         <div className="grid gap-3 sm:grid-cols-2">
           <div><Label>From name</Label><Input value={s.from_name} onChange={(e) => setS({ ...s, from_name: e.target.value })} /></div>
-          <div><Label>From email</Label><Input value={s.from_email} onChange={(e) => setS({ ...s, from_email: e.target.value })} /></div>
+          <div><Label>From email</Label><Input value={s.from_email} onChange={(e) => setS({ ...s, from_email: e.target.value })} placeholder="alerts@yourbank.com" /></div>
         </div>
-        <label className="flex items-center gap-2 text-sm">
-          <input type="checkbox" checked={s.secure} onChange={(e) => setS({ ...s, secure: e.target.checked })} /> Use TLS/SSL (implicit, port 465)
-        </label>
+        <div><Label>Reply-to (optional)</Label><Input value={s.reply_to} onChange={(e) => setS({ ...s, reply_to: e.target.value })} placeholder="support@yourbank.com" /></div>
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" checked={s.enabled} onChange={(e) => setS({ ...s, enabled: e.target.checked })} /> Email delivery enabled
         </label>
-        <Button onClick={() => save.mutate()} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save SMTP settings"}</Button>
+        <Button onClick={() => save.mutate()} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save email settings"}</Button>
+        <p className="text-xs text-muted-foreground">
+          This app runs on an edge runtime, which cannot open raw SMTP connections. Use one of the providers above with an API key — the same
+          mailbox and domain as your SMTP credentials, just over their HTTP API.
+        </p>
         <div className="mt-2 border-t pt-3">
           <Label>Send a test email</Label>
           <div className="mt-1 flex gap-2">
@@ -146,11 +185,15 @@ function SmtpPanel() {
               {test.isPending ? "Sending…" : "Send test"}
             </Button>
           </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            Automatic emails (welcome, verification, loan and cheque decisions, alerts) send themselves whenever a customer notification is created.
+          </p>
         </div>
       </div>
     </div>
   );
 }
+
 
 function EmailLogPanel() {
   const { data } = useQuery(adminEmailLogQuery);
