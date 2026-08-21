@@ -60,6 +60,7 @@ function SiteSettings() {
 }
 
 const PROVIDERS = [
+  { id: "smtp", label: "SMTP server (host, port, username, password)", hint: "Classic SMTP: enter your mail server host, port (465 for SSL/TLS, 587 for STARTTLS), username and password." },
   { id: "resend", label: "Resend", hint: "Paste the API key that starts with re_. Verify your sending domain in Resend first." },
   { id: "brevo", label: "Brevo (Sendinblue)", hint: "Use an API v3 key from Brevo → SMTP & API → API keys." },
   { id: "smtp2go", label: "SMTP2GO", hint: "Use an API key from SMTP2GO → Sending → API Keys." },
@@ -70,15 +71,20 @@ function SmtpPanel() {
   const qc = useQueryClient();
   const { data } = useQuery(smtpSettingsQuery);
   const [s, setS] = useState({
-    provider: "resend", api_key: "", username: "", from_name: "", from_email: "", reply_to: "", enabled: true,
+    provider: "smtp", api_key: "", host: "", port: 465, secure: true, password: "",
+    username: "", from_name: "", from_email: "", reply_to: "", enabled: true,
   });
   const [testTo, setTestTo] = useState("");
 
   useEffect(() => {
     if (!data) return;
     setS({
-      provider: data.provider || "resend",
+      provider: data.provider || "smtp",
       api_key: "",
+      host: data.host ?? "",
+      port: data.port ?? 465,
+      secure: data.secure ?? true,
+      password: "",
       username: data.username ?? "",
       from_name: data.from_name ?? "",
       from_email: data.from_email ?? "",
@@ -98,19 +104,22 @@ function SmtpPanel() {
         reply_to: s.reply_to.trim() || null,
         enabled: s.enabled,
         api_key: s.api_key.trim() ? s.api_key.trim() : (data?.api_key ?? ""),
-        host: data?.host ?? "",
-        port: data?.port ?? 465,
-        secure: data?.secure ?? true,
-        password: data?.password ?? "",
+        host: s.host.trim(),
+        port: Number(s.port) || 465,
+        secure: s.secure,
+        password: s.password ? s.password : (data?.password ?? ""),
       };
       const { error } = await supabase.from("smtp_settings").upsert(row as never, { onConflict: "id" });
       if (error) throw error;
     },
-    onSuccess: () => { toast.success("Email settings saved"); setS((v) => ({ ...v, api_key: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
+    onSuccess: () => { toast.success("Email settings saved"); setS((v) => ({ ...v, api_key: "", password: "" })); qc.invalidateQueries({ queryKey: ["admin"] }); },
     onError: (e) => toast.error(e instanceof Error ? e.message : "Failed"),
   });
 
-  const hasKey = Boolean(s.api_key.trim() || data?.api_key);
+  const isSmtp = s.provider === "smtp";
+  const hasKey = isSmtp
+    ? Boolean(s.host.trim() && (s.password || data?.password))
+    : Boolean(s.api_key.trim() || data?.api_key);
   const configured = Boolean(hasKey && s.from_email.trim());
   const hint = PROVIDERS.find((p) => p.id === s.provider)?.hint ?? "";
 
@@ -152,15 +161,40 @@ function SmtpPanel() {
           </select>
           <p className="mt-1 text-xs text-muted-foreground">{hint}</p>
         </div>
-        <div>
-          <Label>API key</Label>
-          <Input
-            type="password"
-            placeholder={data?.api_key ? "Saved — leave blank to keep current key" : "Paste your provider API key"}
-            value={s.api_key}
-            onChange={(e) => setS({ ...s, api_key: e.target.value })}
-          />
-        </div>
+        {isSmtp ? (
+          <>
+            <div className="grid gap-3 sm:grid-cols-[2fr_1fr]">
+              <div><Label>SMTP host</Label><Input value={s.host} onChange={(e) => setS({ ...s, host: e.target.value })} placeholder="mail.yourbank.com" /></div>
+              <div><Label>Port</Label><Input type="number" value={s.port} onChange={(e) => setS({ ...s, port: Number(e.target.value) })} /></div>
+            </div>
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" checked={s.secure} onChange={(e) => setS({ ...s, secure: e.target.checked, port: e.target.checked ? 465 : 587 })} />
+              Use SSL/TLS (port 465). Untick for STARTTLS (port 587).
+            </label>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div><Label>Username</Label><Input value={s.username} onChange={(e) => setS({ ...s, username: e.target.value })} placeholder="alerts@yourbank.com" /></div>
+              <div>
+                <Label>Password</Label>
+                <Input
+                  type="password"
+                  placeholder={data?.password ? "Saved — leave blank to keep current" : "SMTP password"}
+                  value={s.password}
+                  onChange={(e) => setS({ ...s, password: e.target.value })}
+                />
+              </div>
+            </div>
+          </>
+        ) : (
+          <div>
+            <Label>API key</Label>
+            <Input
+              type="password"
+              placeholder={data?.api_key ? "Saved — leave blank to keep current key" : "Paste your provider API key"}
+              value={s.api_key}
+              onChange={(e) => setS({ ...s, api_key: e.target.value })}
+            />
+          </div>
+        )}
         {s.provider === "mailgun" && (
           <div><Label>Mailgun sending domain</Label><Input value={s.username} onChange={(e) => setS({ ...s, username: e.target.value })} placeholder="mg.yourbank.com" /></div>
         )}
@@ -174,8 +208,9 @@ function SmtpPanel() {
         </label>
         <Button onClick={() => save.mutate()} disabled={save.isPending}>{save.isPending ? "Saving…" : "Save email settings"}</Button>
         <p className="text-xs text-muted-foreground">
-          This app runs on an edge runtime, which cannot open raw SMTP connections. Use one of the providers above with an API key — the same
-          mailbox and domain as your SMTP credentials, just over their HTTP API.
+          {isSmtp
+            ? "Direct SMTP delivery. Some hosts block outbound SMTP ports — if a test fails to connect, try port 465 with SSL/TLS, or switch to one of the API providers above."
+            : "Provider HTTP API delivery — the same mailbox and domain as your SMTP credentials, just over their API."}
         </p>
         <div className="mt-2 border-t pt-3">
           <Label>Send a test email</Label>
