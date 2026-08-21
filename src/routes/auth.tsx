@@ -55,10 +55,20 @@ function AuthPage() {
         const res = await signUpFn({
           data: { email, password, fullName, username: uname, origin: window.location.origin },
         });
-        if (!res.sent) throw new Error(res.error ?? "We couldn't send your confirmation email.");
+        if (res.fallback) {
+          const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: fullName, username: uname }, emailRedirectTo: `${window.location.origin}/app` },
+          });
+          if (error) throw error;
+        } else if (!res.sent) {
+          throw new Error(res.error ?? "We couldn't send your confirmation email.");
+        }
         setPendingEmail(email);
         toast.success("Account created. Check your inbox to confirm your email.");
         return;
+
       }
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
