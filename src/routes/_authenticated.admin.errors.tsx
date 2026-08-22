@@ -90,8 +90,8 @@ function Diagnostics() {
               </div>
             ) : (
               <div className="mt-4 border-t pt-4">
-                <Button variant="outline" onClick={() => analyze.mutate(event.id)} disabled={analyze.isPending || event.ai_status === "analyzing"}>
-                  <Bot />{event.ai_status === "analyzing" ? "Analyzing…" : event.ai_status === "failed" ? "Retry analysis" : "Analyze incident"}
+                <Button variant="outline" onClick={() => analyze.mutate(event.id)} disabled={analyze.isPending}>
+                  <Bot />{analyze.isPending ? "Analyzing…" : event.ai_status === "failed" || event.ai_status === "analyzing" ? "Retry analysis" : "Analyze incident"}
                 </Button>
                 {event.ai_error && <p className="mt-2 text-xs text-destructive">{event.ai_error}</p>}
               </div>

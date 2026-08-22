@@ -17,11 +17,12 @@ export const analyzeErrorEvent = createServerFn({ method: "POST" })
       .eq("id", data.id)
       .single();
     if (error || !event) throw new Error("Incident not found");
-    await supabaseAdmin.from("error_events").update({ ai_status: "analyzing", ai_error: null }).eq("id", data.id);
+    const { error: startError } = await supabaseAdmin.from("error_events").update({ ai_status: "analyzing", ai_error: null }).eq("id", data.id);
+    if (startError) throw new Error(`Could not start analysis: ${startError.message}`);
     try {
       const { analyzeDiagnosticEvent } = await import("@/lib/diagnostics-ai.server");
       const analysis = await analyzeDiagnosticEvent(event);
-      await supabaseAdmin.from("error_events").update({
+      const { error: saveError } = await supabaseAdmin.from("error_events").update({
         ai_status: "ready",
         ai_cause: analysis.cause.slice(0, 2_000),
         ai_confidence: analysis.confidence.slice(0, 20),
@@ -29,10 +30,12 @@ export const analyzeErrorEvent = createServerFn({ method: "POST" })
         ai_action_kind: analysis.actionKind.slice(0, 80),
         analyzed_at: new Date().toISOString(),
       }).eq("id", data.id);
+      if (saveError) throw new Error(`Could not save analysis: ${saveError.message}`);
       return analysis;
     } catch (analysisError) {
       const message = analysisError instanceof Error ? analysisError.message : String(analysisError);
-      await supabaseAdmin.from("error_events").update({ ai_status: "failed", ai_error: message.slice(0, 1_000) }).eq("id", data.id);
+      const { error: failureSaveError } = await supabaseAdmin.from("error_events").update({ ai_status: "failed", ai_error: message.slice(0, 1_000) }).eq("id", data.id);
+      if (failureSaveError) console.error("Could not save diagnostic failure", failureSaveError);
       throw analysisError;
     }
   });
