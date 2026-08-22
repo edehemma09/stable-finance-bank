@@ -1,37 +1,42 @@
-# Why Vercel isn't showing your latest changes
+# Fix the deploy block: move keep-alive off Vercel cron onto the database
 
-## What I checked
+## What's happening
 
-I probed the live site at www.stf-b.com and compared it with the current code here.
+You're right — the cron is the blocker. `vercel.json` currently declares:
 
-- The live site is definitely served by Vercel (`server: Vercel` header), and its server side is alive — marketing pages, `/admin` and `/auth` all render server-rendered HTML.
-- But routes and endpoints that were added in recent rounds return 404 on the live site:
-  - `/admin/errors` (the Diagnostics console) → 404
-  - `/api/public/keepalive` (the cron keep-alive endpoint) → 404
-  - `/api/public/error-report` (browser error logging) → 404
-- All three of those files exist in this codebase and are wired into the route tree.
+```text
+"crons": [ { "path": "/api/public/keepalive", "schedule": "*/10 * * * *" } ]
+```
 
-So the code is fine. Vercel is building an **older commit** — the deployment is not stale in the browser, it genuinely does not contain these files. That's a code-delivery problem between Lovable → GitHub → Vercel, not an app bug.
+Vercel's Hobby plan only permits **one cron job, running at most once per day**. A sub-daily schedule is rejected at deploy time, so the build never completes and the previously working deployment keeps serving. That matches exactly what you saw: the site is live and healthy, but every route added in recent rounds (`/admin/errors`, `/api/public/keepalive`, `/api/public/error-report`) returns 404 because that code was never deployed.
 
-## The likely causes (in order)
+## What I found in the database
 
-1. **"Redeploy" on Vercel re-runs the same commit.** Clicking Redeploy on an existing deployment rebuilds *that* deployment's commit, not the newest one on the branch. This alone explains everything you're seeing.
-2. **Branch mismatch.** Lovable's Git sync may be pushing to a branch (e.g. `lovable` or `main`) that isn't the Production Branch configured in Vercel.
-3. **Git sync stalled.** If the Lovable ↔ GitHub connection lapsed, the repo simply never received the last several rounds of work.
+There is one scheduled job today:
 
-## What I'll do
+```text
+stable-finance-keepalive   */10 * * * *   active   command: SELECT 1;
+```
 
-Since I can't read your GitHub or Vercel account from here, the plan is: confirm which of the three it is, then fix the pipeline so future changes flow through automatically.
+So the database is already pinging itself every 10 minutes — but `SELECT 1` only touches Postgres. It never reaches the web app, so the frontend/server side has no keep-alive at all right now.
 
-1. **Verify what GitHub actually has.** Connect the GitHub connector so I can read the repo directly, then check the latest commit on each branch for the presence of `src/routes/_authenticated.admin.errors.tsx` and `src/routes/api/public/keepalive.ts`.
-   - If those files are missing from the repo → Git sync is broken; you reconnect Git sync in Lovable settings and I re-verify.
-   - If they are present → the repo is current and the problem is entirely on the Vercel side (cause 1 or 2).
-2. **Correct the Vercel side.** Guide you through: Vercel → Project → Settings → Git → confirm the Production Branch matches the branch Lovable pushes to, then trigger a fresh deploy from the newest commit (Deployments → the top commit → Redeploy with "Use existing Build Cache" **unchecked**), not a redeploy of an old deployment.
-3. **Add a build stamp so this is never ambiguous again.** Expose the build's commit SHA and build time at `/api/public/version`, and show it in the admin footer next to the existing "VERSION 2.8.4-STABLE" text. Then a single request tells us exactly which commit is live.
-4. **Re-verify the live site** after the deploy: confirm `/admin/errors`, `/api/public/keepalive` and `/api/public/error-report` all respond, and that the Diagnostics item appears in the admin sidebar.
+## The fix
+
+**1. Make the Vercel cron daily.** Change the schedule in `vercel.json` from `*/10 * * * *` to `0 6 * * *` (once a day, 06:00 UTC). This satisfies the Hobby-plan limit and unblocks deploys. It stays as a daily health check.
+
+**2. Make the database the primary keep-alive.** Upgrade the existing `stable-finance-keepalive` job so instead of `SELECT 1` it uses `pg_net` to make a real HTTP request to `/api/public/keepalive` every 10 minutes. That single request wakes both tiers at once: it hits the app's server runtime, and the endpoint itself reads a row from `site_settings`, which wakes the database. One job, both systems warm.
+
+**3. Add a lightweight ping log.** Record each keep-alive result (status, duration, timestamp) so you can confirm from the admin Diagnostics page that the schedule is actually firing, rather than assuming it is.
+
+**4. Re-verify after deploy.** Once Vercel accepts the build, confirm `/admin/errors`, `/api/public/keepalive` and `/api/public/error-report` all respond on the live site and the Diagnostics item appears in the admin sidebar.
 
 ## Technical notes
 
-- `vercel.json` (apex→www 301, HSTS headers, the `*/10 * * * *` keep-alive cron) is already committed. The cron currently points at `/api/public/keepalive`, which 404s on the live build — further confirmation the deployed commit predates that work.
-- The build stamp will read Vercel's `VERCEL_GIT_COMMIT_SHA` env var at build time, falling back to `"local"` in the sandbox, so it works in both environments.
-- No changes to app logic, database, or email are included here — this is strictly about deployment delivery and observability of which commit is live.
+- The `pg_cron` job will be rescheduled with `cron.schedule` using `net.http_post` against the stable production URL, run through the SQL tool (not a migration) since it contains environment-specific URL values.
+- `pg_net` needs to be enabled alongside `pg_cron`; I'll verify and enable it if absent.
+- The keep-alive endpoint stays under `/api/public/*` so it bypasses site auth, and it remains read-only — it selects one id from `site_settings` and returns JSON. No data is written by the ping itself.
+- No app logic, email, or auth behaviour changes in this plan. It is confined to the cron configuration, the keep-alive endpoint's logging, and the deploy unblock.
+
+## One thing to check on your side
+
+After this change lands and Vercel builds successfully, if the build *still* fails, the next most likely cause is the Hobby-plan limit of one cron total. `vercel.json` declares only one, so this should clear it — but the Vercel deployment log will name the exact reason if not, and I'd want to see that message.
