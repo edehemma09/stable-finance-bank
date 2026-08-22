@@ -59,6 +59,13 @@ export default {
       return await normalizeCatastrophicSsrResponse(response);
     } catch (error) {
       console.error(error);
+      const { recordErrorEvent } = await import("./lib/error-logger.server");
+      await recordErrorEvent(error, {
+        source: "server_entry",
+        route: new URL(request.url).pathname,
+        action: "unhandled_server_error",
+        severity: "critical",
+      });
       return new Response(renderErrorPage(), {
         status: 500,
         headers: { "content-type": "text/html; charset=utf-8" },

@@ -77,7 +77,8 @@ function AdminMessages() {
           footnote: f.footnote.trim() || undefined,
         },
       });
-      if (!res?.sent) throw new Error(`${res?.error ?? "Send failed"}${res?.incidentCode ? ` · ${res.incidentCode}` : ""}`);
+      const incidentCode = res && "incidentCode" in res ? res.incidentCode : undefined;
+      if (!res?.sent) throw new Error(`${res?.error ?? "Send failed"}${incidentCode ? ` · ${incidentCode}` : ""}`);
     },
     onSuccess: () => {
       toast.success("Email sent");

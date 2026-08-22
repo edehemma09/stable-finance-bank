@@ -136,7 +136,8 @@ function SmtpPanel() {
   const test = useMutation({
     mutationFn: async () => {
       const res = await sendTestEmail({ data: { to: testTo.trim() } });
-      if (!res?.sent) throw new Error(`${res?.error ?? "Send failed"}${res?.incidentCode ? ` · ${res.incidentCode}` : ""}`);
+      const incidentCode = res && "incidentCode" in res ? res.incidentCode : undefined;
+      if (!res?.sent) throw new Error(`${res?.error ?? "Send failed"}${incidentCode ? ` · ${incidentCode}` : ""}`);
     },
     onSuccess: () => { toast.success("Test email sent"); qc.invalidateQueries({ queryKey: ["admin", "email_log"] }); },
     onError: (e) => { reportActionError(e, "send_test_email"); toast.error(errorText(e)); },

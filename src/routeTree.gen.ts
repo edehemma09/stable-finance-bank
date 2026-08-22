@@ -73,6 +73,7 @@ import { Route as AuthenticatedAdminRecycleRouteImport } from './routes/_authent
 import { Route as AuthenticatedAdminMessagesRouteImport } from './routes/_authenticated.admin.messages'
 import { Route as AuthenticatedAdminLoansRouteImport } from './routes/_authenticated.admin.loans'
 import { Route as AuthenticatedAdminKycRouteImport } from './routes/_authenticated.admin.kyc'
+import { Route as AuthenticatedAdminErrorsRouteImport } from './routes/_authenticated.admin.errors'
 import { Route as AuthenticatedAdminCmsRouteImport } from './routes/_authenticated.admin.cms'
 import { Route as AuthenticatedAdminChequesRouteImport } from './routes/_authenticated.admin.cheques'
 import { Route as AuthenticatedAppSupportIndexRouteImport } from './routes/_authenticated.app.support.index'
@@ -410,6 +411,12 @@ const AuthenticatedAdminKycRoute = AuthenticatedAdminKycRouteImport.update({
   path: '/kyc',
   getParentRoute: () => AuthenticatedAdminRoute,
 } as any)
+const AuthenticatedAdminErrorsRoute =
+  AuthenticatedAdminErrorsRouteImport.update({
+    id: '/errors',
+    path: '/errors',
+    getParentRoute: () => AuthenticatedAdminRoute,
+  } as any)
 const AuthenticatedAdminCmsRoute = AuthenticatedAdminCmsRouteImport.update({
   id: '/cms',
   path: '/cms',
@@ -516,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/legal/terms': typeof LegalTermsRoute
   '/admin/cheques': typeof AuthenticatedAdminChequesRoute
   '/admin/cms': typeof AuthenticatedAdminCmsRoute
+  '/admin/errors': typeof AuthenticatedAdminErrorsRoute
   '/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/admin/loans': typeof AuthenticatedAdminLoansRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
@@ -589,6 +597,7 @@ export interface FileRoutesByTo {
   '/legal/terms': typeof LegalTermsRoute
   '/admin/cheques': typeof AuthenticatedAdminChequesRoute
   '/admin/cms': typeof AuthenticatedAdminCmsRoute
+  '/admin/errors': typeof AuthenticatedAdminErrorsRoute
   '/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/admin/loans': typeof AuthenticatedAdminLoansRoute
   '/admin/messages': typeof AuthenticatedAdminMessagesRoute
@@ -666,6 +675,7 @@ export interface FileRoutesById {
   '/legal/terms': typeof LegalTermsRoute
   '/_authenticated/admin/cheques': typeof AuthenticatedAdminChequesRoute
   '/_authenticated/admin/cms': typeof AuthenticatedAdminCmsRoute
+  '/_authenticated/admin/errors': typeof AuthenticatedAdminErrorsRoute
   '/_authenticated/admin/kyc': typeof AuthenticatedAdminKycRoute
   '/_authenticated/admin/loans': typeof AuthenticatedAdminLoansRoute
   '/_authenticated/admin/messages': typeof AuthenticatedAdminMessagesRoute
@@ -743,6 +753,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin/cheques'
     | '/admin/cms'
+    | '/admin/errors'
     | '/admin/kyc'
     | '/admin/loans'
     | '/admin/messages'
@@ -816,6 +827,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/admin/cheques'
     | '/admin/cms'
+    | '/admin/errors'
     | '/admin/kyc'
     | '/admin/loans'
     | '/admin/messages'
@@ -892,6 +904,7 @@ export interface FileRouteTypes {
     | '/legal/terms'
     | '/_authenticated/admin/cheques'
     | '/_authenticated/admin/cms'
+    | '/_authenticated/admin/errors'
     | '/_authenticated/admin/kyc'
     | '/_authenticated/admin/loans'
     | '/_authenticated/admin/messages'
@@ -1419,6 +1432,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminKycRouteImport
       parentRoute: typeof AuthenticatedAdminRoute
     }
+    '/_authenticated/admin/errors': {
+      id: '/_authenticated/admin/errors'
+      path: '/errors'
+      fullPath: '/admin/errors'
+      preLoaderRoute: typeof AuthenticatedAdminErrorsRouteImport
+      parentRoute: typeof AuthenticatedAdminRoute
+    }
     '/_authenticated/admin/cms': {
       id: '/_authenticated/admin/cms'
       path: '/cms'
@@ -1495,6 +1515,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedAdminRouteChildren {
   AuthenticatedAdminChequesRoute: typeof AuthenticatedAdminChequesRoute
   AuthenticatedAdminCmsRoute: typeof AuthenticatedAdminCmsRoute
+  AuthenticatedAdminErrorsRoute: typeof AuthenticatedAdminErrorsRoute
   AuthenticatedAdminKycRoute: typeof AuthenticatedAdminKycRoute
   AuthenticatedAdminLoansRoute: typeof AuthenticatedAdminLoansRoute
   AuthenticatedAdminMessagesRoute: typeof AuthenticatedAdminMessagesRoute
@@ -1510,6 +1531,7 @@ interface AuthenticatedAdminRouteChildren {
 const AuthenticatedAdminRouteChildren: AuthenticatedAdminRouteChildren = {
   AuthenticatedAdminChequesRoute: AuthenticatedAdminChequesRoute,
   AuthenticatedAdminCmsRoute: AuthenticatedAdminCmsRoute,
+  AuthenticatedAdminErrorsRoute: AuthenticatedAdminErrorsRoute,
   AuthenticatedAdminKycRoute: AuthenticatedAdminKycRoute,
   AuthenticatedAdminLoansRoute: AuthenticatedAdminLoansRoute,
   AuthenticatedAdminMessagesRoute: AuthenticatedAdminMessagesRoute,
