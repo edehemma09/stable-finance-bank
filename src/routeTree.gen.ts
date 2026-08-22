@@ -56,6 +56,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.
 import { Route as AuthenticatedAppIndexRouteImport } from './routes/_authenticated.app.index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated.admin.index'
 import { Route as ApiPublicKeepaliveRouteImport } from './routes/api/public/keepalive'
+import { Route as ApiPublicErrorReportRouteImport } from './routes/api/public/error-report'
 import { Route as ApiPublicEmailHookRouteImport } from './routes/api/public/email-hook'
 import { Route as AuthenticatedAppWealthRouteImport } from './routes/_authenticated.app.wealth'
 import { Route as AuthenticatedAppTransfersRouteImport } from './routes/_authenticated.app.transfers'
@@ -317,6 +318,11 @@ const ApiPublicKeepaliveRoute = ApiPublicKeepaliveRouteImport.update({
   path: '/api/public/keepalive',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicErrorReportRoute = ApiPublicErrorReportRouteImport.update({
+  id: '/api/public/error-report',
+  path: '/api/public/error-report',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicEmailHookRoute = ApiPublicEmailHookRouteImport.update({
   id: '/api/public/email-hook',
   path: '/api/public/email-hook',
@@ -526,6 +532,7 @@ export interface FileRoutesByFullPath {
   '/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/app/wealth': typeof AuthenticatedAppWealthRoute
   '/api/public/email-hook': typeof ApiPublicEmailHookRoute
+  '/api/public/error-report': typeof ApiPublicErrorReportRoute
   '/api/public/keepalive': typeof ApiPublicKeepaliveRoute
   '/admin/': typeof AuthenticatedAdminIndexRoute
   '/app/': typeof AuthenticatedAppIndexRoute
@@ -598,6 +605,7 @@ export interface FileRoutesByTo {
   '/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/app/wealth': typeof AuthenticatedAppWealthRoute
   '/api/public/email-hook': typeof ApiPublicEmailHookRoute
+  '/api/public/error-report': typeof ApiPublicErrorReportRoute
   '/api/public/keepalive': typeof ApiPublicKeepaliveRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
   '/app': typeof AuthenticatedAppIndexRoute
@@ -674,6 +682,7 @@ export interface FileRoutesById {
   '/_authenticated/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/_authenticated/app/wealth': typeof AuthenticatedAppWealthRoute
   '/api/public/email-hook': typeof ApiPublicEmailHookRoute
+  '/api/public/error-report': typeof ApiPublicErrorReportRoute
   '/api/public/keepalive': typeof ApiPublicKeepaliveRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
   '/_authenticated/app/': typeof AuthenticatedAppIndexRoute
@@ -750,6 +759,7 @@ export interface FileRouteTypes {
     | '/app/transfers'
     | '/app/wealth'
     | '/api/public/email-hook'
+    | '/api/public/error-report'
     | '/api/public/keepalive'
     | '/admin/'
     | '/app/'
@@ -822,6 +832,7 @@ export interface FileRouteTypes {
     | '/app/transfers'
     | '/app/wealth'
     | '/api/public/email-hook'
+    | '/api/public/error-report'
     | '/api/public/keepalive'
     | '/admin'
     | '/app'
@@ -897,6 +908,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/transfers'
     | '/_authenticated/app/wealth'
     | '/api/public/email-hook'
+    | '/api/public/error-report'
     | '/api/public/keepalive'
     | '/_authenticated/admin/'
     | '/_authenticated/app/'
@@ -953,6 +965,7 @@ export interface RootRouteChildren {
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
   ApiPublicEmailHookRoute: typeof ApiPublicEmailHookRoute
+  ApiPublicErrorReportRoute: typeof ApiPublicErrorReportRoute
   ApiPublicKeepaliveRoute: typeof ApiPublicKeepaliveRoute
 }
 
@@ -1287,6 +1300,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicKeepaliveRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/error-report': {
+      id: '/api/public/error-report'
+      path: '/api/public/error-report'
+      fullPath: '/api/public/error-report'
+      preLoaderRoute: typeof ApiPublicErrorReportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/email-hook': {
       id: '/api/public/email-hook'
       path: '/api/public/email-hook'
@@ -1611,6 +1631,7 @@ const rootRouteChildren: RootRouteChildren = {
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
   ApiPublicEmailHookRoute: ApiPublicEmailHookRoute,
+  ApiPublicErrorReportRoute: ApiPublicErrorReportRoute,
   ApiPublicKeepaliveRoute: ApiPublicKeepaliveRoute,
 }
 export const routeTree = rootRouteImport
