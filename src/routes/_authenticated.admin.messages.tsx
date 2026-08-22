@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus, Trash2, Mail } from "lucide-react";
+import { errorText, isTransient } from "@/lib/error-text";
 
 export const Route = createFileRoute("/_authenticated/admin/messages")({
   validateSearch: (s: Record<string, unknown>) => ({ u: typeof s.u === "string" ? s.u : undefined }),
@@ -63,6 +64,8 @@ function AdminMessages() {
   const selected = (customers ?? []).find((c) => c.id === userId);
 
   const send = useMutation({
+    retry: (count, e) => count < 1 && isTransient(e),
+    retryDelay: 800,
     mutationFn: async () => {
       const res = await sendCustomerNotification({
         data: {
@@ -81,7 +84,7 @@ function AdminMessages() {
       toast.success("Email sent");
       qc.invalidateQueries({ queryKey: ["admin", "email_log"] });
     },
-    onError: (e) => toast.error(e instanceof Error ? e.message : "Send failed"),
+    onError: (e) => toast.error(errorText(e)),
   });
 
   const canSend = Boolean(userId && f.subject.trim() && f.intro.trim());

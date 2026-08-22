@@ -2,6 +2,7 @@ import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
+import { ensureSupabaseEnv } from "./lib/supabase-env";
 
 type ServerEntry = {
   fetch: (request: Request, env: unknown, ctx: unknown) => Promise<Response> | Response;
@@ -10,13 +11,9 @@ type ServerEntry = {
 let serverEntryPromise: Promise<ServerEntry> | undefined;
 
 function bindRuntimeEnvironment(env: unknown) {
-  if (!env || typeof env !== "object") return;
-  const bindings = env as Record<string, unknown>;
-  for (const key of ["SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY"] as const) {
-    const value = bindings[key];
-    if (typeof value === "string" && value && !process.env[key]) process.env[key] = value;
-  }
+  ensureSupabaseEnv(env);
 }
+
 
 async function getServerEntry(): Promise<ServerEntry> {
   if (!serverEntryPromise) {
