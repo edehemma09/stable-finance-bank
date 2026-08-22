@@ -42,18 +42,27 @@ function Customers() {
           <tbody>
             {data.map((c) => (
               <tr key={c.id} className="border-b last:border-0 hover:bg-muted/30">
-                <td className="px-4 py-3">
-                  <Link to="/admin/customers/$id" params={{ id: c.id }} className="font-medium hover:underline">
-                    {c.full_name ?? "Unnamed"}
+                <td className="p-0">
+                  <Link to="/admin/customers/$id" params={{ id: c.id }} className="block px-4 py-3">
+                    <span className="font-medium hover:underline">{c.full_name ?? "Unnamed"}</span>
+                    <span className="block text-xs text-muted-foreground">{c.email}</span>
                   </Link>
-                  <p className="text-xs text-muted-foreground">{c.email}</p>
                 </td>
-                <td className="px-4 py-3 font-mono text-xs">{c.username ?? "—"}</td>
-                <td className="px-4 py-3">
-                  <span className={`rounded-full border px-2 py-0.5 text-[11px] capitalize ${statusTone(c.status)}`}>{c.status}</span>
+                <td className="p-0 font-mono text-xs">
+                  <Link to="/admin/customers/$id" params={{ id: c.id }} className="block px-4 py-3">{c.username ?? "—"}</Link>
                 </td>
-                <td className="px-4 py-3 text-xs capitalize text-muted-foreground">{c.kyc_status}</td>
-                <td className="px-4 py-3 text-right font-mono">{formatUSD(c.transaction_limit)}</td>
+                <td className="p-0">
+                  <Link to="/admin/customers/$id" params={{ id: c.id }} className="block px-4 py-3">
+                    <span className={`rounded-full border px-2 py-0.5 text-[11px] capitalize ${statusTone(c.status)}`}>{c.status}</span>
+                  </Link>
+                </td>
+                <td className="p-0 text-xs capitalize text-muted-foreground">
+                  <Link to="/admin/customers/$id" params={{ id: c.id }} className="block px-4 py-3">{c.kyc_status}</Link>
+                </td>
+                <td className="p-0 text-right font-mono">
+                  <Link to="/admin/customers/$id" params={{ id: c.id }} className="block px-4 py-3">{formatUSD(c.transaction_limit)}</Link>
+                </td>
+
               </tr>
             ))}
             {data.length === 0 && (
