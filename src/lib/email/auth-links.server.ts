@@ -3,11 +3,27 @@ import { sendBrandedEmail, loadEmailContext } from "./send.server";
 /** True when the admin email provider is switched on and has everything it needs to send. */
 export async function providerReady() {
   const { settings } = await loadEmailContext();
-  return Boolean(settings?.enabled && settings.from_email?.trim() && (settings.api_key?.trim() || settings.provider === "mailgun"));
+  if (!settings?.enabled || !settings.from_email?.trim()) return false;
+  if (settings.provider === "smtp") {
+    return Boolean(settings.host?.trim() && settings.username?.trim() && settings.password);
+  }
+  return Boolean(settings.api_key?.trim());
 }
 
 
 type LinkKind = "signup" | "recovery" | "magiclink";
+
+async function redirectOrigin(fallbackOrigin: string) {
+  const { publicUrl } = await loadEmailContext();
+  const candidate = publicUrl || fallbackOrigin;
+  try {
+    const parsed = new URL(candidate);
+    if (parsed.protocol !== "https:" && parsed.hostname !== "localhost") throw new Error("Public URL must use HTTPS");
+    return parsed.origin;
+  } catch {
+    return new URL(fallbackOrigin).origin;
+  }
+}
 
 /** Generates a Supabase auth action link with the service-role client (no GoTrue email is sent). */
 async function generateLink(
@@ -39,7 +55,8 @@ export async function signUpAndSendConfirmation(input: {
   username: string;
   origin: string;
 }) {
-  const url = await generateLink("signup", input.email, `${input.origin}/app`, input.password, {
+  const origin = await redirectOrigin(input.origin);
+  const url = await generateLink("signup", input.email, `${origin}/app`, input.password, {
     full_name: input.fullName,
     username: input.username,
   });
@@ -65,7 +82,8 @@ export async function resendConfirmation(email: string, origin: string) {
   const user = data?.users.find((u) => u.email?.toLowerCase() === email.toLowerCase());
   if (!user) return { sent: false as const, error: undefined };
   if (user.email_confirmed_at) return { sent: false as const, error: "already_confirmed" };
-  const url = await generateLink("magiclink", email, `${origin}/app`);
+  const publicOrigin = await redirectOrigin(origin);
+  const url = await generateLink("magiclink", email, `${publicOrigin}/app`);
   return sendBrandedEmail(email, {
     template: "auth_confirm_resend",
     subject: "Confirm your email address",
@@ -79,7 +97,8 @@ export async function resendConfirmation(email: string, origin: string) {
 
 /** Emails a branded password-reset link. Always resolves, even for unknown addresses. */
 export async function sendPasswordReset(email: string, origin: string) {
-  const url = await generateLink("recovery", email, `${origin}/auth/reset`);
+  const publicOrigin = await redirectOrigin(origin);
+  const url = await generateLink("recovery", email, `${publicOrigin}/auth/reset`);
   return sendBrandedEmail(email, {
     template: "auth_recovery",
     subject: "Reset your password",

@@ -11,8 +11,8 @@ The screenshot’s exact error is thrown by the authentication middleware before
 3. Switch all three email actions—test email, direct customer email, and self-notification—to the reliable middleware so they no longer reach the failing generated path.
 4. Remove the automatic retry/error classification for this credential error from the email UI; genuine delivery failures will show their actual SMTP/provider message instead of “backend was restarting.”
 5. Verify the app compiles, then sign into the preview as an admin and test both:
-   - Admin Settings → Send test email
-   - Admin Messages → Send to one customer
+  - Admin Settings → Send test email
+  - Admin Messages → Send to one customer
    Confirm each send reaches the email engine and produces a success/log result without the environment-variable alert.
 
 ## Technical constraints
@@ -20,3 +20,4 @@ The screenshot’s exact error is thrown by the authentication middleware before
 - Do not edit generated backend integration files.
 - Do not expose or hardcode private credentials.
 - Keep the existing SMTP configuration and delivery engine unchanged; this fix targets authentication/environment initialization only.
+- Email verification links point back to Lovable, so i need you to add in the admin seeting a public url feature, this will act act as the email verification or notification redirect link instead of lovable link . especially a new user whom is meant to verify the email used or user that want tp reset password . 
