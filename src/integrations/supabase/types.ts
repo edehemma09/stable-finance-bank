@@ -749,6 +749,7 @@ export type Database = {
           id: number
           logo_url: string | null
           primary_color: string
+          public_url: string
           routing_number: string
           socials: Json
           tagline: string
@@ -763,6 +764,7 @@ export type Database = {
           id?: number
           logo_url?: string | null
           primary_color?: string
+          public_url?: string
           routing_number?: string
           socials?: Json
           tagline?: string
@@ -777,6 +779,7 @@ export type Database = {
           id?: number
           logo_url?: string | null
           primary_color?: string
+          public_url?: string
           routing_number?: string
           socials?: Json
           tagline?: string
