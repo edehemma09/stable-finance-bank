@@ -405,6 +405,99 @@ export type Database = {
         }
         Relationships: []
       }
+      error_events: {
+        Row: {
+          action: string | null
+          action_approved_at: string | null
+          action_approved_by: string | null
+          action_executed_at: string | null
+          ai_action_kind: string | null
+          ai_cause: string | null
+          ai_confidence: string | null
+          ai_error: string | null
+          ai_recommendation: string | null
+          ai_status: string
+          analyzed_at: string | null
+          created_at: string
+          fingerprint: string
+          first_seen_at: string
+          id: string
+          incident_code: string
+          last_seen_at: string
+          message: string
+          metadata: Json
+          occurrence_count: number
+          resolved_at: string | null
+          resolved_by: string | null
+          route: string | null
+          severity: string
+          source: string
+          stack_summary: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          action?: string | null
+          action_approved_at?: string | null
+          action_approved_by?: string | null
+          action_executed_at?: string | null
+          ai_action_kind?: string | null
+          ai_cause?: string | null
+          ai_confidence?: string | null
+          ai_error?: string | null
+          ai_recommendation?: string | null
+          ai_status?: string
+          analyzed_at?: string | null
+          created_at?: string
+          fingerprint: string
+          first_seen_at?: string
+          id?: string
+          incident_code: string
+          last_seen_at?: string
+          message: string
+          metadata?: Json
+          occurrence_count?: number
+          resolved_at?: string | null
+          resolved_by?: string | null
+          route?: string | null
+          severity?: string
+          source: string
+          stack_summary?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          action?: string | null
+          action_approved_at?: string | null
+          action_approved_by?: string | null
+          action_executed_at?: string | null
+          ai_action_kind?: string | null
+          ai_cause?: string | null
+          ai_confidence?: string | null
+          ai_error?: string | null
+          ai_recommendation?: string | null
+          ai_status?: string
+          analyzed_at?: string | null
+          created_at?: string
+          fingerprint?: string
+          first_seen_at?: string
+          id?: string
+          incident_code?: string
+          last_seen_at?: string
+          message?: string
+          metadata?: Json
+          occurrence_count?: number
+          resolved_at?: string | null
+          resolved_by?: string | null
+          route?: string | null
+          severity?: string
+          source?: string
+          stack_summary?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       holdings: {
         Row: {
           account_id: string | null
@@ -1175,6 +1268,20 @@ export type Database = {
       }
       pay_loan: {
         Args: { _amount: number; _from: string; _loan_id: string }
+        Returns: string
+      }
+      record_error_event: {
+        Args: {
+          _action: string
+          _fingerprint: string
+          _incident_code: string
+          _message: string
+          _metadata: Json
+          _route: string
+          _severity: string
+          _source: string
+          _stack_summary: string
+        }
         Returns: string
       }
       resolve_transfer_recipient: {
