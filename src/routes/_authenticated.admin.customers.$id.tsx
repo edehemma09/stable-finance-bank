@@ -152,7 +152,9 @@ function CustomerDetail() {
         </dl>
       </div>
 
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Accounts */}
+
         <div className="rounded-xl border bg-card p-5">
           <h2 className="font-display text-lg">Accounts</h2>
           <div className="mt-3 space-y-2">
