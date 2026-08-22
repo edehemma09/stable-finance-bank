@@ -266,6 +266,78 @@ function CustomerDetail() {
 
       </div>
 
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Cards</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.cards.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
+                <div>
+                  <p className="font-medium capitalize">{c.brand} {c.card_type} · {c.network}</p>
+                  <p className="font-mono text-xs text-muted-foreground">•••• {c.last4} · exp {String(c.exp_month).padStart(2, "0")}/{c.exp_year}</p>
+                </div>
+                <span className="text-xs capitalize text-muted-foreground">{c.status}</span>
+              </div>
+            ))}
+            {data.cards.length === 0 && <p className="text-muted-foreground">No cards issued.</p>}
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Loans</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.loans.map((l) => (
+              <div key={l.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
+                <div>
+                  <p className="font-medium capitalize">{l.nickname ?? l.kind}</p>
+                  <p className="text-xs text-muted-foreground">{formatUSD(l.principal)} at {(Number(l.rate) * 100).toFixed(2)}% · {l.term_months} mo · {l.status}</p>
+                </div>
+                <p className="font-mono">{formatUSD(l.balance)}</p>
+              </div>
+            ))}
+            {data.loans.length === 0 && <p className="text-muted-foreground">No loans.</p>}
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Identity verification</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.kyc.map((k) => (
+              <div key={k.id} className="rounded-lg border px-3 py-2">
+                <p className="font-medium capitalize">{k.doc_type} · {k.status}</p>
+                <p className="text-xs text-muted-foreground">Submitted {new Date(k.submitted_at).toLocaleString()}{k.notes ? ` · ${k.notes}` : ""}</p>
+              </div>
+            ))}
+            {data.kyc.length === 0 && <p className="text-muted-foreground">No submissions.</p>}
+          </div>
+          <h3 className="mt-4 font-display text-base">Cheque deposits</h3>
+          <div className="mt-2 space-y-2 text-sm">
+            {data.cheques.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
+                <p className="text-xs text-muted-foreground">{new Date(c.created_at).toLocaleDateString()} · {c.status}</p>
+                <p className="font-mono">{formatUSD(c.amount)}</p>
+              </div>
+            ))}
+            {data.cheques.length === 0 && <p className="text-muted-foreground">No deposits.</p>}
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Support tickets</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.tickets.map((t) => (
+              <Link key={t.id} to="/admin/tickets/$id" params={{ id: t.id }} className="block rounded-lg border px-3 py-2 hover:bg-muted">
+                <p className="font-medium">{t.subject}</p>
+                <p className="text-xs capitalize text-muted-foreground">{t.category} · {t.status} · {t.priority} · {new Date(t.created_at).toLocaleDateString()}</p>
+              </Link>
+            ))}
+            {data.tickets.length === 0 && <p className="text-muted-foreground">No tickets.</p>}
+          </div>
+        </div>
+      </div>
+
+
+
       <div className="mt-6 rounded-xl border bg-card">
         <h2 className="border-b px-5 py-4 font-display text-lg">Recent transactions</h2>
         <div className="overflow-x-auto">
