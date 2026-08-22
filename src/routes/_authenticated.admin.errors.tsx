@@ -56,6 +56,10 @@ function Diagnostics() {
         </Button>
       </div>
 
+      <KeepAlivePanel />
+
+
+
       <div className="mt-6 grid gap-4">
         {(events.data ?? []).map((event) => (
           <article key={event.id} className="rounded-lg border bg-card p-5">
