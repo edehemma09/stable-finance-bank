@@ -24,6 +24,6 @@
     }
   ],
   "crons": [
-    { "path": "/api/public/keepalive", "schedule": "*/10 * * * *" }
+    { "path": "/api/public/keepalive", "schedule": "0 6 * * *" }
   ]
 }

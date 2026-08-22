@@ -548,6 +548,36 @@ export type Database = {
           },
         ]
       }
+      keepalive_pings: {
+        Row: {
+          created_at: string
+          db_status: string
+          detail: string | null
+          duration_ms: number
+          id: string
+          ok: boolean
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          db_status: string
+          detail?: string | null
+          duration_ms?: number
+          id?: string
+          ok: boolean
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          db_status?: string
+          detail?: string | null
+          duration_ms?: number
+          id?: string
+          ok?: boolean
+          source?: string
+        }
+        Relationships: []
+      }
       kyc_submissions: {
         Row: {
           decided_at: string | null

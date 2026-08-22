@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, Bot, CheckCircle2, RefreshCw } from "lucide-react";
+import { Activity, AlertTriangle, Bot, CheckCircle2, RefreshCw } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -56,6 +56,10 @@ function Diagnostics() {
         </Button>
       </div>
 
+      <KeepAlivePanel />
+
+
+
       <div className="mt-6 grid gap-4">
         {(events.data ?? []).map((event) => (
           <article key={event.id} className="rounded-lg border bg-card p-5">
@@ -103,5 +107,61 @@ function Diagnostics() {
         )}
       </div>
     </div>
+  );
+}
+
+function KeepAlivePanel() {
+  const pings = useQuery({
+    queryKey: ["admin", "keepalive_pings"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("keepalive_pings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(12);
+      if (error) throw error;
+      return data ?? [];
+    },
+    refetchInterval: 60_000,
+  });
+
+  const rows = pings.data ?? [];
+  const latest = rows[0];
+
+  return (
+    <section className="mt-8 rounded-lg border bg-card p-5">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2 text-sm font-medium">
+            <Activity /> Keep-alive schedule
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            The database pings the app every 10 minutes so neither tier goes idle. Vercel runs one
+            daily backup check.
+          </p>
+        </div>
+        <span className="text-xs text-muted-foreground">
+          {latest
+            ? `Last ping ${new Date(latest.created_at).toLocaleString()} · ${latest.ok ? "healthy" : "failed"}`
+            : "No pings recorded yet"}
+        </span>
+      </div>
+
+      {rows.length > 0 && (
+        <ul className="mt-4 grid gap-1 text-xs">
+          {rows.map((ping) => (
+            <li key={ping.id} className="flex flex-wrap items-center gap-3 border-t pt-1 font-mono">
+              <span className={ping.ok ? "text-success" : "text-destructive"}>
+                {ping.ok ? "OK " : "FAIL"}
+              </span>
+              <span className="text-muted-foreground">{new Date(ping.created_at).toLocaleString()}</span>
+              <span className="text-muted-foreground">{ping.source}</span>
+              <span className="text-muted-foreground">{ping.duration_ms}ms</span>
+              {ping.detail && <span className="text-destructive">{ping.detail}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }
