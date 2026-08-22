@@ -1,13 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { NoObjectGeneratedError, Output, streamText } from "ai";
-import { z } from "zod";
-
-const AnalysisSchema = z.object({
-  cause: z.string(),
-  confidence: z.string(),
-  recommendation: z.string(),
-  actionKind: z.string(),
-});
+import { generateText } from "ai";
 
 function parseFallback(text: string) {
   try {
@@ -45,17 +37,10 @@ export async function analyzeDiagnosticEvent(event: {
     baseURL: "https://ai.gateway.lovable.dev/v1",
     headers: { "Lovable-API-Key": key },
   });
-  const prompt = `Analyze this sanitized web application incident. Do not claim to have changed code or infrastructure. Recommend only a safe next action that an administrator can approve. actionKind must be one of: retry_email, refresh_runtime_bindings, mark_resolved, manual_review. Confidence must be low, medium, or high.\n\n${JSON.stringify(event)}`;
-
-  try {
-    const result = streamText({
-      model: gateway.chatModel("google/gemini-3.7-flash"),
-      output: Output.object({ schema: AnalysisSchema }),
-      prompt,
-    });
-    return await result.output;
-  } catch (error) {
-    if (NoObjectGeneratedError.isInstance(error)) return parseFallback(error.text ?? "");
-    throw error;
-  }
+  const prompt = `Analyze this sanitized web application incident. Do not claim to have changed code or infrastructure. Recommend only a safe next action that an administrator can approve. Return only a JSON object with string fields cause, confidence, recommendation, and actionKind. actionKind must be one of: retry_email, refresh_runtime_bindings, mark_resolved, manual_review. Confidence must be low, medium, or high.\n\n${JSON.stringify(event)}`;
+  const result = await generateText({
+    model: gateway.chatModel("google/gemini-3.7-flash"),
+    prompt,
+  });
+  return parseFallback(result.text.replace(/^```json\s*|\s*```$/g, ""));
 }
