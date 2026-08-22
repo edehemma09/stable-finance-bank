@@ -120,8 +120,41 @@ function CustomerDetail() {
         <Mail className="h-4 w-4" /> Email this customer
       </Link>
 
+      {/* Full profile */}
+      <div className="mt-6 rounded-xl border bg-card p-5">
+        <h2 className="font-display text-lg">Profile on file</h2>
+        <dl className="mt-3 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+          {([
+            ["Full name", p.full_name],
+            ["Username", p.username ? `@${p.username}` : null],
+            ["Email", p.email],
+            ["Phone", p.phone],
+            ["Date of birth", p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString() : null],
+            ["SSN (last 4)", p.ssn_last4 ? `•••-••-${p.ssn_last4}` : null],
+            ["Address", [p.address_line1, p.address_line2].filter(Boolean).join(", ") || null],
+            ["City / State", [p.city, p.state].filter(Boolean).join(", ") || null],
+            ["Postal code", p.postal_code],
+            ["Country", p.country],
+            ["Account status", p.status],
+            ["KYC status", p.kyc_status],
+            ["Daily transaction limit", formatUSD(p.transaction_limit)],
+            ["Two-factor", p.two_factor_enabled ? "Enabled" : "Disabled"],
+            ["Roles", data.roles.join(", ") || "customer"],
+            ["Risk score", data.risk ? String(data.risk.score) : null],
+            ["Customer since", new Date(p.created_at).toLocaleString()],
+            ["Last updated", new Date(p.updated_at).toLocaleString()],
+          ] as [string, string | null | undefined][]).map(([label, value]) => (
+            <div key={label}>
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{label}</dt>
+              <dd className="capitalize">{value && String(value).trim() ? value : "—"}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         {/* Accounts */}
+
         <div className="rounded-xl border bg-card p-5">
           <h2 className="font-display text-lg">Accounts</h2>
           <div className="mt-3 space-y-2">
@@ -232,6 +265,78 @@ function CustomerDetail() {
         </div>
 
       </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Cards</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.cards.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
+                <div>
+                  <p className="font-medium capitalize">{c.brand} {c.card_type} · {c.network}</p>
+                  <p className="font-mono text-xs text-muted-foreground">•••• {c.last4} · exp {String(c.exp_month).padStart(2, "0")}/{c.exp_year}</p>
+                </div>
+                <span className="text-xs capitalize text-muted-foreground">{c.status}</span>
+              </div>
+            ))}
+            {data.cards.length === 0 && <p className="text-muted-foreground">No cards issued.</p>}
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Loans</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.loans.map((l) => (
+              <div key={l.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
+                <div>
+                  <p className="font-medium capitalize">{l.nickname ?? l.kind}</p>
+                  <p className="text-xs text-muted-foreground">{formatUSD(l.principal)} at {(Number(l.rate) * 100).toFixed(2)}% · {l.term_months} mo · {l.status}</p>
+                </div>
+                <p className="font-mono">{formatUSD(l.balance)}</p>
+              </div>
+            ))}
+            {data.loans.length === 0 && <p className="text-muted-foreground">No loans.</p>}
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Identity verification</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.kyc.map((k) => (
+              <div key={k.id} className="rounded-lg border px-3 py-2">
+                <p className="font-medium capitalize">{k.doc_type} · {k.status}</p>
+                <p className="text-xs text-muted-foreground">Submitted {new Date(k.submitted_at).toLocaleString()}{k.notes ? ` · ${k.notes}` : ""}</p>
+              </div>
+            ))}
+            {data.kyc.length === 0 && <p className="text-muted-foreground">No submissions.</p>}
+          </div>
+          <h3 className="mt-4 font-display text-base">Cheque deposits</h3>
+          <div className="mt-2 space-y-2 text-sm">
+            {data.cheques.map((c) => (
+              <div key={c.id} className="flex items-center justify-between rounded-lg border px-3 py-2">
+                <p className="text-xs text-muted-foreground">{new Date(c.created_at).toLocaleDateString()} · {c.status}</p>
+                <p className="font-mono">{formatUSD(c.amount)}</p>
+              </div>
+            ))}
+            {data.cheques.length === 0 && <p className="text-muted-foreground">No deposits.</p>}
+          </div>
+        </div>
+
+        <div className="rounded-xl border bg-card p-5">
+          <h2 className="font-display text-lg">Support tickets</h2>
+          <div className="mt-3 space-y-2 text-sm">
+            {data.tickets.map((t) => (
+              <Link key={t.id} to="/admin/tickets/$id" params={{ id: t.id }} className="block rounded-lg border px-3 py-2 hover:bg-muted">
+                <p className="font-medium">{t.subject}</p>
+                <p className="text-xs capitalize text-muted-foreground">{t.category} · {t.status} · {t.priority} · {new Date(t.created_at).toLocaleDateString()}</p>
+              </Link>
+            ))}
+            {data.tickets.length === 0 && <p className="text-muted-foreground">No tickets.</p>}
+          </div>
+        </div>
+      </div>
+
+
 
       <div className="mt-6 rounded-xl border bg-card">
         <h2 className="border-b px-5 py-4 font-display text-lg">Recent transactions</h2>

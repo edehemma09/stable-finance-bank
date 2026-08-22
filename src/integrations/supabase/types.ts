@@ -1287,6 +1287,7 @@ export type Database = {
         }
         Returns: string
       }
+      my_account_state: { Args: never; Returns: string }
       pay_bill: {
         Args: {
           _amount: number

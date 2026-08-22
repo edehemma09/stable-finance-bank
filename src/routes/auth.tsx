@@ -8,11 +8,12 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
 import { signUpWithBrandedEmail, resendConfirmationEmail, sendPasswordResetEmail } from "@/lib/auth-mail.functions";
+import { accountStateMessage, getBlockingAccountState } from "@/lib/account-state";
 
 
 
 
-type Search = { mode?: "signin" | "signup"; redirect?: string };
+type Search = { mode?: "signin" | "signup"; redirect?: string; state?: string };
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -29,6 +30,7 @@ export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): Search => ({
     mode: s.mode === "signup" ? "signup" : "signin",
     redirect: typeof s.redirect === "string" ? s.redirect : undefined,
+    state: typeof s.state === "string" ? s.state : undefined,
   }),
 
   beforeLoad: async ({ search }) => {
@@ -52,6 +54,8 @@ function AuthPage() {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+  const [blockedState, setBlockedState] = useState<string | null>(search.state ?? null);
+  const blockedMessage = accountStateMessage(blockedState);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -87,6 +91,13 @@ function AuthPage() {
         if (/confirm/i.test(error.message)) setPendingEmail(email);
         throw error;
       }
+      const blocked = await getBlockingAccountState();
+      if (blocked) {
+        await supabase.auth.signOut();
+        setBlockedState(blocked);
+        throw new Error(accountStateMessage(blocked) ?? "This account is not available. Contact support.");
+      }
+      setBlockedState(null);
       navigate({ to: search.redirect ?? "/app" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -142,6 +153,14 @@ function AuthPage() {
           <p className="mt-1 text-sm text-muted-foreground">{mode === "signin" ? "Welcome back. Access your accounts securely." : "Open your account in less than a minute."}</p>
 
 
+
+          {blockedMessage && (
+            <div className="mt-5 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
+              <p className="font-semibold text-destructive">Account access restricted</p>
+              <p className="mt-1 text-muted-foreground">{blockedMessage}</p>
+              <a href="/contact" className="mt-2 inline-block font-medium underline">Contact support</a>
+            </div>
+          )}
 
           {pendingEmail && (
             <div className="mt-5 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm">

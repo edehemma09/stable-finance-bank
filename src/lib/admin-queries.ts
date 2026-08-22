@@ -24,11 +24,17 @@ export const adminCustomerQuery = (id: string) =>
   queryOptions({
     queryKey: ["admin", "customer", id],
     queryFn: async () => {
-      const [profile, accounts, tx, roles] = await Promise.all([
+      const [profile, accounts, tx, roles, cards, loans, cheques, tickets, kyc, risk] = await Promise.all([
         supabase.from("profiles").select("*").eq("id", id).maybeSingle(),
         supabase.from("accounts").select("*").eq("user_id", id).order("created_at"),
         supabase.from("transactions").select("*").eq("user_id", id).order("created_at", { ascending: false }).limit(25),
         supabase.from("user_roles").select("role").eq("user_id", id),
+        supabase.from("cards").select("id,brand,network,card_type,last4,exp_month,exp_year,status,daily_limit").eq("user_id", id),
+        supabase.from("loans").select("id,kind,nickname,principal,balance,rate,term_months,monthly_payment,status,next_payment_date").eq("user_id", id).order("created_at", { ascending: false }),
+        supabase.from("cheque_deposits").select("id,amount,status,created_at,decided_at").eq("user_id", id).order("created_at", { ascending: false }).limit(10),
+        supabase.from("support_tickets").select("id,subject,category,status,priority,created_at").eq("user_id", id).order("created_at", { ascending: false }).limit(10),
+        supabase.from("kyc_submissions").select("id,doc_type,status,submitted_at,decided_at,notes").eq("user_id", id).order("submitted_at", { ascending: false }).limit(10),
+        supabase.from("risk_scores").select("score,factors,computed_at").eq("user_id", id).maybeSingle(),
       ]);
       if (profile.error) throw profile.error;
       return {
@@ -36,9 +42,16 @@ export const adminCustomerQuery = (id: string) =>
         accounts: accounts.data ?? [],
         transactions: tx.data ?? [],
         roles: (roles.data ?? []).map((r) => r.role as string),
+        cards: cards.data ?? [],
+        loans: loans.data ?? [],
+        cheques: cheques.data ?? [],
+        tickets: tickets.data ?? [],
+        kyc: kyc.data ?? [],
+        risk: risk.data ?? null,
       };
     },
   });
+
 
 export const statusTone = (status: string | null | undefined) =>
   ({
