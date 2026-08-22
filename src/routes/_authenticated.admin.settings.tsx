@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { smtpSettingsQuery, adminEmailLogQuery } from "@/lib/admin-queries";
 import { sendTestEmail } from "@/lib/mail.functions";
+import { reportActionError } from "@/lib/browser-error-reporting";
 /** Turns raw server errors into something an admin can act on. */
 
 
@@ -135,10 +136,10 @@ function SmtpPanel() {
   const test = useMutation({
     mutationFn: async () => {
       const res = await sendTestEmail({ data: { to: testTo.trim() } });
-      if (!res?.sent) throw new Error(res?.error ?? "Send failed");
+      if (!res?.sent) throw new Error(`${res?.error ?? "Send failed"}${res?.incidentCode ? ` · ${res.incidentCode}` : ""}`);
     },
     onSuccess: () => { toast.success("Test email sent"); qc.invalidateQueries({ queryKey: ["admin", "email_log"] }); },
-    onError: (e) => toast.error(errorText(e)),
+    onError: (e) => { reportActionError(e, "send_test_email"); toast.error(errorText(e)); },
   });
 
   return (

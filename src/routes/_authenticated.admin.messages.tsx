@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { Plus, Trash2, Mail } from "lucide-react";
 import { errorText } from "@/lib/error-text";
+import { reportActionError } from "@/lib/browser-error-reporting";
 
 export const Route = createFileRoute("/_authenticated/admin/messages")({
   validateSearch: (s: Record<string, unknown>) => ({ u: typeof s.u === "string" ? s.u : undefined }),
@@ -76,13 +77,13 @@ function AdminMessages() {
           footnote: f.footnote.trim() || undefined,
         },
       });
-      if (!res?.sent) throw new Error(res?.error ?? "Send failed");
+      if (!res?.sent) throw new Error(`${res?.error ?? "Send failed"}${res?.incidentCode ? ` · ${res.incidentCode}` : ""}`);
     },
     onSuccess: () => {
       toast.success("Email sent");
       qc.invalidateQueries({ queryKey: ["admin", "email_log"] });
     },
-    onError: (e) => toast.error(errorText(e)),
+    onError: (e) => { reportActionError(e, "send_customer_notification"); toast.error(errorText(e)); },
   });
 
   const canSend = Boolean(userId && f.subject.trim() && f.intro.trim());

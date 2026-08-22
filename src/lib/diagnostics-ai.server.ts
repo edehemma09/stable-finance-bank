@@ -55,7 +55,7 @@ export async function analyzeDiagnosticEvent(event: {
     });
     return result.output;
   } catch (error) {
-    if (NoObjectGeneratedError.isInstance(error)) return parseFallback(error.text);
+    if (NoObjectGeneratedError.isInstance(error)) return parseFallback(error.text ?? "");
     throw error;
   }
 }
