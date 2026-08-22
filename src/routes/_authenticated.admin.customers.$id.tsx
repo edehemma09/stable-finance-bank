@@ -120,7 +120,38 @@ function CustomerDetail() {
         <Mail className="h-4 w-4" /> Email this customer
       </Link>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      {/* Full profile */}
+      <div className="mt-6 rounded-xl border bg-card p-5">
+        <h2 className="font-display text-lg">Profile on file</h2>
+        <dl className="mt-3 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
+          {([
+            ["Full name", p.full_name],
+            ["Username", p.username ? `@${p.username}` : null],
+            ["Email", p.email],
+            ["Phone", p.phone],
+            ["Date of birth", p.date_of_birth ? new Date(p.date_of_birth).toLocaleDateString() : null],
+            ["SSN (last 4)", p.ssn_last4 ? `•••-••-${p.ssn_last4}` : null],
+            ["Address", [p.address_line1, p.address_line2].filter(Boolean).join(", ") || null],
+            ["City / State", [p.city, p.state].filter(Boolean).join(", ") || null],
+            ["Postal code", p.postal_code],
+            ["Country", p.country],
+            ["Account status", p.status],
+            ["KYC status", p.kyc_status],
+            ["Daily transaction limit", formatUSD(p.transaction_limit)],
+            ["Two-factor", p.two_factor_enabled ? "Enabled" : "Disabled"],
+            ["Roles", data.roles.join(", ") || "customer"],
+            ["Risk score", data.risk ? String(data.risk.score) : null],
+            ["Customer since", new Date(p.created_at).toLocaleString()],
+            ["Last updated", new Date(p.updated_at).toLocaleString()],
+          ] as [string, string | null | undefined][]).map(([label, value]) => (
+            <div key={label}>
+              <dt className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{label}</dt>
+              <dd className="capitalize">{value && String(value).trim() ? value : "—"}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+
         {/* Accounts */}
         <div className="rounded-xl border bg-card p-5">
           <h2 className="font-display text-lg">Accounts</h2>
