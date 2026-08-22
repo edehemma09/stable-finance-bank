@@ -24,6 +24,17 @@ export type DeliverySettings = {
   enabled: boolean;
 };
 
+type SiteEmailSettings = {
+  brand_name: string;
+  logo_url: string | null;
+  contact_email: string;
+  contact_phone: string;
+  address: string;
+  primary_color: string;
+  accent_color: string;
+  public_url: string;
+};
+
 const DEFAULT_BRAND: Branding = {
   brand_name: "Stable Finance Bank",
   logo_url: null,
@@ -42,16 +53,17 @@ export async function loadEmailContext() {
     supabaseAdmin.from("site_settings").select("*").eq("id", 1).maybeSingle(),
   ]);
   const settings = (smtp ?? null) as DeliverySettings | null;
+  const siteSettings = (site ?? null) as SiteEmailSettings | null;
   const brand: Branding = {
-    brand_name: site?.brand_name ?? DEFAULT_BRAND.brand_name,
-    logo_url: site?.logo_url ?? null,
-    contact_email: site?.contact_email ?? "",
-    contact_phone: site?.contact_phone ?? "",
-    address: site?.address ?? "",
-    primary_color: site?.primary_color ?? DEFAULT_BRAND.primary_color,
-    accent_color: site?.accent_color ?? DEFAULT_BRAND.accent_color,
+    brand_name: siteSettings?.brand_name ?? DEFAULT_BRAND.brand_name,
+    logo_url: siteSettings?.logo_url ?? null,
+    contact_email: siteSettings?.contact_email ?? "",
+    contact_phone: siteSettings?.contact_phone ?? "",
+    address: siteSettings?.address ?? "",
+    primary_color: siteSettings?.primary_color ?? DEFAULT_BRAND.primary_color,
+    accent_color: siteSettings?.accent_color ?? DEFAULT_BRAND.accent_color,
   };
-  return { supabaseAdmin, settings, brand };
+  return { supabaseAdmin, settings, brand, publicUrl: siteSettings?.public_url?.trim() ?? "" };
 }
 
 async function post(url: string, headers: Record<string, string>, body: unknown) {

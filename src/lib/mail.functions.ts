@@ -1,5 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireEmailAuth } from "@/lib/email-auth-middleware";
 
 type Payload = {
   template: string;
@@ -12,7 +12,7 @@ type Payload = {
 
 /** Sends a notification to the signed-in customer's own address only. */
 export const sendMyNotification = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireEmailAuth])
   .inputValidator((data: Payload) => data)
   .handler(async ({ data, context }) => {
     const email = (context.claims as { email?: string } | null)?.email;
@@ -23,7 +23,7 @@ export const sendMyNotification = createServerFn({ method: "POST" })
 
 /** Admin-only: send a test message to any address to validate the email provider. */
 export const sendTestEmail = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireEmailAuth])
   .inputValidator((data: { to: string }) => {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.to)) throw new Error("Invalid email address");
     return data;
@@ -44,7 +44,7 @@ export const sendTestEmail = createServerFn({ method: "POST" })
 
 /** Admin/support-only: send a branded notification to a specific customer. */
 export const sendCustomerNotification = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireEmailAuth])
   .inputValidator((data: Payload & { userId: string }) => data)
   .handler(async ({ data, context }) => {
     const [{ data: isAdmin }, { data: isSupport }] = await Promise.all([

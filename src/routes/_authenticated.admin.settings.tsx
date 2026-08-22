@@ -23,11 +23,12 @@ function SiteSettings() {
     queryKey: ["admin", "site_settings"],
     queryFn: async () => (await supabase.from("site_settings").select("*").eq("id", 1).maybeSingle()).data,
   });
-  const [f, setF] = useState({ brand_name: "", tagline: "", logo_url: "", contact_email: "", contact_phone: "", address: "" });
+  const [f, setF] = useState({ brand_name: "", tagline: "", logo_url: "", public_url: "", contact_email: "", contact_phone: "", address: "" });
   useEffect(() => {
     if (!data) return;
     setF({
       brand_name: data.brand_name, tagline: data.tagline, logo_url: data.logo_url ?? "",
+      public_url: data.public_url ?? "",
       contact_email: data.contact_email, contact_phone: data.contact_phone, address: data.address,
     });
   }, [data]);
@@ -49,6 +50,11 @@ function SiteSettings() {
         <div><Label>Brand name</Label><Input value={f.brand_name} onChange={(e) => setF({ ...f, brand_name: e.target.value })} /></div>
         <div><Label>Tagline</Label><Input value={f.tagline} onChange={(e) => setF({ ...f, tagline: e.target.value })} /></div>
         <div><Label>Logo URL</Label><Input value={f.logo_url} onChange={(e) => setF({ ...f, logo_url: e.target.value })} /></div>
+        <div>
+          <Label>Public URL</Label>
+          <Input type="url" value={f.public_url} onChange={(e) => setF({ ...f, public_url: e.target.value })} placeholder="https://www.yourbank.com" />
+          <p className="mt-1 text-xs text-muted-foreground">Verification and password-reset emails return customers to this secure address.</p>
+        </div>
         <div><Label>Contact email</Label><Input value={f.contact_email} onChange={(e) => setF({ ...f, contact_email: e.target.value })} /></div>
         <div><Label>Contact phone</Label><Input value={f.contact_phone} onChange={(e) => setF({ ...f, contact_phone: e.target.value })} /></div>
         <div><Label>Address</Label><Input value={f.address} onChange={(e) => setF({ ...f, address: e.target.value })} /></div>
