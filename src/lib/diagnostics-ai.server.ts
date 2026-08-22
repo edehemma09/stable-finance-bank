@@ -1,5 +1,5 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
-import { generateText, NoObjectGeneratedError, Output } from "ai";
+import { NoObjectGeneratedError, Output, streamText } from "ai";
 import { z } from "zod";
 
 const AnalysisSchema = z.object({
@@ -48,12 +48,12 @@ export async function analyzeDiagnosticEvent(event: {
   const prompt = `Analyze this sanitized web application incident. Do not claim to have changed code or infrastructure. Recommend only a safe next action that an administrator can approve. actionKind must be one of: retry_email, refresh_runtime_bindings, mark_resolved, manual_review. Confidence must be low, medium, or high.\n\n${JSON.stringify(event)}`;
 
   try {
-    const result = await generateText({
+    const result = streamText({
       model: gateway.chatModel("google/gemini-3.7-flash"),
       output: Output.object({ schema: AnalysisSchema }),
       prompt,
     });
-    return result.output;
+    return await result.output;
   } catch (error) {
     if (NoObjectGeneratedError.isInstance(error)) return parseFallback(error.text ?? "");
     throw error;
