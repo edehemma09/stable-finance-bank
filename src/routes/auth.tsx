@@ -1,17 +1,12 @@
 import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
-import { signUpWithBrandedEmail, resendConfirmationEmail, sendPasswordResetEmail } from "@/lib/auth-mail.functions";
 import { accountStateMessage, getBlockingAccountState } from "@/lib/account-state";
-
-
-
 
 type Search = { mode?: "signin" | "signup"; redirect?: string; state?: string };
 
@@ -44,9 +39,6 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const search = useSearch({ from: "/auth" });
   const navigate = useNavigate();
-  const signUpFn = useServerFn(signUpWithBrandedEmail);
-  const resendFn = useServerFn(resendConfirmationEmail);
-  const resetFn = useServerFn(sendPasswordResetEmail);
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

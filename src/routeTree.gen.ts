@@ -14,6 +14,7 @@ import { Route as SecurityRouteImport } from './routes/security'
 import { Route as SavingsRouteImport } from './routes/savings'
 import { Route as RewardsCardsRouteImport } from './routes/rewards-cards'
 import { Route as RetirementRouteImport } from './routes/retirement'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RefinanceRouteImport } from './routes/refinance'
 import { Route as PersonalLoansRouteImport } from './routes/personal-loans'
 import { Route as PersonalRouteImport } from './routes/personal'
@@ -28,6 +29,7 @@ import { Route as InsuranceRouteImport } from './routes/insurance'
 import { Route as HomeLoansRouteImport } from './routes/home-loans'
 import { Route as HelocRouteImport } from './routes/heloc'
 import { Route as FirstTimeHomebuyerRouteImport } from './routes/first-time-homebuyer'
+import { Route as EmailVerifiedRouteImport } from './routes/email-verified'
 import { Route as EligibilityRouteImport } from './routes/eligibility'
 import { Route as CreditCardsRouteImport } from './routes/credit-cards'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -110,6 +112,11 @@ const RetirementRoute = RetirementRouteImport.update({
   path: '/retirement',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RefinanceRoute = RefinanceRouteImport.update({
   id: '/refinance',
   path: '/refinance',
@@ -178,6 +185,11 @@ const HelocRoute = HelocRouteImport.update({
 const FirstTimeHomebuyerRoute = FirstTimeHomebuyerRouteImport.update({
   id: '/first-time-homebuyer',
   path: '/first-time-homebuyer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EmailVerifiedRoute = EmailVerifiedRouteImport.update({
+  id: '/email-verified',
+  path: '/email-verified',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EligibilityRoute = EligibilityRouteImport.update({
@@ -496,6 +508,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/credit-cards': typeof CreditCardsRoute
   '/eligibility': typeof EligibilityRoute
+  '/email-verified': typeof EmailVerifiedRoute
   '/first-time-homebuyer': typeof FirstTimeHomebuyerRoute
   '/heloc': typeof HelocRoute
   '/home-loans': typeof HomeLoansRoute
@@ -510,6 +523,7 @@ export interface FileRoutesByFullPath {
   '/personal': typeof PersonalRoute
   '/personal-loans': typeof PersonalLoansRoute
   '/refinance': typeof RefinanceRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/retirement': typeof RetirementRoute
   '/rewards-cards': typeof RewardsCardsRoute
   '/savings': typeof SavingsRoute
@@ -572,6 +586,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/credit-cards': typeof CreditCardsRoute
   '/eligibility': typeof EligibilityRoute
+  '/email-verified': typeof EmailVerifiedRoute
   '/first-time-homebuyer': typeof FirstTimeHomebuyerRoute
   '/heloc': typeof HelocRoute
   '/home-loans': typeof HomeLoansRoute
@@ -586,6 +601,7 @@ export interface FileRoutesByTo {
   '/personal': typeof PersonalRoute
   '/personal-loans': typeof PersonalLoansRoute
   '/refinance': typeof RefinanceRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/retirement': typeof RetirementRoute
   '/rewards-cards': typeof RewardsCardsRoute
   '/savings': typeof SavingsRoute
@@ -648,6 +664,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/credit-cards': typeof CreditCardsRoute
   '/eligibility': typeof EligibilityRoute
+  '/email-verified': typeof EmailVerifiedRoute
   '/first-time-homebuyer': typeof FirstTimeHomebuyerRoute
   '/heloc': typeof HelocRoute
   '/home-loans': typeof HomeLoansRoute
@@ -662,6 +679,7 @@ export interface FileRoutesById {
   '/personal': typeof PersonalRoute
   '/personal-loans': typeof PersonalLoansRoute
   '/refinance': typeof RefinanceRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/retirement': typeof RetirementRoute
   '/rewards-cards': typeof RewardsCardsRoute
   '/savings': typeof SavingsRoute
@@ -726,6 +744,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/credit-cards'
     | '/eligibility'
+    | '/email-verified'
     | '/first-time-homebuyer'
     | '/heloc'
     | '/home-loans'
@@ -740,6 +759,7 @@ export interface FileRouteTypes {
     | '/personal'
     | '/personal-loans'
     | '/refinance'
+    | '/reset-password'
     | '/retirement'
     | '/rewards-cards'
     | '/savings'
@@ -802,6 +822,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/credit-cards'
     | '/eligibility'
+    | '/email-verified'
     | '/first-time-homebuyer'
     | '/heloc'
     | '/home-loans'
@@ -816,6 +837,7 @@ export interface FileRouteTypes {
     | '/personal'
     | '/personal-loans'
     | '/refinance'
+    | '/reset-password'
     | '/retirement'
     | '/rewards-cards'
     | '/savings'
@@ -877,6 +899,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/credit-cards'
     | '/eligibility'
+    | '/email-verified'
     | '/first-time-homebuyer'
     | '/heloc'
     | '/home-loans'
@@ -891,6 +914,7 @@ export interface FileRouteTypes {
     | '/personal'
     | '/personal-loans'
     | '/refinance'
+    | '/reset-password'
     | '/retirement'
     | '/rewards-cards'
     | '/savings'
@@ -955,6 +979,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   CreditCardsRoute: typeof CreditCardsRoute
   EligibilityRoute: typeof EligibilityRoute
+  EmailVerifiedRoute: typeof EmailVerifiedRoute
   FirstTimeHomebuyerRoute: typeof FirstTimeHomebuyerRoute
   HelocRoute: typeof HelocRoute
   HomeLoansRoute: typeof HomeLoansRoute
@@ -969,6 +994,7 @@ export interface RootRouteChildren {
   PersonalRoute: typeof PersonalRoute
   PersonalLoansRoute: typeof PersonalLoansRoute
   RefinanceRoute: typeof RefinanceRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   RetirementRoute: typeof RetirementRoute
   RewardsCardsRoute: typeof RewardsCardsRoute
   SavingsRoute: typeof SavingsRoute
@@ -1017,6 +1043,13 @@ declare module '@tanstack/react-router' {
       path: '/retirement'
       fullPath: '/retirement'
       preLoaderRoute: typeof RetirementRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/refinance': {
@@ -1115,6 +1148,13 @@ declare module '@tanstack/react-router' {
       path: '/first-time-homebuyer'
       fullPath: '/first-time-homebuyer'
       preLoaderRoute: typeof FirstTimeHomebuyerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/email-verified': {
+      id: '/email-verified'
+      path: '/email-verified'
+      fullPath: '/email-verified'
+      preLoaderRoute: typeof EmailVerifiedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/eligibility': {
@@ -1630,6 +1670,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   CreditCardsRoute: CreditCardsRoute,
   EligibilityRoute: EligibilityRoute,
+  EmailVerifiedRoute: EmailVerifiedRoute,
   FirstTimeHomebuyerRoute: FirstTimeHomebuyerRoute,
   HelocRoute: HelocRoute,
   HomeLoansRoute: HomeLoansRoute,
@@ -1644,6 +1685,7 @@ const rootRouteChildren: RootRouteChildren = {
   PersonalRoute: PersonalRoute,
   PersonalLoansRoute: PersonalLoansRoute,
   RefinanceRoute: RefinanceRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   RetirementRoute: RetirementRoute,
   RewardsCardsRoute: RewardsCardsRoute,
   SavingsRoute: SavingsRoute,
