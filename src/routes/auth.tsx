@@ -1,17 +1,12 @@
 import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
 import { useState } from "react";
-import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
-import { signUpWithBrandedEmail, resendConfirmationEmail, sendPasswordResetEmail } from "@/lib/auth-mail.functions";
 import { accountStateMessage, getBlockingAccountState } from "@/lib/account-state";
-
-
-
 
 type Search = { mode?: "signin" | "signup"; redirect?: string; state?: string };
 
@@ -44,9 +39,6 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const search = useSearch({ from: "/auth" });
   const navigate = useNavigate();
-  const signUpFn = useServerFn(signUpWithBrandedEmail);
-  const resendFn = useServerFn(resendConfirmationEmail);
-  const resetFn = useServerFn(sendPasswordResetEmail);
   const [mode, setMode] = useState<"signin" | "signup">(search.mode ?? "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -68,19 +60,15 @@ function AuthPage() {
         }
         const { data: taken } = await supabase.from("profiles").select("id").eq("username", uname).maybeSingle();
         if (taken) throw new Error("That username is already taken.");
-        const res = await signUpFn({
-          data: { email, password, fullName, username: uname, origin: window.location.origin },
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: { full_name: fullName, username: uname },
+            emailRedirectTo: `${window.location.origin}/email-verified`,
+          },
         });
-        if (res.fallback) {
-          const { error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: { data: { full_name: fullName, username: uname }, emailRedirectTo: `${window.location.origin}/app` },
-          });
-          if (error) throw error;
-        } else if (!res.sent) {
-          throw new Error(res.error ?? "We couldn't send your confirmation email.");
-        }
+        if (error) throw error;
         setPendingEmail(email);
         toast.success("Account created. Check your inbox to confirm your email.");
         return;
@@ -109,11 +97,17 @@ function AuthPage() {
   async function resend() {
     if (!pendingEmail) return;
     setLoading(true);
-    const res = await resendFn({ data: { email: pendingEmail, origin: window.location.origin } });
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: pendingEmail,
+      options: { emailRedirectTo: `${window.location.origin}/email-verified` },
+    });
     setLoading(false);
-    toast[res.error === "already_confirmed" ? "info" : "success"](
-      res.error === "already_confirmed" ? "That address is already confirmed — just sign in." : "Confirmation link sent.",
-    );
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success("Confirmation link sent.");
   }
 
   async function forgotPassword() {
@@ -122,8 +116,14 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    await resetFn({ data: { email, origin: window.location.origin } });
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
     setLoading(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
     toast.success("If that address has an account, a reset link is on its way.");
   }
 
