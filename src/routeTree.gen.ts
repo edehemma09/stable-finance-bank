@@ -51,7 +51,6 @@ import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as LegalTermsRouteImport } from './routes/legal.terms'
 import { Route as LegalPrivacyRouteImport } from './routes/legal.privacy'
-import { Route as AuthResetRouteImport } from './routes/auth.reset'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedAppRouteImport } from './routes/_authenticated.app'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated.admin'
@@ -296,11 +295,6 @@ const LegalPrivacyRoute = LegalPrivacyRouteImport.update({
   path: '/legal/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthResetRoute = AuthResetRouteImport.update({
-  id: '/reset',
-  path: '/reset',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -493,7 +487,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/accounts': typeof AccountsRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/auto-loans': typeof AutoLoansRoute
   '/benefits': typeof BenefitsRoute
   '/brokerage': typeof BrokerageRoute
@@ -532,7 +526,6 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthenticatedAdminRouteWithChildren
   '/app': typeof AuthenticatedAppRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
-  '/auth/reset': typeof AuthResetRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/admin/cheques': typeof AuthenticatedAdminChequesRoute
@@ -571,7 +564,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/accounts': typeof AccountsRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/auto-loans': typeof AutoLoansRoute
   '/benefits': typeof BenefitsRoute
   '/brokerage': typeof BrokerageRoute
@@ -608,7 +601,6 @@ export interface FileRoutesByTo {
   '/security': typeof SecurityRoute
   '/student-loans': typeof StudentLoansRoute
   '/admin/login': typeof AdminLoginRoute
-  '/auth/reset': typeof AuthResetRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/admin/cheques': typeof AuthenticatedAdminChequesRoute
@@ -649,7 +641,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/about': typeof AboutRoute
   '/accounts': typeof AccountsRoute
-  '/auth': typeof AuthRouteWithChildren
+  '/auth': typeof AuthRoute
   '/auto-loans': typeof AutoLoansRoute
   '/benefits': typeof BenefitsRoute
   '/brokerage': typeof BrokerageRoute
@@ -688,7 +680,6 @@ export interface FileRoutesById {
   '/_authenticated/admin': typeof AuthenticatedAdminRouteWithChildren
   '/_authenticated/app': typeof AuthenticatedAppRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
-  '/auth/reset': typeof AuthResetRoute
   '/legal/privacy': typeof LegalPrivacyRoute
   '/legal/terms': typeof LegalTermsRoute
   '/_authenticated/admin/cheques': typeof AuthenticatedAdminChequesRoute
@@ -768,7 +759,6 @@ export interface FileRouteTypes {
     | '/admin'
     | '/app'
     | '/admin/login'
-    | '/auth/reset'
     | '/legal/privacy'
     | '/legal/terms'
     | '/admin/cheques'
@@ -844,7 +834,6 @@ export interface FileRouteTypes {
     | '/security'
     | '/student-loans'
     | '/admin/login'
-    | '/auth/reset'
     | '/legal/privacy'
     | '/legal/terms'
     | '/admin/cheques'
@@ -923,7 +912,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin'
     | '/_authenticated/app'
     | '/admin/login'
-    | '/auth/reset'
     | '/legal/privacy'
     | '/legal/terms'
     | '/_authenticated/admin/cheques'
@@ -964,7 +952,7 @@ export interface RootRouteChildren {
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   AboutRoute: typeof AboutRoute
   AccountsRoute: typeof AccountsRoute
-  AuthRoute: typeof AuthRouteWithChildren
+  AuthRoute: typeof AuthRoute
   AutoLoansRoute: typeof AutoLoansRoute
   BenefitsRoute: typeof BenefitsRoute
   BrokerageRoute: typeof BrokerageRoute
@@ -1304,13 +1292,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LegalPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/auth/reset': {
-      id: '/auth/reset'
-      path: '/reset'
-      fullPath: '/auth/reset'
-      preLoaderRoute: typeof AuthResetRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -1640,22 +1621,12 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
-interface AuthRouteChildren {
-  AuthResetRoute: typeof AuthResetRoute
-}
-
-const AuthRouteChildren: AuthRouteChildren = {
-  AuthResetRoute: AuthResetRoute,
-}
-
-const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
   AboutRoute: AboutRoute,
   AccountsRoute: AccountsRoute,
-  AuthRoute: AuthRouteWithChildren,
+  AuthRoute: AuthRoute,
   AutoLoansRoute: AutoLoansRoute,
   BenefitsRoute: BenefitsRoute,
   BrokerageRoute: BrokerageRoute,
