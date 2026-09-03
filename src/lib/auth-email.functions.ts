@@ -18,24 +18,33 @@ export const sendAuthEmail = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { configuredPublicPath } = await import("./email/public-url.server");
     const { sendBrandedEmail } = await import("./email/send.server");
-    const redirectTo = await configuredPublicPath(data.type === "signup" ? "email-verified" : "reset-password");
-    const generated = await supabaseAdmin.auth.admin.generateLink(
-      data.type === "signup"
-        ? {
-            type: "signup",
-            email: data.email,
-            password: data.password,
-            data: { full_name: data.fullName ?? "", username: data.username ?? "" },
-            options: { redirectTo },
-          }
-        : { type: "recovery", email: data.email, options: { redirectTo } },
-    );
+    const isSignup = data.type === "signup";
+    const redirectTo = await configuredPublicPath(isSignup ? "email-verified" : "reset-password");
+
+    let generated;
+    if (isSignup) {
+      const password = data.password;
+      if (!password) throw new Error("Password must be at least 8 characters.");
+
+      generated = await supabaseAdmin.auth.admin.generateLink({
+        type: "signup",
+        email: data.email,
+        password,
+        data: { full_name: data.fullName ?? "", username: data.username ?? "" },
+        options: { redirectTo },
+      });
+    } else {
+      generated = await supabaseAdmin.auth.admin.generateLink({
+        type: "recovery",
+        email: data.email,
+        options: { redirectTo },
+      });
+    }
 
     if (generated.error || !generated.data?.properties?.action_link) {
       throw generated.error ?? new Error("Could not create the authentication link");
     }
 
-    const isSignup = data.type === "signup";
     const result = await sendBrandedEmail(data.email, {
       template: isSignup ? "auth_signup" : "auth_recovery",
       subject: isSignup ? "Confirm your Stable Finance Bank email" : "Reset your Stable Finance Bank password",
