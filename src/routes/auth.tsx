@@ -1,4 +1,5 @@
 import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
 import { accountStateMessage, getBlockingAccountState } from "@/lib/account-state";
+import { sendAuthEmail } from "@/lib/auth-email.functions";
+import { Eye, EyeOff } from "lucide-react";
 
 type Search = { mode?: "signin" | "signup"; redirect?: string; state?: string };
 
@@ -47,6 +50,8 @@ function AuthPage() {
   const [loading, setLoading] = useState(false);
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [blockedState, setBlockedState] = useState<string | null>(search.state ?? null);
+  const [showPassword, setShowPassword] = useState(false);
+  const sendAuthEmailAction = useServerFn(sendAuthEmail);
   const blockedMessage = accountStateMessage(blockedState);
 
   async function submit(e: React.FormEvent) {
@@ -60,15 +65,10 @@ function AuthPage() {
         }
         const { data: taken } = await supabase.from("profiles").select("id").eq("username", uname).maybeSingle();
         if (taken) throw new Error("That username is already taken.");
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: { full_name: fullName, username: uname },
-            emailRedirectTo: `${window.location.origin}/email-verified`,
-          },
+        const result = await sendAuthEmailAction({
+          data: { type: "signup", email: email.trim(), password, fullName: fullName.trim(), username: uname },
         });
-        if (error) throw error;
+        if (!result.sent) throw new Error(result.error ?? "Could not send the confirmation email.");
         setPendingEmail(email);
         toast.success("Account created. Check your inbox to confirm your email.");
         return;
@@ -97,14 +97,12 @@ function AuthPage() {
   async function resend() {
     if (!pendingEmail) return;
     setLoading(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: pendingEmail,
-      options: { emailRedirectTo: `${window.location.origin}/email-verified` },
+    const result = await sendAuthEmailAction({
+      data: { type: "resend", email: pendingEmail },
     });
     setLoading(false);
-    if (error) {
-      toast.error(error.message);
+    if (!result.sent) {
+      toast.error(result.error ?? "Could not resend the confirmation email.");
       return;
     }
     toast.success("Confirmation link sent.");
@@ -116,12 +114,12 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+    const result = await sendAuthEmailAction({
+      data: { type: "recovery", email: email.trim() },
     });
     setLoading(false);
-    if (error) {
-      toast.error(error.message);
+    if (!result.sent) {
+      toast.error(result.error ?? "Could not send the password reset email.");
       return;
     }
     toast.success("If that address has an account, a reset link is on its way.");
@@ -187,7 +185,15 @@ function AuthPage() {
               </>
             )}
             <div><Label htmlFor="e">Email</Label><Input id="e" className="bg-card" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></div>
-            <div><Label htmlFor="p">Password</Label><Input id="p" className="bg-card" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} /></div>
+            <div>
+              <Label htmlFor="p">Password</Label>
+              <div className="relative">
+                <Input id="p" className="bg-card pr-10" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
+                <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-9 w-9" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide password" : "Show password"} title={showPassword ? "Hide password" : "Show password"}>
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </Button>
+              </div>
+            </div>
             <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>{loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Enroll now"}</Button>
           </form>
 

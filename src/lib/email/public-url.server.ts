@@ -30,3 +30,14 @@ export async function configuredPublicPath(path: string) {
   const base = await getConfiguredPublicUrl();
   return `${base}/${path.replace(/^\/+/, "")}`;
 }
+
+/** Replaces the backend-hosted auth URL with a same-domain proxy URL. */
+export async function configuredAuthLink(actionLink: string) {
+  const action = new URL(actionLink);
+  const type = action.searchParams.get("type");
+  const token = action.searchParams.get("token");
+  if (!type || !token) throw new Error("The authentication link was incomplete");
+
+  const proxy = await configuredPublicPath("api/public/auth-link");
+  return `${proxy}?${new URLSearchParams({ type, token }).toString()}`;
+}

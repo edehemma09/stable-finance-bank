@@ -59,6 +59,7 @@ import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authentic
 import { Route as ApiPublicKeepaliveRouteImport } from './routes/api/public/keepalive'
 import { Route as ApiPublicErrorReportRouteImport } from './routes/api/public/error-report'
 import { Route as ApiPublicEmailHookRouteImport } from './routes/api/public/email-hook'
+import { Route as ApiPublicAuthLinkRouteImport } from './routes/api/public/auth-link'
 import { Route as AuthenticatedAppWealthRouteImport } from './routes/_authenticated.app.wealth'
 import { Route as AuthenticatedAppTransfersRouteImport } from './routes/_authenticated.app.transfers'
 import { Route as AuthenticatedAppStatementsRouteImport } from './routes/_authenticated.app.statements'
@@ -335,6 +336,11 @@ const ApiPublicEmailHookRoute = ApiPublicEmailHookRouteImport.update({
   path: '/api/public/email-hook',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicAuthLinkRoute = ApiPublicAuthLinkRouteImport.update({
+  id: '/api/public/auth-link',
+  path: '/api/public/auth-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedAppWealthRoute = AuthenticatedAppWealthRouteImport.update({
   id: '/wealth',
   path: '/wealth',
@@ -546,6 +552,7 @@ export interface FileRoutesByFullPath {
   '/app/statements': typeof AuthenticatedAppStatementsRoute
   '/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/app/wealth': typeof AuthenticatedAppWealthRoute
+  '/api/public/auth-link': typeof ApiPublicAuthLinkRoute
   '/api/public/email-hook': typeof ApiPublicEmailHookRoute
   '/api/public/error-report': typeof ApiPublicErrorReportRoute
   '/api/public/keepalive': typeof ApiPublicKeepaliveRoute
@@ -621,6 +628,7 @@ export interface FileRoutesByTo {
   '/app/statements': typeof AuthenticatedAppStatementsRoute
   '/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/app/wealth': typeof AuthenticatedAppWealthRoute
+  '/api/public/auth-link': typeof ApiPublicAuthLinkRoute
   '/api/public/email-hook': typeof ApiPublicEmailHookRoute
   '/api/public/error-report': typeof ApiPublicErrorReportRoute
   '/api/public/keepalive': typeof ApiPublicKeepaliveRoute
@@ -700,6 +708,7 @@ export interface FileRoutesById {
   '/_authenticated/app/statements': typeof AuthenticatedAppStatementsRoute
   '/_authenticated/app/transfers': typeof AuthenticatedAppTransfersRoute
   '/_authenticated/app/wealth': typeof AuthenticatedAppWealthRoute
+  '/api/public/auth-link': typeof ApiPublicAuthLinkRoute
   '/api/public/email-hook': typeof ApiPublicEmailHookRoute
   '/api/public/error-report': typeof ApiPublicErrorReportRoute
   '/api/public/keepalive': typeof ApiPublicKeepaliveRoute
@@ -779,6 +788,7 @@ export interface FileRouteTypes {
     | '/app/statements'
     | '/app/transfers'
     | '/app/wealth'
+    | '/api/public/auth-link'
     | '/api/public/email-hook'
     | '/api/public/error-report'
     | '/api/public/keepalive'
@@ -854,6 +864,7 @@ export interface FileRouteTypes {
     | '/app/statements'
     | '/app/transfers'
     | '/app/wealth'
+    | '/api/public/auth-link'
     | '/api/public/email-hook'
     | '/api/public/error-report'
     | '/api/public/keepalive'
@@ -932,6 +943,7 @@ export interface FileRouteTypes {
     | '/_authenticated/app/statements'
     | '/_authenticated/app/transfers'
     | '/_authenticated/app/wealth'
+    | '/api/public/auth-link'
     | '/api/public/email-hook'
     | '/api/public/error-report'
     | '/api/public/keepalive'
@@ -991,6 +1003,7 @@ export interface RootRouteChildren {
   AdminLoginRoute: typeof AdminLoginRoute
   LegalPrivacyRoute: typeof LegalPrivacyRoute
   LegalTermsRoute: typeof LegalTermsRoute
+  ApiPublicAuthLinkRoute: typeof ApiPublicAuthLinkRoute
   ApiPublicEmailHookRoute: typeof ApiPublicEmailHookRoute
   ApiPublicErrorReportRoute: typeof ApiPublicErrorReportRoute
   ApiPublicKeepaliveRoute: typeof ApiPublicKeepaliveRoute
@@ -1348,6 +1361,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEmailHookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/auth-link': {
+      id: '/api/public/auth-link'
+      path: '/api/public/auth-link'
+      fullPath: '/api/public/auth-link'
+      preLoaderRoute: typeof ApiPublicAuthLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/app/wealth': {
       id: '/_authenticated/app/wealth'
       path: '/wealth'
@@ -1665,6 +1685,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminLoginRoute: AdminLoginRoute,
   LegalPrivacyRoute: LegalPrivacyRoute,
   LegalTermsRoute: LegalTermsRoute,
+  ApiPublicAuthLinkRoute: ApiPublicAuthLinkRoute,
   ApiPublicEmailHookRoute: ApiPublicEmailHookRoute,
   ApiPublicErrorReportRoute: ApiPublicErrorReportRoute,
   ApiPublicKeepaliveRoute: ApiPublicKeepaliveRoute,
