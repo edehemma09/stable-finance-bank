@@ -30,8 +30,10 @@ export const sendAuthEmail = createServerFn({ method: "POST" })
         type: "signup",
         email: data.email,
         password,
-        data: { full_name: data.fullName ?? "", username: data.username ?? "" },
-        options: { redirectTo },
+        options: {
+          data: { full_name: data.fullName ?? "", username: data.username ?? "" },
+          redirectTo,
+        },
       });
     } else {
       generated = await supabaseAdmin.auth.admin.generateLink({
