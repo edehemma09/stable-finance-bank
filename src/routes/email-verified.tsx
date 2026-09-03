@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { BrandMark } from "@/components/brand";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { sendAuthEmail } from "@/lib/auth-email.functions";
 
 export const Route = createFileRoute("/email-verified")({
   head: () => ({
@@ -29,6 +31,7 @@ function EmailVerifiedPage() {
   const [state, setState] = useState<PageState>("loading");
   const [email, setEmail] = useState("");
   const [resending, setResending] = useState(false);
+  const sendAuthEmailAction = useServerFn(sendAuthEmail);
 
   useEffect(() => {
     let settled = false;
@@ -64,14 +67,12 @@ function EmailVerifiedPage() {
       return;
     }
     setResending(true);
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/email-verified` },
+    const result = await sendAuthEmailAction({
+      data: { type: "resend", email: email.trim() },
     });
     setResending(false);
-    if (error) {
-      toast.error(error.message);
+    if (!result.sent) {
+      toast.error(result.error ?? "Could not resend the confirmation email.");
       return;
     }
     toast.success("A fresh confirmation link is on its way.");
