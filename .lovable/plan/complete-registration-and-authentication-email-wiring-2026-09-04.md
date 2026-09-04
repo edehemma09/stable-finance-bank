@@ -2,7 +2,8 @@
 
 ## 1. Restore the registration backend credential first
 
-- Rebind the Lovable Cloud runtime secrets so the managed service credential is available to server functions again.
+- Rewire the sign up to went through with no service-role error, the user will be created (unconfirmed, awaiting email), and the database trigger auto-created their profile plus 2 accounts. Reset-password and email-verified pages render correctly, including the expired-link states.
+- Rebind the Lovable Cloud runtime secrets so the managed service credential is available to server functions again but won't trigger SERVICE ROLE KEY.
 - Verify the binding with a server-side auth action before changing application behavior.
 - Keep the service credential server-only; it will never be added to frontend code, returned to the browser, or committed to the repository.
 - Replace the infrastructure-focused error shown to customers with a safe registration failure message while recording the detailed cause in Diagnostics.
