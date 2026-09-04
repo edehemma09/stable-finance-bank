@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -13,13 +13,22 @@ export const Route = createFileRoute("/email-verified")({
   head: () => ({
     meta: [
       { title: "Email verified — Stable Finance Bank" },
-      { name: "description", content: "Confirm your email address to activate your Stable Finance Bank accounts." },
+      {
+        name: "description",
+        content: "Confirm your email address to activate your Stable Finance Bank accounts.",
+      },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Email verified — Stable Finance Bank" },
       { property: "og:description", content: "Your email address has been confirmed." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+  }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    flow: search.flow === "verification" ? "verification" : undefined,
+    error: typeof search.error === "string" ? search.error : undefined,
+    errorDescription:
+      typeof search.error_description === "string" ? search.error_description : undefined,
   }),
   component: EmailVerifiedPage,
 });
@@ -28,12 +37,17 @@ type PageState = "loading" | "verified" | "invalid";
 
 function EmailVerifiedPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/email-verified" });
   const [state, setState] = useState<PageState>("loading");
   const [email, setEmail] = useState("");
   const [resending, setResending] = useState(false);
   const sendAuthEmailAction = useServerFn(sendAuthEmail);
 
   useEffect(() => {
+    if (search.error || !search.flow) {
+      setState("invalid");
+      return;
+    }
     let settled = false;
     const settle = (s: PageState) => {
       if (!settled) {
@@ -42,15 +56,14 @@ function EmailVerifiedPage() {
       }
     };
 
-    // Supabase processes the verification token in the URL automatically.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) settle("verified");
     });
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) settle("verified");
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (!error && data.user?.email_confirmed_at) settle("verified");
     });
 
     const timer = setTimeout(() => settle("invalid"), 3500);
@@ -58,7 +71,7 @@ function EmailVerifiedPage() {
       subscription.unsubscribe();
       clearTimeout(timer);
     };
-  }, []);
+  }, [search.error, search.flow]);
 
   async function resend(e: React.FormEvent) {
     e.preventDefault();
@@ -67,15 +80,19 @@ function EmailVerifiedPage() {
       return;
     }
     setResending(true);
-    const result = await sendAuthEmailAction({
-      data: { type: "resend", email: email.trim() },
-    });
-    setResending(false);
-    if (!result.sent) {
-      toast.error(result.error ?? "Could not resend the confirmation email.");
-      return;
+    try {
+      const result = await sendAuthEmailAction({
+        data: { type: "resend", email: email.trim().toLowerCase() },
+      });
+      if (!result.sent) throw new Error(result.error);
+      toast.success("A fresh confirmation link is on its way.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Could not resend the confirmation email.",
+      );
+    } finally {
+      setResending(false);
     }
-    toast.success("A fresh confirmation link is on its way.");
   }
 
   return (
@@ -96,7 +113,8 @@ function EmailVerifiedPage() {
           <div>
             <h1 className="font-display text-3xl">Email verified</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              Your email address has been confirmed and your Stable Finance Bank accounts are now active.
+              Your email address has been confirmed and your Stable Finance Bank accounts are now
+              active.
             </p>
             <Button
               className="mt-6 w-full bg-accent text-accent-foreground hover:bg-accent/90"
@@ -104,7 +122,11 @@ function EmailVerifiedPage() {
             >
               Continue to my accounts
             </Button>
-            <Button variant="outline" className="mt-2 w-full" onClick={() => navigate({ to: "/auth" })}>
+            <Button
+              variant="outline"
+              className="mt-2 w-full"
+              onClick={() => navigate({ to: "/auth" })}
+            >
               Go to sign in
             </Button>
           </div>
@@ -114,7 +136,8 @@ function EmailVerifiedPage() {
           <div>
             <h1 className="font-display text-3xl">Link expired</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              This confirmation link is invalid or has expired. Enter your email below and we'll send a fresh one.
+              This confirmation link is invalid or has expired. Enter your email below and we'll
+              send a fresh one.
             </p>
             <form onSubmit={resend} className="mt-6 space-y-3">
               <Input
@@ -134,7 +157,11 @@ function EmailVerifiedPage() {
                 {resending ? "Sending…" : "Resend verification email"}
               </Button>
             </form>
-            <Button variant="outline" className="mt-2 w-full" onClick={() => navigate({ to: "/auth" })}>
+            <Button
+              variant="outline"
+              className="mt-2 w-full"
+              onClick={() => navigate({ to: "/auth" })}
+            >
               Back to sign in
             </Button>
           </div>

@@ -14,9 +14,12 @@ export const Route = createFileRoute("/api/public/auth-link")({
         }
 
         const { configuredPublicPath } = await import("@/lib/email/public-url.server");
-        const redirectTo = await configuredPublicPath(type === "recovery" ? "reset-password" : "email-verified");
+        const callbackPath =
+          type === "recovery" ? "reset-password?flow=recovery" : "email-verified?flow=verification";
+        const redirectTo = await configuredPublicPath(callbackPath);
         const backendUrl = process.env["SUPABASE_URL"] || import.meta.env["VITE_SUPABASE_URL"];
-        if (!backendUrl) return new Response("Authentication service is unavailable", { status: 503 });
+        if (!backendUrl)
+          return new Response("Authentication service is unavailable", { status: 503 });
 
         const verifyUrl = new URL("/auth/v1/verify", backendUrl);
         verifyUrl.searchParams.set("type", type);
@@ -27,8 +30,9 @@ export const Route = createFileRoute("/api/public/auth-link")({
         if (!location) return Response.redirect(`${redirectTo}?error=invalid_link`, 303);
 
         const destination = new URL(location, redirectTo);
-        const configuredOrigin = new URL(await configuredPublicPath("" )).origin;
-        const validPath = destination.pathname === "/email-verified" || destination.pathname === "/reset-password";
+        const configuredOrigin = new URL(await configuredPublicPath("")).origin;
+        const validPath =
+          destination.pathname === "/email-verified" || destination.pathname === "/reset-password";
         if (destination.origin !== configuredOrigin || !validPath) {
           return Response.redirect(`${redirectTo}?error=invalid_link`, 303);
         }

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,13 +12,23 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Reset your password — Stable Finance Bank" },
-      { name: "description", content: "Choose a new password for your Stable Finance Bank online banking profile." },
+      {
+        name: "description",
+        content: "Choose a new password for your Stable Finance Bank online banking profile.",
+      },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Reset your password — Stable Finance Bank" },
-      { property: "og:description", content: "Choose a new password for your online banking profile." },
+      {
+        property: "og:description",
+        content: "Choose a new password for your online banking profile.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
+  }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    flow: search.flow === "recovery" ? "recovery" : undefined,
+    error: typeof search.error === "string" ? search.error : undefined,
   }),
   component: ResetPasswordPage,
 });
@@ -27,6 +37,7 @@ type PageState = "loading" | "ready" | "invalid" | "done";
 
 function ResetPasswordPage() {
   const navigate = useNavigate();
+  const search = useSearch({ from: "/reset-password" });
   const [state, setState] = useState<PageState>("loading");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -36,6 +47,10 @@ function ResetPasswordPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
+    if (search.error || !search.flow) {
+      setState("invalid");
+      return;
+    }
     let settled = false;
     const settle = (s: PageState) => {
       if (!settled) {
@@ -44,16 +59,14 @@ function ResetPasswordPage() {
       }
     };
 
-    // Supabase processes the recovery token from the URL automatically and
-    // fires PASSWORD_RECOVERY once the recovery session is established.
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) settle("ready");
     });
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (data.session) settle("ready");
+    supabase.auth.getUser().then(({ data, error }) => {
+      if (!error && data.user) settle("ready");
     });
 
     // If no token/session materializes, the link is invalid or expired.
@@ -62,7 +75,7 @@ function ResetPasswordPage() {
       subscription.unsubscribe();
       clearTimeout(timer);
     };
-  }, []);
+  }, [search.error, search.flow]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,6 +95,7 @@ function ResetPasswordPage() {
       setError(updateError.message);
       return;
     }
+    await supabase.auth.signOut();
     setState("done");
   }
 
@@ -103,8 +117,8 @@ function ResetPasswordPage() {
           <div>
             <h1 className="font-display text-3xl">Link expired</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              This password-reset link is invalid or has expired. Reset links are valid for one hour and can only be
-              used once.
+              This password-reset link is invalid or has expired. Reset links are valid for one hour
+              and can only be used once.
             </p>
             <Button
               className="mt-6 w-full bg-accent text-accent-foreground hover:bg-accent/90"
@@ -122,11 +136,11 @@ function ResetPasswordPage() {
               Enter a new password for your online banking profile.
             </p>
             <form onSubmit={submit} className="mt-6 space-y-3">
-              <div>
+              <div className="relative">
                 <Label htmlFor="np">New password</Label>
                 <Input
                   id="np"
-                  className="bg-card"
+                  className="bg-card pr-10"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -134,15 +148,23 @@ function ResetPasswordPage() {
                   minLength={8}
                   autoComplete="new-password"
                 />
-                <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-9 w-9" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide new password" : "Show new password"} title={showPassword ? "Hide new password" : "Show new password"}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-9 w-9"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? "Hide new password" : "Show new password"}
+                  title={showPassword ? "Hide new password" : "Show new password"}
+                >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
-              <div>
+              <div className="relative">
                 <Label htmlFor="cp">Confirm password</Label>
                 <Input
                   id="cp"
-                  className="bg-card"
+                  className="bg-card pr-10"
                   type={showConfirm ? "text" : "password"}
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
@@ -150,7 +172,17 @@ function ResetPasswordPage() {
                   minLength={8}
                   autoComplete="new-password"
                 />
-                <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-9 w-9" onClick={() => setShowConfirm((value) => !value)} aria-label={showConfirm ? "Hide password confirmation" : "Show password confirmation"} title={showConfirm ? "Hide password confirmation" : "Show password confirmation"}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-9 w-9"
+                  onClick={() => setShowConfirm((value) => !value)}
+                  aria-label={
+                    showConfirm ? "Hide password confirmation" : "Show password confirmation"
+                  }
+                  title={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
+                >
                   {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>

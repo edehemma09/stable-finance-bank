@@ -17,7 +17,11 @@ export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
       { title: "Sign in or open an account — Stable Finance Bank" },
-      { name: "description", content: "Sign in to Stable Finance Bank online banking, or open a new checking or savings account in minutes." },
+      {
+        name: "description",
+        content:
+          "Sign in to Stable Finance Bank online banking, or open a new checking or savings account in minutes.",
+      },
       { name: "robots", content: "noindex, follow" },
       { property: "og:title", content: "Sign in — Stable Finance Bank" },
       { property: "og:description", content: "Secure online banking sign-in." },
@@ -63,16 +67,26 @@ function AuthPage() {
         if (!/^[a-z0-9_.]{3,20}$/.test(uname)) {
           throw new Error("Username must be 3–20 characters: letters, numbers, dot or underscore.");
         }
-        const { data: taken } = await supabase.from("profiles").select("id").eq("username", uname).maybeSingle();
+        const { data: taken } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("username", uname)
+          .maybeSingle();
         if (taken) throw new Error("That username is already taken.");
+        const normalizedEmail = email.trim().toLowerCase();
         const result = await sendAuthEmailAction({
-          data: { type: "signup", email: email.trim(), password, fullName: fullName.trim(), username: uname },
+          data: {
+            type: "signup",
+            email: normalizedEmail,
+            password,
+            fullName: fullName.trim(),
+            username: uname,
+          },
         });
-        if (!result.sent) throw new Error(result.error ?? "Could not send the confirmation email.");
-        setPendingEmail(email);
+        if (!result.sent) throw new Error(result.error);
+        setPendingEmail(normalizedEmail);
         toast.success("Account created. Check your inbox to confirm your email.");
         return;
-
       }
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
@@ -83,7 +97,9 @@ function AuthPage() {
       if (blocked) {
         await supabase.auth.signOut();
         setBlockedState(blocked);
-        throw new Error(accountStateMessage(blocked) ?? "This account is not available. Contact support.");
+        throw new Error(
+          accountStateMessage(blocked) ?? "This account is not available. Contact support.",
+        );
       }
       setBlockedState(null);
       navigate({ to: search.redirect ?? "/app" });
@@ -97,15 +113,19 @@ function AuthPage() {
   async function resend() {
     if (!pendingEmail) return;
     setLoading(true);
-    const result = await sendAuthEmailAction({
-      data: { type: "resend", email: pendingEmail },
-    });
-    setLoading(false);
-    if (!result.sent) {
-      toast.error(result.error ?? "Could not resend the confirmation email.");
-      return;
+    try {
+      const result = await sendAuthEmailAction({
+        data: { type: "resend", email: pendingEmail },
+      });
+      if (!result.sent) throw new Error(result.error);
+      toast.success("Confirmation link sent.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Could not resend the confirmation email.",
+      );
+    } finally {
+      setLoading(false);
     }
-    toast.success("Confirmation link sent.");
   }
 
   async function forgotPassword() {
@@ -114,28 +134,33 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const result = await sendAuthEmailAction({
-      data: { type: "recovery", email: email.trim() },
-    });
-    setLoading(false);
-    if (!result.sent) {
-      toast.error(result.error ?? "Could not send the password reset email.");
-      return;
+    try {
+      const result = await sendAuthEmailAction({
+        data: { type: "recovery", email: email.trim().toLowerCase() },
+      });
+      if (!result.sent) throw new Error(result.error);
+      toast.success("If that address has an account, a reset link is on its way.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Could not send the password reset email.",
+      );
+    } finally {
+      setLoading(false);
     }
-    toast.success("If that address has an account, a reset link is on its way.");
   }
-
-
-
-
 
   return (
     <div className="grid min-h-screen md:grid-cols-2">
       <div className="hidden bg-primary p-10 text-primary-foreground md:flex md:flex-col md:justify-between">
         <BrandMark className="text-primary-foreground [&_span]:text-primary-foreground" />
         <div>
-          <p className="max-w-md font-display text-4xl leading-tight md:text-5xl">Banking with clarity, care, and craft.</p>
-          <p className="mt-4 max-w-md text-sm text-primary-foreground/80">A modern bank built around your day — checking, savings, cards, loans, and human support.</p>
+          <p className="max-w-md font-display text-4xl leading-tight md:text-5xl">
+            Banking with clarity, care, and craft.
+          </p>
+          <p className="mt-4 max-w-md text-sm text-primary-foreground/80">
+            A modern bank built around your day — checking, savings, cards, loans, and human
+            support.
+          </p>
           <div className="mt-8 h-40 w-64 rounded-2xl bg-primary-dark p-5 ring-1 ring-primary-foreground/15">
             <p className="text-xs opacity-70">Stable Finance</p>
             <p className="mt-8 font-mono tracking-widest">•••• 4218</p>
@@ -146,17 +171,25 @@ function AuthPage() {
       </div>
       <div className="flex items-center justify-center bg-surface p-6">
         <div className="w-full max-w-sm">
-          <div className="mb-6 md:hidden"><BrandMark /></div>
-          <h1 className="font-display text-3xl">{mode === "signin" ? "Sign in to Stable Finance" : "Enroll in Stable Finance"}</h1>
-          <p className="mt-1 text-sm text-muted-foreground">{mode === "signin" ? "Welcome back. Access your accounts securely." : "Open your account in less than a minute."}</p>
-
-
+          <div className="mb-6 md:hidden">
+            <BrandMark />
+          </div>
+          <h1 className="font-display text-3xl">
+            {mode === "signin" ? "Sign in to Stable Finance" : "Enroll in Stable Finance"}
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {mode === "signin"
+              ? "Welcome back. Access your accounts securely."
+              : "Open your account in less than a minute."}
+          </p>
 
           {blockedMessage && (
             <div className="mt-5 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-sm">
               <p className="font-semibold text-destructive">Account access restricted</p>
               <p className="mt-1 text-muted-foreground">{blockedMessage}</p>
-              <a href="/contact" className="mt-2 inline-block font-medium underline">Contact support</a>
+              <a href="/contact" className="mt-2 inline-block font-medium underline">
+                Contact support
+              </a>
             </div>
           )}
 
@@ -164,55 +197,131 @@ function AuthPage() {
             <div className="mt-5 rounded-lg border border-accent/40 bg-accent/10 p-4 text-sm">
               <p className="font-semibold">Confirm your email</p>
               <p className="mt-1 text-muted-foreground">
-                We sent a confirmation link to <span className="font-medium text-foreground">{pendingEmail}</span>. Open it to
+                We sent a confirmation link to{" "}
+                <span className="font-medium text-foreground">{pendingEmail}</span>. Open it to
                 activate your accounts and sign in.
               </p>
-              <button type="button" onClick={resend} disabled={loading} className="mt-2 font-semibold text-brand-blue underline">
+              <Button
+                type="button"
+                variant="link"
+                onClick={resend}
+                disabled={loading}
+                className="mt-2 h-auto p-0 font-semibold text-brand-blue underline"
+              >
                 Resend the link
-              </button>
+              </Button>
             </div>
           )}
 
           <form onSubmit={submit} className="mt-5 space-y-3">
             {mode === "signup" && (
               <>
-                <div><Label htmlFor="fn">Full name</Label><Input id="fn" className="bg-card" value={fullName} onChange={(e) => setFullName(e.target.value)} required /></div>
+                <div>
+                  <Label htmlFor="fn">Full name</Label>
+                  <Input
+                    id="fn"
+                    className="bg-card"
+                    value={fullName}
+                    onChange={(e) => setFullName(e.target.value)}
+                    required
+                  />
+                </div>
                 <div>
                   <Label htmlFor="un">Username</Label>
-                  <Input id="un" className="bg-card" value={username} onChange={(e) => setUsername(e.target.value)} required minLength={3} maxLength={20} autoComplete="username" placeholder="e.g. jordan_m" />
-                  <p className="mt-1 text-xs text-muted-foreground">3–20 characters. Letters, numbers, dot or underscore.</p>
+                  <Input
+                    id="un"
+                    className="bg-card"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    minLength={3}
+                    maxLength={20}
+                    autoComplete="username"
+                    placeholder="e.g. jordan_m"
+                  />
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    3–20 characters. Letters, numbers, dot or underscore.
+                  </p>
                 </div>
               </>
             )}
-            <div><Label htmlFor="e">Email</Label><Input id="e" className="bg-card" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required autoComplete="email" /></div>
+            <div>
+              <Label htmlFor="e">Email</Label>
+              <Input
+                id="e"
+                className="bg-card"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
+            </div>
             <div>
               <Label htmlFor="p">Password</Label>
               <div className="relative">
-                <Input id="p" className="bg-card pr-10" type={showPassword ? "text" : "password"} value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} autoComplete={mode === "signup" ? "new-password" : "current-password"} />
-                <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-9 w-9" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide password" : "Show password"} title={showPassword ? "Hide password" : "Show password"}>
+                <Input
+                  id="p"
+                  className="bg-card pr-10"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  minLength={8}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-9 w-9"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                  title={showPassword ? "Hide password" : "Show password"}
+                >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
             </div>
-            <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loading}>{loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Enroll now"}</Button>
+            <Button
+              type="submit"
+              className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+              disabled={loading}
+            >
+              {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Enroll now"}
+            </Button>
           </form>
 
           {mode === "signin" && (
             <p className="mt-3 text-center text-sm">
-              <button type="button" onClick={forgotPassword} disabled={loading} className="text-muted-foreground underline hover:text-foreground">
+              <Button
+                type="button"
+                variant="link"
+                onClick={forgotPassword}
+                disabled={loading}
+                className="h-auto p-0 text-muted-foreground underline hover:text-foreground"
+              >
                 Forgot password?
-              </button>
+              </Button>
             </p>
           )}
 
-
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "New to Stable Finance?" : "Already a member?"}{" "}
-            <button className="font-semibold text-brand-blue underline" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>
+            <Button
+              type="button"
+              variant="link"
+              className="h-auto p-0 font-semibold text-brand-blue underline"
+              onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            >
               {mode === "signin" ? "Enroll now" : "Sign in"}
-            </button>
+            </Button>
           </p>
-          <p className="mt-6 text-center text-xs text-muted-foreground"><a href="/" className="hover:underline">← Back to site</a></p>
+          <p className="mt-6 text-center text-xs text-muted-foreground">
+            <a href="/" className="hover:underline">
+              ← Back to site
+            </a>
+          </p>
         </div>
       </div>
     </div>
