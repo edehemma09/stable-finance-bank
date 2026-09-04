@@ -12,10 +12,16 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Reset your password — Stable Finance Bank" },
-      { name: "description", content: "Choose a new password for your Stable Finance Bank online banking profile." },
+      {
+        name: "description",
+        content: "Choose a new password for your Stable Finance Bank online banking profile.",
+      },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Reset your password — Stable Finance Bank" },
-      { property: "og:description", content: "Choose a new password for your online banking profile." },
+      {
+        property: "og:description",
+        content: "Choose a new password for your online banking profile.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -111,8 +117,8 @@ function ResetPasswordPage() {
           <div>
             <h1 className="font-display text-3xl">Link expired</h1>
             <p className="mt-2 text-sm text-muted-foreground">
-              This password-reset link is invalid or has expired. Reset links are valid for one hour and can only be
-              used once.
+              This password-reset link is invalid or has expired. Reset links are valid for one hour
+              and can only be used once.
             </p>
             <Button
               className="mt-6 w-full bg-accent text-accent-foreground hover:bg-accent/90"
@@ -142,7 +148,15 @@ function ResetPasswordPage() {
                   minLength={8}
                   autoComplete="new-password"
                 />
-                <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-9 w-9" onClick={() => setShowPassword((value) => !value)} aria-label={showPassword ? "Hide new password" : "Show new password"} title={showPassword ? "Hide new password" : "Show new password"}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-9 w-9"
+                  onClick={() => setShowPassword((value) => !value)}
+                  aria-label={showPassword ? "Hide new password" : "Show new password"}
+                  title={showPassword ? "Hide new password" : "Show new password"}
+                >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>
@@ -158,7 +172,17 @@ function ResetPasswordPage() {
                   minLength={8}
                   autoComplete="new-password"
                 />
-                <Button type="button" variant="ghost" size="icon" className="absolute right-0 top-0 h-9 w-9" onClick={() => setShowConfirm((value) => !value)} aria-label={showConfirm ? "Hide password confirmation" : "Show password confirmation"} title={showConfirm ? "Hide password confirmation" : "Show password confirmation"}>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-0 top-0 h-9 w-9"
+                  onClick={() => setShowConfirm((value) => !value)}
+                  aria-label={
+                    showConfirm ? "Hide password confirmation" : "Show password confirmation"
+                  }
+                  title={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
+                >
                   {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </Button>
               </div>

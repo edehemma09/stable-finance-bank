@@ -2,9 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 
 type AuthEmailType = "signup" | "recovery" | "resend";
 
-type AuthEmailResult =
-  | { sent: true }
-  | { sent: false; error: string };
+type AuthEmailResult = { sent: true } | { sent: false; error: string };
 
 function validEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
@@ -29,11 +27,14 @@ export const sendAuthEmail = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<AuthEmailResult> => {
     try {
       const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { configuredAuthLink, configuredPublicPath } = await import("./email/public-url.server");
+      const { configuredAuthLink, configuredPublicPath } =
+        await import("./email/public-url.server");
       const { sendBrandedEmail } = await import("./email/send.server");
       const email = data.email.trim().toLowerCase();
       const redirectTo = await configuredPublicPath(
-        data.type === "recovery" ? "reset-password?flow=recovery" : "email-verified?flow=verification",
+        data.type === "recovery"
+          ? "reset-password?flow=recovery"
+          : "email-verified?flow=verification",
       );
 
       let generated;
@@ -46,7 +47,10 @@ export const sendAuthEmail = createServerFn({ method: "POST" })
           email,
           password,
           options: {
-            data: { full_name: data.fullName?.trim() ?? "", username: data.username?.trim().toLowerCase() ?? "" },
+            data: {
+              full_name: data.fullName?.trim() ?? "",
+              username: data.username?.trim().toLowerCase() ?? "",
+            },
             redirectTo,
           },
         });
