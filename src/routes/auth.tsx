@@ -65,11 +65,12 @@ function AuthPage() {
         }
         const { data: taken } = await supabase.from("profiles").select("id").eq("username", uname).maybeSingle();
         if (taken) throw new Error("That username is already taken.");
+        const normalizedEmail = email.trim().toLowerCase();
         const result = await sendAuthEmailAction({
-          data: { type: "signup", email: email.trim(), password, fullName: fullName.trim(), username: uname },
+          data: { type: "signup", email: normalizedEmail, password, fullName: fullName.trim(), username: uname },
         });
-        if (!result.sent) throw new Error(result.error ?? "Could not send the confirmation email.");
-        setPendingEmail(email);
+        if (!result.sent) throw new Error(result.error);
+        setPendingEmail(normalizedEmail);
         toast.success("Account created. Check your inbox to confirm your email.");
         return;
 
@@ -97,15 +98,17 @@ function AuthPage() {
   async function resend() {
     if (!pendingEmail) return;
     setLoading(true);
-    const result = await sendAuthEmailAction({
-      data: { type: "resend", email: pendingEmail },
-    });
-    setLoading(false);
-    if (!result.sent) {
-      toast.error(result.error ?? "Could not resend the confirmation email.");
-      return;
+    try {
+      const result = await sendAuthEmailAction({
+        data: { type: "resend", email: pendingEmail },
+      });
+      if (!result.sent) throw new Error(result.error);
+      toast.success("Confirmation link sent.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not resend the confirmation email.");
+    } finally {
+      setLoading(false);
     }
-    toast.success("Confirmation link sent.");
   }
 
   async function forgotPassword() {
@@ -114,15 +117,17 @@ function AuthPage() {
       return;
     }
     setLoading(true);
-    const result = await sendAuthEmailAction({
-      data: { type: "recovery", email: email.trim() },
-    });
-    setLoading(false);
-    if (!result.sent) {
-      toast.error(result.error ?? "Could not send the password reset email.");
-      return;
+    try {
+      const result = await sendAuthEmailAction({
+        data: { type: "recovery", email: email.trim().toLowerCase() },
+      });
+      if (!result.sent) throw new Error(result.error);
+      toast.success("If that address has an account, a reset link is on its way.");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not send the password reset email.");
+    } finally {
+      setLoading(false);
     }
-    toast.success("If that address has an account, a reset link is on its way.");
   }
 
 
@@ -167,9 +172,9 @@ function AuthPage() {
                 We sent a confirmation link to <span className="font-medium text-foreground">{pendingEmail}</span>. Open it to
                 activate your accounts and sign in.
               </p>
-              <button type="button" onClick={resend} disabled={loading} className="mt-2 font-semibold text-brand-blue underline">
+              <Button type="button" variant="link" onClick={resend} disabled={loading} className="mt-2 h-auto p-0 font-semibold text-brand-blue underline">
                 Resend the link
-              </button>
+              </Button>
             </div>
           )}
 
@@ -199,18 +204,18 @@ function AuthPage() {
 
           {mode === "signin" && (
             <p className="mt-3 text-center text-sm">
-              <button type="button" onClick={forgotPassword} disabled={loading} className="text-muted-foreground underline hover:text-foreground">
+              <Button type="button" variant="link" onClick={forgotPassword} disabled={loading} className="h-auto p-0 text-muted-foreground underline hover:text-foreground">
                 Forgot password?
-              </button>
+              </Button>
             </p>
           )}
 
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             {mode === "signin" ? "New to Stable Finance?" : "Already a member?"}{" "}
-            <button className="font-semibold text-brand-blue underline" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>
+            <Button type="button" variant="link" className="h-auto p-0 font-semibold text-brand-blue underline" onClick={() => setMode(mode === "signin" ? "signup" : "signin")}>
               {mode === "signin" ? "Enroll now" : "Sign in"}
-            </button>
+            </Button>
           </p>
           <p className="mt-6 text-center text-xs text-muted-foreground"><a href="/" className="hover:underline">← Back to site</a></p>
         </div>
