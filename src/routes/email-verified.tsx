@@ -1,5 +1,4 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { BrandMark } from "@/components/brand";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { sendAuthEmail } from "@/lib/auth-email.functions";
 
 export const Route = createFileRoute("/email-verified")({
   head: () => ({
@@ -41,7 +39,6 @@ function EmailVerifiedPage() {
   const [state, setState] = useState<PageState>("loading");
   const [email, setEmail] = useState("");
   const [resending, setResending] = useState(false);
-  const sendAuthEmailAction = useServerFn(sendAuthEmail);
 
   useEffect(() => {
     if (search.error || !search.flow) {
@@ -81,10 +78,14 @@ function EmailVerifiedPage() {
     }
     setResending(true);
     try {
-      const result = await sendAuthEmailAction({
-        data: { type: "resend", email: email.trim().toLowerCase() },
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim().toLowerCase(),
+        options: {
+          emailRedirectTo: `${window.location.origin}/email-verified?flow=verification`,
+        },
       });
-      if (!result.sent) throw new Error(result.error);
+      if (error) throw error;
       toast.success("A fresh confirmation link is on its way.");
     } catch (error) {
       toast.error(
