@@ -27,16 +27,20 @@ export const Route = createFileRoute("/api/public/auth-link")({
         verifyUrl.searchParams.set("redirect_to", redirectTo);
         const verification = await fetch(verifyUrl, { redirect: "manual" });
         const location = verification.headers.get("location");
-        if (!location) return Response.redirect(`${redirectTo}?error=invalid_link`, 303);
+        const invalidUrl = new URL(redirectTo);
+        invalidUrl.searchParams.set("error", "invalid_link");
+        if (!location || verification.status < 300 || verification.status >= 400) {
+          return Response.redirect(invalidUrl.toString(), 303);
+        }
 
         const destination = new URL(location, redirectTo);
         const configuredOrigin = new URL(await configuredPublicPath("")).origin;
         const validPath =
           destination.pathname === "/email-verified" || destination.pathname === "/reset-password";
         if (destination.origin !== configuredOrigin || !validPath) {
-          return Response.redirect(`${redirectTo}?error=invalid_link`, 303);
+          return Response.redirect(invalidUrl.toString(), 303);
         }
-        return Response.redirect(destination.toString(), verification.status);
+        return Response.redirect(destination.toString(), 303);
       },
     },
   },
