@@ -184,7 +184,9 @@ function ResetPasswordPage() {
                     aria-label={
                       showConfirm ? "Hide password confirmation" : "Show password confirmation"
                     }
-                    title={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
+                    title={
+                      showConfirm ? "Hide password confirmation" : "Show password confirmation"
+                    }
                   >
                     {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </Button>
