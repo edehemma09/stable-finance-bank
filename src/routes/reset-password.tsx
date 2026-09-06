@@ -136,55 +136,59 @@ function ResetPasswordPage() {
               Enter a new password for your online banking profile.
             </p>
             <form onSubmit={submit} className="mt-6 space-y-3">
-              <div className="relative">
+              <div>
                 <Label htmlFor="np">New password</Label>
-                <Input
-                  id="np"
-                  className="bg-card pr-10"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-9 w-9"
-                  onClick={() => setShowPassword((value) => !value)}
-                  aria-label={showPassword ? "Hide new password" : "Show new password"}
-                  title={showPassword ? "Hide new password" : "Show new password"}
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
+                <div className="relative">
+                  <Input
+                    id="np"
+                    className="bg-card pr-10"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-9 w-9"
+                    onClick={() => setShowPassword((value) => !value)}
+                    aria-label={showPassword ? "Hide new password" : "Show new password"}
+                    title={showPassword ? "Hide new password" : "Show new password"}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
-              <div className="relative">
+              <div>
                 <Label htmlFor="cp">Confirm password</Label>
-                <Input
-                  id="cp"
-                  className="bg-card pr-10"
-                  type={showConfirm ? "text" : "password"}
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  required
-                  minLength={8}
-                  autoComplete="new-password"
-                />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-0 top-0 h-9 w-9"
-                  onClick={() => setShowConfirm((value) => !value)}
-                  aria-label={
-                    showConfirm ? "Hide password confirmation" : "Show password confirmation"
-                  }
-                  title={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
-                >
-                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </Button>
+                <div className="relative">
+                  <Input
+                    id="cp"
+                    className="bg-card pr-10"
+                    type={showConfirm ? "text" : "password"}
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    required
+                    minLength={8}
+                    autoComplete="new-password"
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-9 w-9"
+                    onClick={() => setShowConfirm((value) => !value)}
+                    aria-label={
+                      showConfirm ? "Hide password confirmation" : "Show password confirmation"
+                    }
+                    title={showConfirm ? "Hide password confirmation" : "Show password confirmation"}
+                  >
+                    {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
               </div>
               {error && (
                 <p className="rounded-lg border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">

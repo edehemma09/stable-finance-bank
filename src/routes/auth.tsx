@@ -1,4 +1,5 @@
 import { createFileRoute, redirect, useNavigate, useSearch } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
 import { accountStateMessage, getBlockingAccountState } from "@/lib/account-state";
+import { sendAuthEmail } from "@/lib/auth-email.functions";
 import { Eye, EyeOff } from "lucide-react";
 
 type Search = { mode?: "signin" | "signup"; redirect?: string; state?: string };
@@ -53,11 +55,8 @@ function AuthPage() {
   const [pendingEmail, setPendingEmail] = useState<string | null>(null);
   const [blockedState, setBlockedState] = useState<string | null>(search.state ?? null);
   const [showPassword, setShowPassword] = useState(false);
+  const sendAuthEmailAction = useServerFn(sendAuthEmail);
   const blockedMessage = accountStateMessage(blockedState);
-
-  function authRedirect(path: "/email-verified" | "/reset-password") {
-    return `${window.location.origin}${path}`;
-  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -75,23 +74,16 @@ function AuthPage() {
           .maybeSingle();
         if (taken) throw new Error("That username is already taken.");
         const normalizedEmail = email.trim().toLowerCase();
-        const { data, error } = await supabase.auth.signUp({
-          email: normalizedEmail,
-          password,
-          options: {
-            emailRedirectTo: `${authRedirect("/email-verified")}?flow=verification`,
-            data: {
-              full_name: fullName.trim(),
-              username: uname,
-            },
+        const result = await sendAuthEmailAction({
+          data: {
+            type: "signup",
+            email: normalizedEmail,
+            password,
+            fullName: fullName.trim(),
+            username: uname,
           },
         });
-        if (error) throw error;
-        if (!data.user) throw new Error("Registration could not be completed. Please try again.");
-        if (data.session) {
-          navigate({ to: search.redirect ?? "/app" });
-          return;
-        }
+        if (!result.sent) throw new Error(result.error);
         setPendingEmail(normalizedEmail);
         toast.success("Account created. Check your inbox to confirm your email.");
         return;
@@ -122,14 +114,10 @@ function AuthPage() {
     if (!pendingEmail) return;
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resend({
-        type: "signup",
-        email: pendingEmail,
-        options: {
-          emailRedirectTo: `${authRedirect("/email-verified")}?flow=verification`,
-        },
+      const result = await sendAuthEmailAction({
+        data: { type: "resend", email: pendingEmail },
       });
-      if (error) throw error;
+      if (!result.sent) throw new Error(result.error);
       toast.success("Confirmation link sent.");
     } catch (error) {
       toast.error(
@@ -147,10 +135,10 @@ function AuthPage() {
     }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-        redirectTo: `${authRedirect("/reset-password")}?flow=recovery`,
+      const result = await sendAuthEmailAction({
+        data: { type: "recovery", email: email.trim().toLowerCase() },
       });
-      if (error) throw error;
+      if (!result.sent) throw new Error(result.error);
       toast.success("If that address has an account, a reset link is on its way.");
     } catch (error) {
       toast.error(
