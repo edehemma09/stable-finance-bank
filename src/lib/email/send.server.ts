@@ -1,4 +1,5 @@
 import { renderEmail, type Branding } from "./render.server";
+import { loadSmtpConfigWithFallback, type SmtpConfigSource } from "./config-loader.server";
 
 export type EmailPayload = {
   template: string;
@@ -45,15 +46,51 @@ const DEFAULT_BRAND: Branding = {
   accent_color: "#C9A227",
 };
 
-/** Loads delivery settings + branding with the service-role client. Server only. */
+/**
+ * Convert SmtpConfigSource to DeliverySettings format
+ */
+function smtpConfigToDeliverySettings(cfg: SmtpConfigSource): DeliverySettings {
+  return {
+    provider: cfg.provider || "smtp",
+    api_key: cfg.api_key || "",
+    host: cfg.host,
+    port: cfg.port,
+    secure: cfg.secure,
+    username: cfg.username,
+    password: cfg.password,
+    from_name: cfg.from_name,
+    from_email: cfg.from_email,
+    reply_to: cfg.reply_to,
+    enabled: cfg.enabled,
+  };
+}
+
+/** Loads delivery settings + branding with fallback to process.env. Server only. */
 export async function loadEmailContext() {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const [{ data: smtp }, { data: site }] = await Promise.all([
-    supabaseAdmin.from("smtp_settings").select("*").eq("id", 1).maybeSingle(),
-    supabaseAdmin.from("site_settings").select("*").eq("id", 1).maybeSingle(),
-  ]);
-  const settings = (smtp ?? null) as DeliverySettings | null;
-  const siteSettings = (site ?? null) as SiteEmailSettings | null;
+  
+  // Load SMTP config with fallback
+  const smtpConfig = await loadSmtpConfigWithFallback();
+  const settings: DeliverySettings | null = smtpConfig 
+    ? smtpConfigToDeliverySettings(smtpConfig)
+    : null;
+
+  // Load site settings (branding) with fallback to process.env for public_url
+  let siteSettings: SiteEmailSettings | null = null;
+  try {
+    const { data: site } = await supabaseAdmin
+      .from("site_settings")
+      .select("*")
+      .eq("id", 1)
+      .maybeSingle();
+    siteSettings = (site ?? null) as SiteEmailSettings | null;
+  } catch (e) {
+    console.warn("[Email] Failed to load site settings from database:", e instanceof Error ? e.message : String(e));
+  }
+
+  // Fallback to process.env for public_url if not in database
+  const publicUrl = siteSettings?.public_url?.trim() || process.env["PUBLIC_URL"]?.trim() || "";
+
   const brand: Branding = {
     brand_name: siteSettings?.brand_name ?? DEFAULT_BRAND.brand_name,
     logo_url: siteSettings?.logo_url ?? null,
@@ -63,7 +100,8 @@ export async function loadEmailContext() {
     primary_color: siteSettings?.primary_color ?? DEFAULT_BRAND.primary_color,
     accent_color: siteSettings?.accent_color ?? DEFAULT_BRAND.accent_color,
   };
-  return { supabaseAdmin, settings, brand, publicUrl: siteSettings?.public_url?.trim() ?? "" };
+  
+  return { supabaseAdmin, settings, brand, publicUrl };
 }
 
 async function post(url: string, headers: Record<string, string>, body: unknown) {
@@ -81,7 +119,7 @@ async function post(url: string, headers: Record<string, string>, body: unknown)
 /** Sends one HTML email through the configured HTTP email provider. */
 async function transport(s: DeliverySettings, from: { name: string; email: string }, to: string, subject: string, html: string) {
   const key = s.api_key?.trim() || process.env["EMAIL_API_KEY"] || "";
-  const provider = (s.provider || "resend").toLowerCase();
+  const provider = (s.provider || "smtp").toLowerCase();
 
   if (provider === "smtp") {
     const { sendViaSmtp } = await import("./smtp.server");
@@ -144,7 +182,7 @@ async function transport(s: DeliverySettings, from: { name: string; email: strin
   }
 
   throw new Error(
-    `Unsupported email provider "${provider}". This app runs on an edge runtime, which cannot open raw SMTP connections — choose Resend, Brevo, SMTP2GO or Mailgun and paste the API key from that provider.`,
+    `Unsupported email provider "${provider}". This app runs on an edge runtime, which cannot open raw SMTP connections — choose Resend, Brevo, SMTP2GO or Mailgun and paste the API key from that service.`,
   );
 }
 
@@ -155,15 +193,19 @@ async function transport(s: DeliverySettings, from: { name: string; email: strin
 export async function sendBrandedEmail(to: string, p: EmailPayload): Promise<{ sent: boolean; error?: string }> {
   const { supabaseAdmin, settings, brand } = await loadEmailContext();
   const log = async (status: string, error?: string) => {
-    await supabaseAdmin
-      .from("email_log")
-      .insert({ to_email: to, subject: p.subject, template: p.template, status, error: error ?? null });
+    try {
+      await supabaseAdmin
+        .from("email_log")
+        .insert({ to_email: to, subject: p.subject, template: p.template, status, error: error ?? null });
+    } catch (e) {
+      console.warn("[Email] Failed to log email result:", e instanceof Error ? e.message : String(e));
+    }
   };
 
   try {
-    if (!settings) throw new Error("Email settings row is missing");
+    if (!settings) throw new Error("Email settings not configured. Set SMTP_* environment variables or configure via admin panel.");
     if (!settings.enabled) throw new Error("Email delivery is switched off in admin settings");
-    if (!settings.from_email?.trim()) throw new Error("No from-address saved in admin settings");
+    if (!settings.from_email?.trim()) throw new Error("No from-address configured. Set SMTP_FROM_EMAIL environment variable.");
 
     const html = renderEmail(brand, p.title, p.intro, p.rows, p.footnote, p.action);
     await transport(
