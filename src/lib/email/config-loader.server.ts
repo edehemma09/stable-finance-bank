@@ -1,6 +1,7 @@
 /**
- * Loads email configuration from database with graceful fallback to process.env.
- * This ensures email delivery works even if the service role key is temporarily unavailable.
+ * Loads email configuration from process.env FIRST (as primary),
+ * then falls back to database if env vars are not set.
+ * This ensures your SMTP credentials take priority over Lovable's defaults.
  */
 
 export type SmtpConfigSource = {
@@ -15,20 +16,49 @@ export type SmtpConfigSource = {
   enabled: boolean;
   provider: string;
   api_key?: string;
-  source: 'database' | 'environment';
+  source: 'environment' | 'database';
 };
 
 export type PublicUrlSource = {
   url: string;
-  source: 'database' | 'environment';
+  source: 'environment' | 'database';
 };
 
 /**
- * Load SMTP configuration from database, falling back to process.env
- * Returns both the config and its source (database or environment)
+ * Load SMTP configuration with process.env taking PRIORITY over database.
+ * This ensures your configured SMTP is used instead of Lovable defaults.
  */
 export async function loadSmtpConfigWithFallback(): Promise<SmtpConfigSource | null> {
-  // Try to load from database first
+  // CHECK PROCESS.ENV FIRST (Priority 1)
+  const envHost = process.env["SMTP_HOST"];
+  const envPort = process.env["SMTP_PORT"];
+  const envSecure = process.env["SMTP_SECURE"];
+  const envUsername = process.env["SMTP_USERNAME"];
+  const envPassword = process.env["SMTP_PASSWORD"];
+  const envFromName = process.env["SMTP_FROM_NAME"];
+  const envFromEmail = process.env["SMTP_FROM_EMAIL"];
+  const envReplyTo = process.env["SMTP_REPLY_TO"];
+  const envProvider = process.env["SMTP_PROVIDER"];
+
+  // If all critical env vars are set, use them (this is the primary source)
+  if (envHost && envUsername && envPassword && envFromEmail) {
+    console.log("[Email Config] Using SMTP configuration from process.env (PRIMARY)");
+    return {
+      host: envHost,
+      port: envPort ? parseInt(envPort, 10) : 465,
+      secure: envSecure !== 'false', // default true
+      username: envUsername,
+      password: envPassword,
+      from_name: envFromName ?? null,
+      from_email: envFromEmail,
+      reply_to: envReplyTo ?? null,
+      enabled: true,
+      provider: envProvider || 'smtp',
+      source: 'environment',
+    };
+  }
+
+  // FALLBACK TO DATABASE (Priority 2)
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: smtp, error } = await supabaseAdmin
@@ -38,6 +68,7 @@ export async function loadSmtpConfigWithFallback(): Promise<SmtpConfigSource | n
       .maybeSingle();
 
     if (!error && smtp) {
+      console.log("[Email Config] Using SMTP configuration from database (FALLBACK)");
       return {
         host: smtp.host,
         port: smtp.port,
@@ -54,46 +85,28 @@ export async function loadSmtpConfigWithFallback(): Promise<SmtpConfigSource | n
       };
     }
   } catch (e) {
-    // Database unavailable, fall through to environment
-    console.warn('[Email Config] Database unavailable, attempting process.env fallback:', e instanceof Error ? e.message : String(e));
+    console.warn('[Email Config] Database unavailable:', e instanceof Error ? e.message : String(e));
   }
 
-  // Fallback to process.env
-  const envHost = process.env["SMTP_HOST"];
-  const envPort = process.env["SMTP_PORT"];
-  const envSecure = process.env["SMTP_SECURE"];
-  const envUsername = process.env["SMTP_USERNAME"];
-  const envPassword = process.env["SMTP_PASSWORD"];
-  const envFromName = process.env["SMTP_FROM_NAME"];
-  const envFromEmail = process.env["SMTP_FROM_EMAIL"];
-  const envReplyTo = process.env["SMTP_REPLY_TO"];
-
-  if (!envHost || !envUsername || !envPassword || !envFromEmail) {
-    // No complete config in either source
-    return null;
-  }
-
-  return {
-    host: envHost,
-    port: envPort ? parseInt(envPort, 10) : 465,
-    secure: envSecure !== 'false', // default true
-    username: envUsername,
-    password: envPassword,
-    from_name: envFromName ?? null,
-    from_email: envFromEmail,
-    reply_to: envReplyTo ?? null,
-    enabled: true,
-    provider: 'smtp',
-    source: 'environment',
-  };
+  // No configuration found in either source
+  console.error("[Email Config] No SMTP configuration found in process.env or database");
+  return null;
 }
 
 /**
- * Load public URL from database, falling back to process.env
- * Returns the URL and its source
+ * Load public URL with process.env taking PRIORITY over database.
+ * Ensures email links use your configured domain, not Lovable's.
  */
 export async function loadPublicUrlWithFallback(): Promise<PublicUrlSource | null> {
-  // Try database first
+  // CHECK PROCESS.ENV FIRST (Priority 1)
+  const envUrl = process.env["PUBLIC_URL"];
+  if (envUrl?.trim()) {
+    const url = envUrl.trim().replace(/\/+$/, '');
+    console.log("[Public URL] Using URL from process.env (PRIMARY):", url);
+    return { url, source: 'environment' };
+  }
+
+  // FALLBACK TO DATABASE (Priority 2)
   try {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
@@ -104,19 +117,14 @@ export async function loadPublicUrlWithFallback(): Promise<PublicUrlSource | nul
 
     if (!error && data?.public_url?.trim()) {
       const url = data.public_url.trim().replace(/\/+$/, '');
+      console.log("[Public URL] Using URL from database (FALLBACK):", url);
       return { url, source: 'database' };
     }
   } catch (e) {
-    console.warn('[Email Config] Database unavailable for public URL, attempting process.env fallback:', e instanceof Error ? e.message : String(e));
+    console.warn('[Public URL] Database unavailable:', e instanceof Error ? e.message : String(e));
   }
 
-  // Fallback to process.env
-  const envUrl = process.env["PUBLIC_URL"];
-  if (envUrl?.trim()) {
-    const url = envUrl.trim().replace(/\/+$/, '');
-    return { url, source: 'environment' };
-  }
-
+  console.error("[Public URL] No PUBLIC_URL configured in process.env or database");
   return null;
 }
 
@@ -128,7 +136,7 @@ export function validatePublicUrl(url: string): URL {
   try {
     parsed = new URL(url);
   } catch {
-    throw new Error(`Public URL is invalid: "${url}"`);
+    throw new Error(`Public URL is invalid: "${url}". Must be a valid HTTPS URL (e.g., https://stf-b.com)`);
   }
 
   if (parsed.protocol !== 'https:' || parsed.username || parsed.password || parsed.search || parsed.hash) {
