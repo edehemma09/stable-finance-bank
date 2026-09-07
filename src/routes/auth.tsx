@@ -479,27 +479,27 @@ function AuthPage() {
   }
 
   async function forgotPassword() {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Enter your email address first, then tap "Forgot password".");
-      return;
-    }
-    setLoading(true);
-    try {
-      // Client-side password reset using Supabase publishable key
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-        redirectUrl: `${window.location.origin}/reset-password?flow=recovery`,
-      });
-
-      if (error) throw error;
-      toast.success("If that address has an account, a reset link is on its way.");
-    } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Could not send the password reset email.",
-      );
-    } finally {
-      setLoading(false);
-    }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    toast.error("Enter your email address first, then tap \"Forgot password\".");
+    return;
   }
+  setLoading(true);
+  try {
+    // Client-side password reset using Supabase publishable key
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+      redirectUrl: `${window.location.origin}/reset-password?flow=recovery`,
+    });
+
+    if (error) throw error;
+    toast.success("If that address has an account, a reset link is on its way.");
+  } catch (error) {
+    toast.error(
+      error instanceof Error ? error.message : "Could not send the password reset email.",
+    );
+  } finally {
+    setLoading(false);
+  }
+}
 
   return (
     <div className="grid min-h-screen md:grid-cols-2">
