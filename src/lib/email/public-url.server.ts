@@ -1,29 +1,28 @@
 import { createServerOnlyFn } from "@tanstack/react-start";
+import { loadPublicUrlWithFallback, validatePublicUrl } from "./config-loader.server";
 
+/**
+ * Get configured public URL with process.env taking priority over database.
+ * This ensures email verification and password reset links use the configured domain.
+ */
 export const getConfiguredPublicUrl = createServerOnlyFn(async () => {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const { data, error } = await supabaseAdmin
-    .from("site_settings")
-    .select("public_url")
-    .eq("id", 1)
-    .maybeSingle();
-
-  if (error) throw error;
-  const value = data?.public_url?.trim().replace(/\/+$/, "");
-  if (!value) throw new Error("Public URL is not configured in admin settings");
-
-  let url: URL;
   try {
-    url = new URL(value);
-  } catch {
-    throw new Error("Public URL in admin settings is invalid");
-  }
+    const urlConfig = await loadPublicUrlWithFallback();
+    
+    if (!urlConfig?.url) {
+      throw new Error("Public URL is not configured in admin settings or PUBLIC_URL environment variable");
+    }
 
-  if (url.protocol !== "https:" || url.username || url.password || url.search || url.hash) {
-    throw new Error("Public URL must be a clean HTTPS site address");
+    const url = validatePublicUrl(urlConfig.url);
+    const result = url.toString().replace(/\/+$/, "");
+    
+    console.log(`[Public URL] Using ${urlConfig.source} URL: ${result}`);
+    return result;
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error("[Public URL] Configuration error:", message);
+    throw new Error(`Public URL configuration error: ${message}`);
   }
-
-  return url.toString().replace(/\/+$/, "");
 });
 
 export async function configuredPublicPath(path: string) {
@@ -31,7 +30,10 @@ export async function configuredPublicPath(path: string) {
   return `${base}/${path.replace(/^\/+/, "")}`;
 }
 
-/** Replaces the backend-hosted auth URL with a same-domain proxy URL. */
+/**
+ * Replaces the backend-hosted auth URL with a same-domain proxy URL.
+ * Uses the configured public URL from process.env or database.
+ */
 export async function configuredAuthLink(actionLink: string) {
   const action = new URL(actionLink);
   const type = action.searchParams.get("type");
