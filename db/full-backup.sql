@@ -1,5 +1,6 @@
 -- Stable Finance Bank — FULL BACKUP (schema + storage + data)
--- Run this single file against an empty Supabase project.
+-- Run this single file against a fresh Supabase project.
+-- Customer records, SMTP credentials, and webhook secrets are intentionally excluded.
 
 -- ===== 1. SCHEMA =====
 -- Stable Finance Bank — full schema for a fresh Supabase project
@@ -29,6 +30,8 @@ create table if not exists public.accounts (
   "created_at" timestamp with time zone default now() not null,
   "updated_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.accounts TO authenticated;
+GRANT ALL ON public.accounts TO service_role;
 create table if not exists public.alerts (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -38,6 +41,8 @@ create table if not exists public.alerts (
   "read_at" timestamp with time zone,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.alerts TO authenticated;
+GRANT ALL ON public.alerts TO service_role;
 create table if not exists public.alerts_prefs (
   "user_id" uuid not null,
   "large_txn_threshold" numeric(18,2) default 500 not null,
@@ -45,6 +50,8 @@ create table if not exists public.alerts_prefs (
   "login_alerts" boolean default true not null,
   "updated_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.alerts_prefs TO authenticated;
+GRANT ALL ON public.alerts_prefs TO service_role;
 create table if not exists public.audit_log (
   "id" uuid default gen_random_uuid() not null,
   "actor_id" uuid,
@@ -54,6 +61,8 @@ create table if not exists public.audit_log (
   "details" jsonb default '{}'::jsonb,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.audit_log TO authenticated;
+GRANT ALL ON public.audit_log TO service_role;
 create table if not exists public.bill_payments (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -65,6 +74,8 @@ create table if not exists public.bill_payments (
   "memo" text,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.bill_payments TO authenticated;
+GRANT ALL ON public.bill_payments TO service_role;
 create table if not exists public.cards (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -86,6 +97,8 @@ create table if not exists public.cards (
   "international_enabled" boolean default false not null,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.cards TO authenticated;
+GRANT ALL ON public.cards TO service_role;
 create table if not exists public.cheque_deposits (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -98,6 +111,8 @@ create table if not exists public.cheque_deposits (
   "created_at" timestamp with time zone default now() not null,
   "decided_at" timestamp with time zone
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.cheque_deposits TO authenticated;
+GRANT ALL ON public.cheque_deposits TO service_role;
 create table if not exists public.deleted_users (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -108,6 +123,8 @@ create table if not exists public.deleted_users (
   "deleted_by" uuid,
   "deleted_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.deleted_users TO authenticated;
+GRANT ALL ON public.deleted_users TO service_role;
 create table if not exists public.email_log (
   "id" uuid default gen_random_uuid() not null,
   "to_email" text not null,
@@ -117,6 +134,8 @@ create table if not exists public.email_log (
   "error" text,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.email_log TO authenticated;
+GRANT ALL ON public.email_log TO service_role;
 create table if not exists public.holdings (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -130,6 +149,8 @@ create table if not exists public.holdings (
   "created_at" timestamp with time zone default now() not null,
   "updated_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.holdings TO authenticated;
+GRANT ALL ON public.holdings TO service_role;
 create table if not exists public.kyc_submissions (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -143,6 +164,8 @@ create table if not exists public.kyc_submissions (
   "submitted_at" timestamp with time zone default now() not null,
   "decided_at" timestamp with time zone
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.kyc_submissions TO authenticated;
+GRANT ALL ON public.kyc_submissions TO service_role;
 create table if not exists public.loans (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -161,6 +184,8 @@ create table if not exists public.loans (
   "decided_at" timestamp with time zone,
   "decision_notes" text
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.loans TO authenticated;
+GRANT ALL ON public.loans TO service_role;
 create table if not exists public.pages (
   "id" uuid default gen_random_uuid() not null,
   "slug" text not null,
@@ -178,6 +203,9 @@ create table if not exists public.pages (
   "created_at" timestamp with time zone default now() not null,
   "updated_at" timestamp with time zone default now() not null
 );
+GRANT SELECT ON public.pages TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.pages TO authenticated;
+GRANT ALL ON public.pages TO service_role;
 create table if not exists public.payees (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -187,6 +215,8 @@ create table if not exists public.payees (
   "address" text,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.payees TO authenticated;
+GRANT ALL ON public.payees TO service_role;
 create table if not exists public.profiles (
   "id" uuid not null,
   "email" text not null,
@@ -210,12 +240,16 @@ create table if not exists public.profiles (
   "transaction_limit" numeric(18,2) default 5000 not null,
   "username" text
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.profiles TO authenticated;
+GRANT ALL ON public.profiles TO service_role;
 create table if not exists public.risk_scores (
   "user_id" uuid not null,
   "score" integer default 30 not null,
   "factors" jsonb default '{}'::jsonb not null,
   "computed_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.risk_scores TO authenticated;
+GRANT ALL ON public.risk_scores TO service_role;
 create table if not exists public.site_settings (
   "id" integer default 1 not null,
   "brand_name" text default 'Stable Finance Bank'::text not null,
@@ -228,8 +262,12 @@ create table if not exists public.site_settings (
   "address" text default '100 Harbor St, Boston, MA'::text not null,
   "routing_number" text default '011000138'::text not null,
   "socials" jsonb default '{}'::jsonb not null,
-  "updated_at" timestamp with time zone default now() not null
+  "updated_at" timestamp with time zone default now() not null,
+  "public_url" text default 'https://www.stf-b.com'::text not null
 );
+GRANT SELECT ON public.site_settings TO anon;
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.site_settings TO authenticated;
+GRANT ALL ON public.site_settings TO service_role;
 create table if not exists public.smtp_settings (
   "id" integer default 1 not null,
   "host" text default 'smtp.stf-b.com'::text not null,
@@ -239,9 +277,63 @@ create table if not exists public.smtp_settings (
   "password" text default ''::text not null,
   "from_name" text,
   "from_email" text default ''::text not null,
-  "enabled" boolean default true not null,
+  "enabled" boolean default false not null,
+  "updated_at" timestamp with time zone default now() not null,
+  "provider" text default 'smtp'::text not null,
+  "api_key" text default ''::text not null,
+  "reply_to" text
+);
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.smtp_settings TO authenticated;
+GRANT ALL ON public.smtp_settings TO service_role;
+create table if not exists public.app_config (
+  "key" text not null,
+  "value" text not null,
   "updated_at" timestamp with time zone default now() not null
 );
+GRANT ALL ON public.app_config TO service_role;
+create table if not exists public.error_events (
+  "id" uuid default gen_random_uuid() not null,
+  "incident_code" text not null,
+  "fingerprint" text not null,
+  "severity" text default 'error'::text not null,
+  "source" text not null,
+  "route" text,
+  "action" text,
+  "message" text not null,
+  "stack_summary" text,
+  "metadata" jsonb default '{}'::jsonb not null,
+  "occurrence_count" integer default 1 not null,
+  "status" text default 'open'::text not null,
+  "first_seen_at" timestamp with time zone default now() not null,
+  "last_seen_at" timestamp with time zone default now() not null,
+  "resolved_at" timestamp with time zone,
+  "resolved_by" uuid,
+  "ai_status" text default 'not_analyzed'::text not null,
+  "ai_cause" text,
+  "ai_confidence" text,
+  "ai_recommendation" text,
+  "ai_action_kind" text,
+  "ai_error" text,
+  "analyzed_at" timestamp with time zone,
+  "action_approved_at" timestamp with time zone,
+  "action_approved_by" uuid,
+  "action_executed_at" timestamp with time zone,
+  "created_at" timestamp with time zone default now() not null,
+  "updated_at" timestamp with time zone default now() not null
+);
+GRANT SELECT, UPDATE ON public.error_events TO authenticated;
+GRANT ALL ON public.error_events TO service_role;
+create table if not exists public.keepalive_pings (
+  "id" uuid default gen_random_uuid() not null,
+  "source" text not null,
+  "ok" boolean default true not null,
+  "db_status" text not null,
+  "duration_ms" integer default 0 not null,
+  "detail" text,
+  "created_at" timestamp with time zone default now() not null
+);
+GRANT SELECT ON public.keepalive_pings TO authenticated;
+GRANT ALL ON public.keepalive_pings TO service_role;
 create table if not exists public.statements (
   "id" uuid default gen_random_uuid() not null,
   "account_id" uuid not null,
@@ -252,6 +344,8 @@ create table if not exists public.statements (
   "closing_balance" numeric(18,2) not null,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.statements TO authenticated;
+GRANT ALL ON public.statements TO service_role;
 create table if not exists public.support_tickets (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -263,6 +357,8 @@ create table if not exists public.support_tickets (
   "created_at" timestamp with time zone default now() not null,
   "updated_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.support_tickets TO authenticated;
+GRANT ALL ON public.support_tickets TO service_role;
 create table if not exists public.ticket_messages (
   "id" uuid default gen_random_uuid() not null,
   "ticket_id" uuid not null,
@@ -271,6 +367,8 @@ create table if not exists public.ticket_messages (
   "is_staff" boolean default false not null,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.ticket_messages TO authenticated;
+GRANT ALL ON public.ticket_messages TO service_role;
 create table if not exists public.transactions (
   "id" uuid default gen_random_uuid() not null,
   "account_id" uuid not null,
@@ -287,6 +385,8 @@ create table if not exists public.transactions (
   "metadata" jsonb default '{}'::jsonb not null,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.transactions TO authenticated;
+GRANT ALL ON public.transactions TO service_role;
 create table if not exists public.transfers (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
@@ -300,14 +400,23 @@ create table if not exists public.transfers (
   "receipt_number" text default ('TX-'::text || upper(substr((gen_random_uuid())::text, 1, 10))) not null,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.transfers TO authenticated;
+GRANT ALL ON public.transfers TO service_role;
 create table if not exists public.user_roles (
   "id" uuid default gen_random_uuid() not null,
   "user_id" uuid not null,
   "role" app_role not null,
   "created_at" timestamp with time zone default now() not null
 );
+GRANT SELECT ON public.user_roles TO authenticated;
+GRANT ALL ON public.user_roles TO service_role;
 
 -- ============ CONSTRAINTS ============
+do $$ begin alter table public.app_config add constraint "app_config_pkey" PRIMARY KEY (key); exception when duplicate_object then null; when duplicate_table then null; end $$;
+do $$ begin alter table public.error_events add constraint "error_events_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
+do $$ begin alter table public.error_events add constraint "error_events_fingerprint_key" UNIQUE (fingerprint); exception when duplicate_object then null; when duplicate_table then null; end $$;
+do $$ begin alter table public.keepalive_pings add constraint "keepalive_pings_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
+
 do $$ begin alter table public.accounts add constraint "accounts_account_number_key" UNIQUE (account_number); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.accounts add constraint "accounts_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.accounts add constraint "accounts_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE; exception when duplicate_object then null; when duplicate_table then null; end $$;
@@ -792,6 +901,8 @@ drop trigger if exists pages_updated on public.pages;
 CREATE TRIGGER pages_updated BEFORE UPDATE ON public.pages FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 drop trigger if exists profiles_updated on public.profiles;
 CREATE TRIGGER profiles_updated BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+drop trigger if exists error_events_updated on public.error_events;
+CREATE TRIGGER error_events_updated BEFORE UPDATE ON public.error_events FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 drop trigger if exists smtp_settings_touch on public.smtp_settings;
 CREATE TRIGGER smtp_settings_touch BEFORE UPDATE ON public.smtp_settings FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 drop trigger if exists tickets_updated on public.support_tickets;
@@ -813,6 +924,9 @@ alter table public.cards enable row level security;
 alter table public.cheque_deposits enable row level security;
 alter table public.deleted_users enable row level security;
 alter table public.email_log enable row level security;
+alter table public.app_config enable row level security;
+alter table public.error_events enable row level security;
+alter table public.keepalive_pings enable row level security;
 alter table public.holdings enable row level security;
 alter table public.kyc_submissions enable row level security;
 alter table public.loans enable row level security;
@@ -989,12 +1103,28 @@ create policy "users read own roles" on public.user_roles for select to authenti
   using (((auth.uid() = user_id) OR has_role(auth.uid(), 'admin'::app_role)));
 
 
+-- Admin diagnostics and private application configuration.
+drop policy if exists "admin read error events" on public.error_events;
+create policy "admin read error events" on public.error_events for select to authenticated
+  using (has_role(auth.uid(), 'admin'::app_role));
+drop policy if exists "admin update error events" on public.error_events;
+create policy "admin update error events" on public.error_events for update to authenticated
+  using (has_role(auth.uid(), 'admin'::app_role))
+  with check (has_role(auth.uid(), 'admin'::app_role));
+drop policy if exists "admin read keepalive pings" on public.keepalive_pings;
+create policy "admin read keepalive pings" on public.keepalive_pings for select to authenticated
+  using (has_role(auth.uid(), 'admin'::app_role));
+drop policy if exists "service role app config access" on public.app_config;
+create policy "service role app config access" on public.app_config for all to service_role
+  using (true) with check (true);
+
+
 -- ===== 2. STORAGE =====
 -- Stable Finance Bank — storage buckets and policies
 -- Run AFTER db/schema.sql (it depends on the public.has_role function).
 
 insert into storage.buckets (id, name, public)
-values ('kyc', 'kyc', false), ('deposits', 'deposits', false)
+values ('avatars', 'avatars', false), ('kyc', 'kyc', false), ('deposits', 'deposits', false)
 on conflict (id) do nothing;
 
 -- Users upload into a folder named after their own user id: <uid>/<file>
@@ -1017,14 +1147,47 @@ create policy "own docs read" on storage.objects for select to authenticated
   );
 
 
+-- Private profile photos: users can manage only files in their own folder.
+drop policy if exists "Users can view own avatars" on storage.objects;
+create policy "Users can view own avatars" on storage.objects for select to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+drop policy if exists "Users can upload own avatars" on storage.objects;
+create policy "Users can upload own avatars" on storage.objects for insert to authenticated
+  with check (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = auth.uid()::text
+    and lower(storage.extension(name)) in ('png', 'jpg', 'jpeg')
+    and metadata->>'mimetype' in ('image/png', 'image/jpeg')
+  );
+drop policy if exists "Users can update own avatars" on storage.objects;
+create policy "Users can update own avatars" on storage.objects for update to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text)
+  with check (
+    bucket_id = 'avatars'
+    and (storage.foldername(name))[1] = auth.uid()::text
+    and lower(storage.extension(name)) in ('png', 'jpg', 'jpeg')
+    and metadata->>'mimetype' in ('image/png', 'image/jpeg')
+  );
+drop policy if exists "Users can delete own avatars" on storage.objects;
+create policy "Users can delete own avatars" on storage.objects for delete to authenticated
+  using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+
 -- ===== 3. DATA =====
--- Stable Finance Bank — data snapshot
--- Generated from the live database. Safe to re-run.
+-- Stable Finance Bank — data snapshot. Credentials and webhook secrets are intentionally omitted.
 
-INSERT INTO public.site_settings (id,brand_name,tagline,logo_url,primary_color,accent_color,contact_email,contact_phone,address,routing_number,socials) VALUES (1,'Stable Finance Bank','Stable money. Modern banking.','/mark.png','#1B17FF','#4B48FF','support@stf-b.com','+1 (800) 555-0110','100 Harbor St, Boston, MA','011000138','{}'::jsonb) ON CONFLICT (id) DO UPDATE SET brand_name=EXCLUDED.brand_name,tagline=EXCLUDED.tagline,logo_url=EXCLUDED.logo_url,primary_color=EXCLUDED.primary_color,accent_color=EXCLUDED.accent_color,contact_email=EXCLUDED.contact_email,contact_phone=EXCLUDED.contact_phone,address=EXCLUDED.address,routing_number=EXCLUDED.routing_number,socials=EXCLUDED.socials;
+INSERT INTO public.site_settings (id,brand_name,tagline,logo_url,primary_color,accent_color,contact_email,contact_phone,address,routing_number,socials,public_url)
+VALUES (1,'Stable Finance Bank','Stable money. Modern banking.','/mark.png','#1B17FF','#4B48FF','support@stf-b.com','+1 (800) 555-0110','100 Harbor St, Boston, MA','011000138','{}'::jsonb,'https://www.stf-b.com')
+ON CONFLICT (id) DO UPDATE SET brand_name=EXCLUDED.brand_name,tagline=EXCLUDED.tagline,logo_url=EXCLUDED.logo_url,primary_color=EXCLUDED.primary_color,accent_color=EXCLUDED.accent_color,contact_email=EXCLUDED.contact_email,contact_phone=EXCLUDED.contact_phone,address=EXCLUDED.address,routing_number=EXCLUDED.routing_number,socials=EXCLUDED.socials,public_url=EXCLUDED.public_url;
 
-INSERT INTO public.smtp_settings (id, host, port, secure, username, password, from_name, from_email, enabled)
-VALUES (1, '', 465, true, '', '', 'Stable Finance Bank', '', false)
+INSERT INTO public.smtp_settings (id,host,port,secure,username,password,from_name,from_email,enabled,provider,api_key,reply_to)
+VALUES (1,'',465,true,'','','Stable Finance Bank','',false,'smtp','','')
 ON CONFLICT (id) DO NOTHING;
 
+INSERT INTO public.app_config (key,value) VALUES
+  ('app_url','https://www.stf-b.com'),
+  ('email_hook_url','https://www.stf-b.com/api/public/email-hook')
+ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value;
+
+-- Set email_hook_secret separately to a newly generated secret before enabling email hooks.
 INSERT INTO public.pages (slug,title,meta_description,og_image,hero_title,hero_subtitle,hero_image,blocks,nav_label,nav_order,in_nav,published) VALUES ('home','Stable Finance Bank','Everyday checking, high-yield savings, cards and loans from Stable Finance Bank — open an account online in minutes.',NULL,'Stable money. Modern banking.','Checking, savings, cards and loans built for real life — with clear rates, no surprise fees, and support from real people.','/hero-home.jpg','[{"type": "tiles", "items": [{"to": "/checking", "icon": "wallet", "label": "Checking"}, {"to": "/savings", "icon": "piggy", "label": "Savings"}, {"to": "/credit-cards", "icon": "card", "label": "Credit Cards"}, {"to": "/home-loans", "icon": "home", "label": "Home Loans"}, {"to": "/auto-loans", "icon": "car", "label": "Auto Loans"}, {"to": "/investments", "icon": "bank", "label": "Investments"}], "title": "What can we help you with?"}, {"type": "promos", "items": [{"to": "/mortgage", "cta": "See mortgage rates", "body": "Lock a competitive fixed rate and close in as few as 21 days with a dedicated loan officer.", "image": "/promo-mortgage.jpg", "title": "Mortgages from 5.75% APR"}, {"to": "/credit-cards", "cta": "Compare cards", "body": "Earn 2% back on everyday spend, plus contactless tap-to-pay and instant card freeze.", "image": "/promo-card.jpg", "title": "Cash-back card, no annual fee"}, {"to": "/savings", "cta": "Start saving", "body": "No minimum balance, no monthly fee, and interest compounded daily on every dollar.", "image": "/promo-savings.jpg", "title": "High-yield savings at 4.30% APY"}], "title": "Rates & offers"}, {"type": "features", "items": [{"body": "Apply online with a photo ID and start moving money the same day.", "title": "Open in minutes"}, {"body": "No hidden maintenance fees, no surprise overdraft traps, no fine-print gotchas.", "title": "Clear, honest pricing"}, {"body": "Instant alerts, card freeze, and account-level verification on every sensitive change.", "title": "Security you can see"}], "title": "Banking that stays out of your way"}, {"type": "stats", "items": [{"k": "4.30%", "v": "APY on high-yield savings"}, {"k": "$0", "v": "Monthly maintenance fee on checking"}, {"k": "24/7", "v": "Support from real people"}]}, {"to": "/auth", "cta": "Open an account", "body": "Switch your direct deposit, bring your bills across, and we will help you close out the old account.", "type": "billboard", "title": "Move your everyday banking to Stable Finance", "kicker": "Members first"}, {"to": "/auth", "body": "Open a Stable Finance Bank account online in about five minutes.", "type": "cta", "title": "Ready when you are", "button": "Get started"}]'::jsonb,'Home',0,false,true) ON CONFLICT (slug) DO UPDATE SET title=EXCLUDED.title,meta_description=EXCLUDED.meta_description,og_image=EXCLUDED.og_image,hero_title=EXCLUDED.hero_title,hero_subtitle=EXCLUDED.hero_subtitle,hero_image=EXCLUDED.hero_image,blocks=EXCLUDED.blocks,nav_label=EXCLUDED.nav_label,nav_order=EXCLUDED.nav_order,in_nav=EXCLUDED.in_nav,published=EXCLUDED.published;
