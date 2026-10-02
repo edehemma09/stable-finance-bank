@@ -1,6 +1,6 @@
 -- Stable Finance Bank — FULL BACKUP (schema + storage + data)
 -- Run this single file against a fresh Supabase project.
--- SMTP passwords and webhook secrets are intentionally not included.
+-- Customer records, SMTP credentials, and webhook secrets are intentionally excluded.
 
 -- ===== 1. SCHEMA =====
 -- Stable Finance Bank — full schema for a fresh Supabase project
@@ -415,8 +415,6 @@ GRANT ALL ON public.user_roles TO service_role;
 do $$ begin alter table public.app_config add constraint "app_config_pkey" PRIMARY KEY (key); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.error_events add constraint "error_events_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.error_events add constraint "error_events_fingerprint_key" UNIQUE (fingerprint); exception when duplicate_object then null; when duplicate_table then null; end $$;
-do $$ begin alter table public.error_events add constraint "error_events_resolved_by_fkey" FOREIGN KEY (resolved_by) REFERENCES auth.users(id); exception when duplicate_object then null; when duplicate_table then null; end $$;
-do $$ begin alter table public.error_events add constraint "error_events_action_approved_by_fkey" FOREIGN KEY (action_approved_by) REFERENCES auth.users(id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.keepalive_pings add constraint "keepalive_pings_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 
 do $$ begin alter table public.accounts add constraint "accounts_account_number_key" UNIQUE (account_number); exception when duplicate_object then null; when duplicate_table then null; end $$;
@@ -1175,7 +1173,7 @@ create policy "Users can delete own avatars" on storage.objects for delete to au
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
 
 
--- ===== 3. SEED DATA =====
+-- ===== 3. DATA =====
 -- Stable Finance Bank — data snapshot. Credentials and webhook secrets are intentionally omitted.
 
 INSERT INTO public.site_settings (id,brand_name,tagline,logo_url,primary_color,accent_color,contact_email,contact_phone,address,routing_number,socials,public_url)
