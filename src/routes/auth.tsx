@@ -487,7 +487,7 @@ function AuthPage() {
   try {
     // Client-side password reset using Supabase publishable key
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-      redirectUrl: `${window.location.origin}/reset-password?flow=recovery`,
+      redirectTo: `${window.location.origin}/reset-password?flow=recovery`,
     });
 
     if (error) throw error;
