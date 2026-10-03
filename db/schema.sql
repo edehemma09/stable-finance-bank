@@ -2,6 +2,7 @@
 -- Run in the SQL editor of your Supabase project (once, top to bottom).
 
 create extension if not exists pgcrypto;
+create extension if not exists pg_net with schema extensions;
 
 
 -- ============ ENUM TYPES ============
@@ -747,16 +748,17 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
  SECURITY DEFINER
  SET search_path TO 'public'
 AS $function$
-DECLARE _acct text; _uname text;
+DECLARE _acct text; _sav text; _uname text; _name text;
 BEGIN
   _uname := NULLIF(trim(COALESCE(NEW.raw_user_meta_data->>'username','')), '');
   IF _uname IS NULL THEN _uname := split_part(NEW.email,'@',1); END IF;
   IF EXISTS (SELECT 1 FROM public.profiles WHERE lower(username)=lower(_uname)) THEN
     _uname := _uname || substr(replace(gen_random_uuid()::text,'-',''),1,4);
   END IF;
+  _name := COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', split_part(NEW.email,'@',1));
 
   INSERT INTO public.profiles (id, email, full_name, username)
-  VALUES (NEW.id, NEW.email, COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.raw_user_meta_data->>'name', split_part(NEW.email,'@',1)), _uname)
+  VALUES (NEW.id, NEW.email, _name, _uname)
   ON CONFLICT (id) DO NOTHING;
   INSERT INTO public.user_roles(user_id, role) VALUES (NEW.id, 'customer') ON CONFLICT DO NOTHING;
 
@@ -764,13 +766,87 @@ BEGIN
     _acct := lpad((floor(random()*9000000000)::bigint + 1000000000)::text, 10, '0');
     EXIT WHEN NOT EXISTS (SELECT 1 FROM public.accounts WHERE account_number = _acct);
   END LOOP;
-
   INSERT INTO public.accounts (user_id, type, nickname, account_number, balance, available_balance, interest_rate, status)
   VALUES (NEW.id, 'checking', 'Everyday Checking', _acct, 0, 0, 0.0010, 'active');
+
+  LOOP
+    _sav := lpad((floor(random()*9000000000)::bigint + 1000000000)::text, 10, '0');
+    EXIT WHEN NOT EXISTS (SELECT 1 FROM public.accounts WHERE account_number = _sav);
+  END LOOP;
+  INSERT INTO public.accounts (user_id, type, nickname, account_number, balance, available_balance, interest_rate, status)
+  VALUES (NEW.id, 'savings', 'High-Yield Savings', _sav, 0, 0, 0.0435, 'active');
+
+  INSERT INTO public.alerts_prefs(user_id) VALUES (NEW.id) ON CONFLICT DO NOTHING;
+  INSERT INTO public.alerts(user_id, kind, title, body)
+  VALUES (NEW.id, 'welcome', 'Welcome to Stable Finance Bank',
+    'Your Everyday Checking account (••' || right(_acct,4) || ') and High-Yield Savings account (••' || right(_sav,4) ||
+    ') are open and ready. Verify your identity to lift your transaction limits.');
 
   RETURN NEW;
 END $function$
 ;
+
+CREATE OR REPLACE FUNCTION public.notify_alert_email()
+RETURNS trigger LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public'
+AS $function$
+DECLARE _url text; _secret text;
+BEGIN
+  SELECT value INTO _url FROM public.app_config WHERE key='email_hook_url';
+  SELECT value INTO _secret FROM public.app_config WHERE key='email_hook_secret';
+  IF _url IS NULL OR _url = '' THEN RETURN NEW; END IF;
+  BEGIN
+    PERFORM net.http_post(
+      url := _url,
+      body := jsonb_build_object('alert_id', NEW.id),
+      headers := jsonb_build_object('content-type','application/json','x-email-hook-secret', COALESCE(_secret,''))
+    );
+  EXCEPTION WHEN OTHERS THEN
+    NULL;
+  END;
+  RETURN NEW;
+END $function$;
+;
+
+CREATE OR REPLACE FUNCTION public.my_account_state()
+RETURNS text LANGUAGE sql STABLE SECURITY DEFINER SET search_path TO 'public'
+AS $$ SELECT status FROM public.profiles WHERE id = auth.uid() $$;
+GRANT EXECUTE ON FUNCTION public.my_account_state() TO authenticated;
+
+CREATE OR REPLACE FUNCTION public.record_error_event(
+  _incident_code text, _fingerprint text, _severity text, _source text,
+  _route text, _action text, _message text, _stack_summary text, _metadata jsonb
+) RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = public
+AS $$
+DECLARE _id uuid;
+BEGIN
+  IF current_user NOT IN ('service_role', 'postgres', 'supabase_admin') THEN
+    RAISE EXCEPTION 'forbidden';
+  END IF;
+  INSERT INTO public.error_events (
+    incident_code, fingerprint, severity, source, route, action, message, stack_summary, metadata
+  ) VALUES (
+    left(_incident_code, 24), left(_fingerprint, 128),
+    CASE WHEN _severity IN ('info','warning','error','critical') THEN _severity ELSE 'error' END,
+    left(_source, 80), left(_route, 300), left(_action, 120),
+    left(_message, 1200), left(_stack_summary, 3000), COALESCE(_metadata, '{}'::jsonb)
+  )
+  ON CONFLICT (fingerprint) DO UPDATE SET
+    occurrence_count = public.error_events.occurrence_count + 1,
+    last_seen_at = now(), severity = EXCLUDED.severity,
+    route = COALESCE(EXCLUDED.route, public.error_events.route),
+    action = COALESCE(EXCLUDED.action, public.error_events.action),
+    message = EXCLUDED.message,
+    stack_summary = COALESCE(EXCLUDED.stack_summary, public.error_events.stack_summary),
+    metadata = EXCLUDED.metadata,
+    status = CASE WHEN public.error_events.status = 'resolved' THEN 'open' ELSE public.error_events.status END,
+    resolved_at = CASE WHEN public.error_events.status = 'resolved' THEN NULL ELSE public.error_events.resolved_at END,
+    resolved_by = CASE WHEN public.error_events.status = 'resolved' THEN NULL ELSE public.error_events.resolved_by END
+  RETURNING id INTO _id;
+  RETURN _id;
+END;
+$$;
+REVOKE ALL ON FUNCTION public.record_error_event(text,text,text,text,text,text,text,text,jsonb) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.record_error_event(text,text,text,text,text,text,text,text,jsonb) TO service_role;
 CREATE OR REPLACE FUNCTION public.has_role(_user_id uuid, _role app_role)
  RETURNS boolean
  LANGUAGE sql
@@ -902,6 +978,8 @@ drop trigger if exists smtp_settings_touch on public.smtp_settings;
 CREATE TRIGGER smtp_settings_touch BEFORE UPDATE ON public.smtp_settings FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 drop trigger if exists tickets_updated on public.support_tickets;
 CREATE TRIGGER tickets_updated BEFORE UPDATE ON public.support_tickets FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+drop trigger if exists alerts_send_email on public.alerts;
+CREATE TRIGGER alerts_send_email AFTER INSERT ON public.alerts FOR EACH ROW EXECUTE FUNCTION public.notify_alert_email();
 -- Auth trigger: creates a profile, role and first account on signup.
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created after insert on auth.users
