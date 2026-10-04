@@ -1,4 +1,5 @@
 -- Stable Finance Bank — complete portable restore
+-- Schema, access rules, private storage, and safe starter data.
 
 -- Stable Finance Bank — full schema for a fresh Supabase project
 -- Run in the SQL editor of your Supabase project (once, top to bottom).
@@ -1208,7 +1209,6 @@ drop policy if exists "service role app config access" on public.app_config;
 create policy "service role app config access" on public.app_config for all to service_role
   using (true) with check (true);
 
-
 -- ============ STORAGE ============
 
 -- Stable Finance Bank — storage buckets and policies
@@ -1262,7 +1262,6 @@ create policy "Users can update own avatars" on storage.objects for update to au
 drop policy if exists "Users can delete own avatars" on storage.objects;
 create policy "Users can delete own avatars" on storage.objects for delete to authenticated
   using (bucket_id = 'avatars' and (storage.foldername(name))[1] = auth.uid()::text);
-
 
 -- ============ STARTER DATA ============
 
