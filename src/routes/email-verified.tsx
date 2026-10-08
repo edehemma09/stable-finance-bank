@@ -1,5 +1,4 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -7,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { BrandMark } from "@/components/brand";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { sendAuthEmail } from "@/lib/auth-email.functions";
 
 export const Route = createFileRoute("/email-verified")({
   head: () => ({
@@ -26,6 +24,9 @@ export const Route = createFileRoute("/email-verified")({
   }),
   validateSearch: (search: Record<string, unknown>) => ({
     flow: search.flow === "verification" ? "verification" : undefined,
+    tokenHash: typeof search.token_hash === "string" ? search.token_hash : undefined,
+    tokenType: search.type === "email" ? "email" : undefined,
+    code: typeof search.code === "string" ? search.code : undefined,
     error: typeof search.error === "string" ? search.error : undefined,
     errorDescription:
       typeof search.error_description === "string" ? search.error_description : undefined,
@@ -41,37 +42,51 @@ function EmailVerifiedPage() {
   const [state, setState] = useState<PageState>("loading");
   const [email, setEmail] = useState("");
   const [resending, setResending] = useState(false);
-  const sendAuthEmailAction = useServerFn(sendAuthEmail);
 
   useEffect(() => {
-    if (search.error || !search.flow) {
+    let cancelled = false;
+    if (search.error) {
       setState("invalid");
       return;
     }
-    let settled = false;
-    const settle = (s: PageState) => {
-      if (!settled) {
-        settled = true;
-        setState(s);
+
+    async function verifyEmail() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const tokenHash = search.tokenHash ?? params.get("token_hash");
+        const tokenType = search.tokenType ?? params.get("type");
+        const code = search.code ?? params.get("code");
+
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (tokenHash && tokenType === "email") {
+          const { error } = await supabase.auth.verifyOtp({ type: "email", token_hash: tokenHash });
+          if (error) throw error;
+        } else if (hash.get("access_token") && hash.get("refresh_token")) {
+          const { error } = await supabase.auth.setSession({
+            access_token: hash.get("access_token") ?? "",
+            refresh_token: hash.get("refresh_token") ?? "",
+          });
+          if (error) throw error;
+        } else {
+          throw new Error("The confirmation link is incomplete.");
+        }
+
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user?.email_confirmed_at) throw error ?? new Error("Email was not confirmed.");
+        if (!cancelled) setState("verified");
+      } catch {
+        if (!cancelled) setState("invalid");
       }
-    };
+    }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session) settle("verified");
-    });
-
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (!error && data.user?.email_confirmed_at) settle("verified");
-    });
-
-    const timer = setTimeout(() => settle("invalid"), 3500);
+    void verifyEmail();
     return () => {
-      subscription.unsubscribe();
-      clearTimeout(timer);
+      cancelled = true;
     };
-  }, [search.error, search.flow]);
+  }, [search.code, search.error, search.tokenHash, search.tokenType]);
 
   async function resend(e: React.FormEvent) {
     e.preventDefault();
@@ -81,10 +96,12 @@ function EmailVerifiedPage() {
     }
     setResending(true);
     try {
-      const result = await sendAuthEmailAction({
-        data: { type: "resend", email: email.trim().toLowerCase() },
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: email.trim().toLowerCase(),
+        options: { emailRedirectTo: `${window.location.origin}/email-verified` },
       });
-      if (!result.sent) throw new Error(result.error);
+      if (error) throw error;
       toast.success("A fresh confirmation link is on its way.");
     } catch (error) {
       toast.error(
