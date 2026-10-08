@@ -28,6 +28,9 @@ export const Route = createFileRoute("/reset-password")({
   }),
   validateSearch: (search: Record<string, unknown>) => ({
     flow: search.flow === "recovery" ? "recovery" : undefined,
+    tokenHash: typeof search.token_hash === "string" ? search.token_hash : undefined,
+    tokenType: search.type === "recovery" ? "recovery" : undefined,
+    code: typeof search.code === "string" ? search.code : undefined,
     error: typeof search.error === "string" ? search.error : undefined,
   }),
   component: ResetPasswordPage,
@@ -47,35 +50,49 @@ function ResetPasswordPage() {
   const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
-    if (search.error || !search.flow) {
+    let cancelled = false;
+    if (search.error) {
       setState("invalid");
       return;
     }
-    let settled = false;
-    const settle = (s: PageState) => {
-      if (!settled) {
-        settled = true;
-        setState(s);
+
+    async function verifyRecovery() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+        const tokenHash = search.tokenHash ?? params.get("token_hash");
+        const tokenType = search.tokenType ?? params.get("type");
+        const code = search.code ?? params.get("code");
+
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (tokenHash && tokenType === "recovery") {
+          const { error } = await supabase.auth.verifyOtp({ type: "recovery", token_hash: tokenHash });
+          if (error) throw error;
+        } else if (hash.get("access_token") && hash.get("refresh_token")) {
+          const { error } = await supabase.auth.setSession({
+            access_token: hash.get("access_token") ?? "",
+            refresh_token: hash.get("refresh_token") ?? "",
+          });
+          if (error) throw error;
+        } else {
+          throw new Error("The recovery link is incomplete.");
+        }
+
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data.user) throw error ?? new Error("Recovery session was not created.");
+        if (!cancelled) setState("ready");
+      } catch {
+        if (!cancelled) setState("invalid");
       }
-    };
+    }
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) settle("ready");
-    });
-
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (!error && data.user) settle("ready");
-    });
-
-    // If no token/session materializes, the link is invalid or expired.
-    const timer = setTimeout(() => settle("invalid"), 3500);
+    void verifyRecovery();
     return () => {
-      subscription.unsubscribe();
-      clearTimeout(timer);
+      cancelled = true;
     };
-  }, [search.error, search.flow]);
+  }, [search.code, search.error, search.tokenHash, search.tokenType]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
