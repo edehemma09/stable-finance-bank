@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { BrandMark } from "@/components/brand";
 import { Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { getAuthRedirectUrl } from "@/lib/auth-public-url";
 
 export const Route = createFileRoute("/email-verified")({
   head: () => ({
@@ -96,10 +97,11 @@ function EmailVerifiedPage() {
     }
     setResending(true);
     try {
+      const emailRedirectTo = await getAuthRedirectUrl("email-verified");
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: email.trim().toLowerCase(),
-        options: { emailRedirectTo: `${window.location.origin}/email-verified` },
+        options: { emailRedirectTo },
       });
       if (error) throw error;
       toast.success("A fresh confirmation link is on its way.");

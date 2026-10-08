@@ -340,6 +340,7 @@ import { toast } from "sonner";
 import { BrandMark } from "@/components/brand";
 import { accountStateMessage, getBlockingAccountState } from "@/lib/account-state";
 import { Eye, EyeOff } from "lucide-react";
+import { getAuthRedirectUrl } from "@/lib/auth-public-url";
 
 type Search = { mode?: "signin" | "signup"; redirect?: string; state?: string };
 
@@ -408,12 +409,13 @@ function AuthPage() {
 
         // Client-side signup with Supabase publishable key
         const normalizedEmail = email.trim().toLowerCase();
+        const emailRedirectTo = await getAuthRedirectUrl("email-verified");
         const { data, error } = await supabase.auth.signUp({
           email: normalizedEmail,
           password,
           options: {
             // Dynamic redirect URL using current site origin
-            emailRedirectTo: `${window.location.origin}/email-verified?flow=verification`,
+            emailRedirectTo,
             data: {
               full_name: fullName.trim(),
               username: uname,
@@ -459,11 +461,12 @@ function AuthPage() {
     setLoading(true);
     try {
       // Client-side resend using Supabase publishable key
+      const emailRedirectTo = await getAuthRedirectUrl("email-verified");
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: pendingEmail,
         options: {
-          emailRedirectTo: `${window.location.origin}/email-verified?flow=verification`,
+          emailRedirectTo,
         },
       });
 
@@ -486,8 +489,9 @@ function AuthPage() {
   setLoading(true);
   try {
     // Client-side password reset using Supabase publishable key
+    const redirectTo = await getAuthRedirectUrl("reset-password");
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
-      redirectTo: `${window.location.origin}/reset-password?flow=recovery`,
+      redirectTo,
     });
 
     if (error) throw error;
