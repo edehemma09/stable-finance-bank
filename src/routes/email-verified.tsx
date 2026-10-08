@@ -26,7 +26,7 @@ export const Route = createFileRoute("/email-verified")({
   validateSearch: (search: Record<string, unknown>) => ({
     flow: search.flow === "verification" ? "verification" : undefined,
     tokenHash: typeof search.token_hash === "string" ? search.token_hash : undefined,
-    tokenType: search.type === "email" ? "email" : undefined,
+    tokenType: search.type === "email" || search.type === "signup" ? search.type : undefined,
     code: typeof search.code === "string" ? search.code : undefined,
     error: typeof search.error === "string" ? search.error : undefined,
     errorDescription:
@@ -62,7 +62,7 @@ function EmailVerifiedPage() {
         if (code) {
           const { error } = await supabase.auth.exchangeCodeForSession(code);
           if (error) throw error;
-        } else if (tokenHash && tokenType === "email") {
+        } else if (tokenHash && (tokenType === "email" || tokenType === "signup")) {
           const { error } = await supabase.auth.verifyOtp({ type: "email", token_hash: tokenHash });
           if (error) throw error;
         } else if (hash.get("access_token") && hash.get("refresh_token")) {
