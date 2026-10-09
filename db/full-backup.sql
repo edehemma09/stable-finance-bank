@@ -426,6 +426,7 @@ do $$ begin alter table public.alerts_prefs add constraint "alerts_prefs_user_id
 do $$ begin alter table public.audit_log add constraint "audit_log_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.audit_log add constraint "audit_log_actor_id_fkey" FOREIGN KEY (actor_id) REFERENCES auth.users(id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.bill_payments add constraint "bill_payments_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
+do $$ begin alter table public.payees add constraint "payees_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.bill_payments add constraint "bill_payments_from_account_id_fkey" FOREIGN KEY (from_account_id) REFERENCES accounts(id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.bill_payments add constraint "bill_payments_payee_id_fkey" FOREIGN KEY (payee_id) REFERENCES payees(id) ON DELETE CASCADE; exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.bill_payments add constraint "bill_payments_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE; exception when duplicate_object then null; when duplicate_table then null; end $$;
@@ -450,7 +451,6 @@ do $$ begin alter table public.loans add constraint "loans_funding_account_id_fk
 do $$ begin alter table public.loans add constraint "loans_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE; exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.pages add constraint "pages_slug_key" UNIQUE (slug); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.pages add constraint "pages_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
-do $$ begin alter table public.payees add constraint "payees_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.payees add constraint "payees_user_id_fkey" FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE; exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.profiles add constraint "profiles_pkey" PRIMARY KEY (id); exception when duplicate_object then null; when duplicate_table then null; end $$;
 do $$ begin alter table public.profiles add constraint "profiles_id_fkey" FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE; exception when duplicate_object then null; when duplicate_table then null; end $$;
