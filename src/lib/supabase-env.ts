@@ -10,6 +10,11 @@
 export function ensureSupabaseEnv(bindings?: unknown): void {
   if (typeof process === "undefined" || !process.env) return;
 
+  // The external (customer-owned) backend override always wins: it is applied
+  // before platform bindings so the managed credentials can never leak in.
+  const external = applyExternalSupabaseOverride();
+  const externalServiceRole = externalServiceRoleConfigured();
+
   const fromBindings =
     bindings && typeof bindings === "object" ? (bindings as Record<string, unknown>) : {};
 
@@ -24,6 +29,8 @@ export function ensureSupabaseEnv(bindings?: unknown): void {
     "SUPABASE_SERVICE_ROLE_KEY",
     "SUPABASE_PROJECT_ID",
   ] as const) {
+    // Never mix the platform admin credential with the external project URL.
+    if (key === "SUPABASE_SERVICE_ROLE_KEY" && external && !externalServiceRole) continue;
     put(key, fromBindings[key]);
   }
 
