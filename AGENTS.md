@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- In SQL exports, create referenced-table primary keys before adding dependent foreign keys so migrations work on fresh databases.
