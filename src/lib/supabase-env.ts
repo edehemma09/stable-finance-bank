@@ -7,6 +7,11 @@
  * public values that Vite inlines at build time, so we can safely fall back
  * to them whenever the runtime has not populated `process.env` yet.
  */
+import {
+  applyExternalSupabaseOverride,
+  externalServiceRoleConfigured,
+} from "./external-supabase";
+
 export function ensureSupabaseEnv(bindings?: unknown): void {
   if (typeof process === "undefined" || !process.env) return;
 
