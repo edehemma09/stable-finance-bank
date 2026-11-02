@@ -1,3 +1,9 @@
+import {
+  applyExternalSupabaseOverride,
+  externalBackendActive,
+  externalServiceRoleConfigured,
+} from "./external-supabase";
+
 /**
  * Guarantees the server-side Supabase environment variables always exist.
  *
@@ -17,7 +23,8 @@ export function ensureSupabaseEnv(bindings?: unknown): void {
 
   // The external (customer-owned) backend override always wins: it is applied
   // before platform bindings so the managed credentials can never leak in.
-  const external = applyExternalSupabaseOverride();
+  applyExternalSupabaseOverride();
+  const external = externalBackendActive();
   const externalServiceRole = externalServiceRoleConfigured();
 
   const fromBindings =
